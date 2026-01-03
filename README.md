@@ -18,7 +18,7 @@ Nền tảng thương mại điện tử hiện đại được xây dựng vớ
    ```env
    DB_PRISMA="your_supabase_connection_string"
    JWT_SECRET="your_secret_key"
-   PORT=3000
+   PORT=4000
    ```
 4. Generate Prisma Client: `npx prisma generate`
 5. Khởi tạo database: `npx prisma db push`

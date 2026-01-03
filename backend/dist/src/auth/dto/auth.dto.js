@@ -25,7 +25,14 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     (0, class_validator_1.IsNotEmpty)({ message: 'Mật khẩu không được để trống' }),
-    (0, class_validator_1.MinLength)(6, { message: 'Mật khẩu phải có ít nhất 6 ký tự' }),
+    (0, class_validator_1.MinLength)(8, { message: 'Mật khẩu phải có ít nhất 8 ký tự' }),
+    (0, class_validator_1.MaxLength)(16, { message: 'Mật khẩu không được quá 16 ký tự' }),
+    (0, class_validator_1.Matches)(/[A-Z]/, { message: 'Mật khẩu phải chứa ít nhất 1 chữ hoa' }),
+    (0, class_validator_1.Matches)(/[a-z]/, { message: 'Mật khẩu phải chứa ít nhất 1 chữ thường' }),
+    (0, class_validator_1.Matches)(/[0-9]/, { message: 'Mật khẩu phải chứa ít nhất 1 số' }),
+    (0, class_validator_1.Matches)(/[!@#$%^&*(),.?":{}|<>]/, {
+        message: 'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
+    }),
     __metadata("design:type", String)
 ], RegisterDto.prototype, "password", void 0);
 __decorate([
