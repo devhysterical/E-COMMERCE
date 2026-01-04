@@ -7,11 +7,11 @@ export declare class OrdersController {
         address: string;
         phone: string;
     }): Promise<{
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         address: string;
@@ -23,27 +23,27 @@ export declare class OrdersController {
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 name: string;
                 description: string | null;
                 price: number;
                 stock: number;
                 imageUrl: string | null;
                 categoryId: string;
-                deletedAt: Date | null;
             };
         } & {
             id: string;
             productId: string;
-            quantity: number;
             price: number;
+            quantity: number;
             orderId: string;
         })[];
     } & {
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         address: string;
@@ -55,27 +55,27 @@ export declare class OrdersController {
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 name: string;
                 description: string | null;
                 price: number;
                 stock: number;
                 imageUrl: string | null;
                 categoryId: string;
-                deletedAt: Date | null;
             };
         } & {
             id: string;
             productId: string;
-            quantity: number;
             price: number;
+            quantity: number;
             orderId: string;
         })[];
     } & {
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         address: string;
@@ -83,8 +83,8 @@ export declare class OrdersController {
     }) | null>;
     findAllAdmin(): Promise<({
         user: {
-            email: string;
             id: string;
+            email: string;
             fullName: string | null;
         };
         orderItems: ({
@@ -96,16 +96,16 @@ export declare class OrdersController {
         } & {
             id: string;
             productId: string;
-            quantity: number;
             price: number;
+            quantity: number;
             orderId: string;
         })[];
     } & {
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         address: string;
@@ -120,8 +120,8 @@ export declare class OrdersController {
         status: OrderStatus;
     }): Promise<{
         user: {
-            email: string;
             id: string;
+            email: string;
             fullName: string | null;
         };
         orderItems: ({
@@ -132,16 +132,16 @@ export declare class OrdersController {
         } & {
             id: string;
             productId: string;
-            quantity: number;
             price: number;
+            quantity: number;
             orderId: string;
         })[];
     } & {
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         address: string;

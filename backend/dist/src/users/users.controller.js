@@ -22,13 +22,13 @@ let UsersController = class UsersController {
         this.usersService = usersService;
     }
     getProfile(req) {
-        return this.usersService.getProfile(req.user.sub);
+        return this.usersService.getProfile(req.user.userId);
     }
     updateProfile(req, dto) {
-        return this.usersService.updateProfile(req.user.sub, dto);
+        return this.usersService.updateProfile(req.user.userId, dto);
     }
     changePassword(req, dto) {
-        return this.usersService.changePassword(req.user.sub, dto);
+        return this.usersService.changePassword(req.user.userId, dto);
     }
 };
 exports.UsersController = UsersController;

@@ -8,45 +8,45 @@ export declare class CartsController {
                 id: string;
                 createdAt: Date;
                 updatedAt: Date;
+                deletedAt: Date | null;
                 name: string;
                 description: string | null;
                 price: number;
                 stock: number;
                 imageUrl: string | null;
                 categoryId: string;
-                deletedAt: Date | null;
             };
         } & {
             id: string;
-            cartId: string;
             productId: string;
+            cartId: string;
             quantity: number;
         })[];
     } & {
-        userId: string;
         id: string;
         createdAt: Date;
         updatedAt: Date;
+        userId: string;
     }>;
     addToCart(userId: string, dto: {
         productId: string;
         quantity: number;
     }): Promise<{
         id: string;
-        cartId: string;
         productId: string;
+        cartId: string;
         quantity: number;
     }>;
     updateQuantity(itemId: string, quantity: number): Promise<{
         id: string;
-        cartId: string;
         productId: string;
+        cartId: string;
         quantity: number;
     }>;
     removeItem(itemId: string): Promise<{
         id: string;
-        cartId: string;
         productId: string;
+        cartId: string;
         quantity: number;
     }>;
 }

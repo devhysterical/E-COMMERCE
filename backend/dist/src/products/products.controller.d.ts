@@ -5,11 +5,11 @@ export declare class ProductsController {
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
@@ -18,49 +18,49 @@ export declare class ProductsController {
     findAll(categoryId?: string, search?: string): Promise<({
         category: {
             id: string;
-            name: string;
-            description: string | null;
             createdAt: Date;
             updatedAt: Date;
             deletedAt: Date | null;
+            name: string;
+            description: string | null;
         };
     } & {
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
         categoryId: string;
     })[]>;
     findOne(id: string): Promise<{
-        category: {
-            id: string;
-            name: string;
-            description: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-        };
         reviews: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
-            userId: string;
-            productId: string;
             rating: number;
             comment: string | null;
+            productId: string;
+            userId: string;
         }[];
+        category: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            name: string;
+            description: string | null;
+        };
     } & {
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
@@ -68,11 +68,11 @@ export declare class ProductsController {
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
@@ -80,11 +80,11 @@ export declare class ProductsController {
     }>;
     remove(id: string): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
