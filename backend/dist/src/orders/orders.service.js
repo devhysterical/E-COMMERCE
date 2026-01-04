@@ -79,6 +79,62 @@ let OrdersService = class OrdersService {
             },
         });
     }
+    async findAllAdmin() {
+        return this.prisma.order.findMany({
+            where: { deletedAt: null },
+            include: {
+                user: {
+                    select: { id: true, email: true, fullName: true },
+                },
+                orderItems: {
+                    include: {
+                        product: { select: { id: true, name: true, imageUrl: true } },
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async updateStatus(id, status) {
+        const order = await this.prisma.order.findUnique({ where: { id } });
+        if (!order) {
+            throw new common_1.NotFoundException('Đơn hàng không tồn tại');
+        }
+        return this.prisma.order.update({
+            where: { id },
+            data: { status },
+            include: {
+                user: {
+                    select: { id: true, email: true, fullName: true },
+                },
+                orderItems: {
+                    include: { product: { select: { id: true, name: true } } },
+                },
+            },
+        });
+    }
+    async getStats() {
+        const [totalOrders, totalRevenue, ordersByStatus] = await Promise.all([
+            this.prisma.order.count({ where: { deletedAt: null } }),
+            this.prisma.order.aggregate({
+                where: { deletedAt: null, status: { not: 'CANCELLED' } },
+                _sum: { totalAmount: true },
+            }),
+            this.prisma.order.groupBy({
+                by: ['status'],
+                _count: { status: true },
+                where: { deletedAt: null },
+            }),
+        ]);
+        return {
+            totalOrders,
+            totalRevenue: totalRevenue._sum.totalAmount || 0,
+            ordersByStatus: ordersByStatus.reduce((acc, item) => {
+                acc[item.status] = item._count.status;
+                return acc;
+            }, {}),
+        };
+    }
 };
 exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = __decorate([
