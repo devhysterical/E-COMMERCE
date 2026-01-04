@@ -15,12 +15,12 @@ export declare class ReviewsController {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     findByProduct(productId: string): Promise<({
         user: {
@@ -30,12 +30,12 @@ export declare class ReviewsController {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     })[]>;
     getProductStats(productId: string): Promise<{
         averageRating: number;
@@ -49,12 +49,12 @@ export declare class ReviewsController {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     update(id: string, req: {
         user: {
@@ -69,12 +69,12 @@ export declare class ReviewsController {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     remove(id: string, req: {
         user: {
@@ -83,11 +83,11 @@ export declare class ReviewsController {
         };
     }): Promise<{
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
 }

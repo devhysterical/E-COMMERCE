@@ -6,7 +6,11 @@ import {
   Link,
   useLocation,
 } from "react-router-dom";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
 import ProductListPage from "./pages/ProductListPage";
@@ -17,6 +21,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import { useAuthStore } from "./store/useAuthStore";
+import { CartService } from "./services/cart.service";
 import {
   LogOut,
   User as UserIcon,
@@ -30,8 +35,22 @@ import { useState } from "react";
 const queryClient = new QueryClient();
 
 const Navbar = () => {
-  const { user, logout } = useAuthStore();
+  const { user, logout, isAuthenticated } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
+
+  // Lấy số lượng sản phẩm trong giỏ hàng
+  const { data: cart } = useQuery({
+    queryKey: ["cart"],
+    queryFn: CartService.get,
+    enabled: isAuthenticated,
+    staleTime: 0,
+  });
+
+  const cartItemCount =
+    cart?.cartItems?.reduce(
+      (sum: number, item: { quantity: number }) => sum + item.quantity,
+      0
+    ) || 0;
 
   return (
     <nav className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
@@ -43,19 +62,17 @@ const Navbar = () => {
               className="text-3xl font-black text-indigo-600 tracking-tighter italic hover:opacity-80 transition-opacity">
               L-TECH.
             </Link>
-            {user?.role === "ADMIN" && (
-              <Link
-                to="/admin"
-                className="hidden md:flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold text-xs uppercase tracking-widest transition-colors">
-                <Layout size={16} /> Admin Panel
-              </Link>
-            )}
           </div>
           <div className="flex items-center gap-8">
             <Link
               to="/cart"
               className="relative p-2 text-slate-600 hover:text-indigo-600 transition-colors">
               <ShoppingCart size={24} />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {cartItemCount > 99 ? "99+" : cartItemCount}
+                </span>
+              )}
             </Link>
             <div className="h-8 w-px bg-slate-100 hidden sm:block"></div>
 
@@ -87,6 +104,18 @@ const Navbar = () => {
                     <Package size={18} className="text-indigo-600" />
                     <span className="font-medium">Lịch sử đơn hàng</span>
                   </Link>
+                  {user?.role === "ADMIN" && (
+                    <>
+                      <hr className="my-2 border-slate-100" />
+                      <Link
+                        to="/admin"
+                        onClick={() => setShowUserMenu(false)}
+                        className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors">
+                        <Layout size={18} className="text-purple-600" />
+                        <span className="font-medium">Quản trị hệ thống</span>
+                      </Link>
+                    </>
+                  )}
                   <hr className="my-2 border-slate-100" />
                   <button
                     onClick={() => {

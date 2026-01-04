@@ -11,12 +11,12 @@ export declare class ReviewsService {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     findByProduct(productId: string): Promise<({
         user: {
@@ -26,12 +26,12 @@ export declare class ReviewsService {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     })[]>;
     findOne(id: string): Promise<{
         user: {
@@ -41,12 +41,12 @@ export declare class ReviewsService {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     update(id: string, userId: string, userRole: string, dto: UpdateReviewDto): Promise<{
         user: {
@@ -56,21 +56,21 @@ export declare class ReviewsService {
         };
     } & {
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     remove(id: string, userId: string, userRole: string): Promise<{
         id: string;
-        rating: number;
-        comment: string | null;
         createdAt: Date;
         updatedAt: Date;
-        userId: string;
+        rating: number;
+        comment: string | null;
         productId: string;
+        userId: string;
     }>;
     getProductStats(productId: string): Promise<{
         averageRating: number;

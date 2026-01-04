@@ -5,7 +5,7 @@ export declare class UsersController {
     constructor(usersService: UsersService);
     getProfile(req: {
         user: {
-            sub: string;
+            userId: string;
         };
     }): Promise<{
         id: string;
@@ -18,7 +18,7 @@ export declare class UsersController {
     }>;
     updateProfile(req: {
         user: {
-            sub: string;
+            userId: string;
         };
     }, dto: UpdateProfileDto): Promise<{
         id: string;
@@ -31,7 +31,7 @@ export declare class UsersController {
     }>;
     changePassword(req: {
         user: {
-            sub: string;
+            userId: string;
         };
     }, dto: ChangePasswordDto): Promise<{
         message: string;
