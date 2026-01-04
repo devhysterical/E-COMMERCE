@@ -1,23 +1,106 @@
-import React from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { ProductService } from "../services/api.service";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ProductService, ReviewService } from "../services/api.service";
+import { CartService } from "../services/cart.service";
+import type { Review } from "../services/api.service";
+import { useAuthStore } from "../store/useAuthStore";
 import {
   ChevronLeft,
   ShoppingCart,
   ShieldCheck,
   Truck,
   RefreshCcw,
+  Star,
+  Send,
+  Trash2,
 } from "lucide-react";
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const { user, isAuthenticated } = useAuthStore();
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
     queryFn: () => ProductService.getOne(id!),
     enabled: !!id,
   });
+
+  const { data: reviews = [] } = useQuery({
+    queryKey: ["reviews", id],
+    queryFn: () => ReviewService.getByProduct(id!),
+    enabled: !!id,
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ["reviewStats", id],
+    queryFn: () => ReviewService.getStats(id!),
+    enabled: !!id,
+  });
+
+  const createReviewMutation = useMutation({
+    mutationFn: ReviewService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["reviewStats", id] });
+      setComment("");
+      setRating(5);
+    },
+  });
+
+  const deleteReviewMutation = useMutation({
+    mutationFn: ReviewService.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["reviews", id] });
+      queryClient.invalidateQueries({ queryKey: ["reviewStats", id] });
+    },
+  });
+
+  const addToCartMutation = useMutation({
+    mutationFn: () => CartService.add(id!, 1),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+      setCartMessage("Đã thêm vào giỏ hàng!");
+      setTimeout(() => setCartMessage(null), 3000);
+    },
+    onError: () => {
+      setCartMessage("Không thể thêm vào giỏ hàng!");
+      setTimeout(() => setCartMessage(null), 3000);
+    },
+  });
+
+  const handleSubmitReview = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!id) return;
+    createReviewMutation.mutate({ rating, comment, productId: id });
+  };
+
+  const renderStars = (count: number, interactive = false) => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <Star
+            key={star}
+            size={interactive ? 28 : 16}
+            className={`${
+              star <= count
+                ? "text-yellow-400 fill-yellow-400"
+                : "text-slate-300"
+            } ${
+              interactive
+                ? "cursor-pointer hover:scale-110 transition-transform"
+                : ""
+            }`}
+            onClick={interactive ? () => setRating(star) : undefined}
+          />
+        ))}
+      </div>
+    );
+  };
 
   if (isLoading)
     return (
@@ -70,12 +153,20 @@ const ProductDetailPage = () => {
             <h1 className="text-4xl font-extrabold text-slate-900 leading-tight italic uppercase">
               {product.name}
             </h1>
-            <p className="text-3xl font-black text-indigo-600">
-              {product.price.toLocaleString("vi-VN")} đ
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-3xl font-black text-indigo-600">
+                {product.price.toLocaleString("vi-VN")} đ
+              </p>
+              {stats && stats.totalReviews > 0 && (
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  {renderStars(Math.round(stats.averageRating))}
+                  <span>({stats.totalReviews} đánh giá)</span>
+                </div>
+              )}
+            </div>
           </div>
 
-          <p className="text-lg text-slate-600 leading-relaxed">
+          <p className="text-lg text-slate-600 leading-relaxed whitespace-pre-line">
             {product.description || "Chưa có mô tả cho sản phẩm này."}
           </p>
 
@@ -89,10 +180,27 @@ const ProductDetailPage = () => {
                 {product.stock > 0 ? `Còn hàng (${product.stock})` : "Hết hàng"}
               </span>
             </div>
+
+            {/* Cart Message */}
+            {cartMessage && (
+              <div
+                className={`p-3 rounded-xl text-center font-medium ${
+                  cartMessage.includes("Đã thêm")
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                }`}>
+                {cartMessage}
+              </div>
+            )}
+
             <button
-              disabled={product.stock <= 0}
+              onClick={() => addToCartMutation.mutate()}
+              disabled={product.stock <= 0 || addToCartMutation.isPending}
               className="w-full flex items-center justify-center gap-3 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:bg-slate-300 disabled:shadow-none">
-              <ShoppingCart size={22} /> Thêm vào giỏ hàng
+              <ShoppingCart size={22} />
+              {addToCartMutation.isPending
+                ? "Đang thêm..."
+                : "Thêm vào giỏ hàng"}
             </button>
           </div>
 
@@ -116,6 +224,99 @@ const ProductDetailPage = () => {
               </span>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
+      <div className="mt-16 space-y-8">
+        <h2 className="text-2xl font-bold text-slate-900">Đánh giá sản phẩm</h2>
+
+        {/* Write Review Form */}
+        {isAuthenticated ? (
+          <form
+            onSubmit={handleSubmitReview}
+            className="bg-slate-50 p-6 rounded-2xl border border-slate-100 space-y-4">
+            <p className="font-semibold text-slate-700">
+              Viết đánh giá của bạn
+            </p>
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-slate-500">Đánh giá:</span>
+              {renderStars(rating, true)}
+            </div>
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none h-24"
+            />
+            <button
+              type="submit"
+              disabled={createReviewMutation.isPending}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors disabled:bg-indigo-400">
+              <Send size={18} />
+              {createReviewMutation.isPending ? "Đang gửi..." : "Gửi đánh giá"}
+            </button>
+          </form>
+        ) : (
+          <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center">
+            <p className="text-slate-500">
+              Vui lòng{" "}
+              <Link
+                to="/login"
+                className="text-indigo-600 font-semibold hover:underline">
+                đăng nhập
+              </Link>{" "}
+              để viết đánh giá.
+            </p>
+          </div>
+        )}
+
+        {/* Reviews List */}
+        <div className="space-y-4">
+          {reviews.length === 0 ? (
+            <p className="text-slate-500 text-center py-8">
+              Chưa có đánh giá nào cho sản phẩm này.
+            </p>
+          ) : (
+            reviews.map((review: Review) => (
+              <div
+                key={review.id}
+                className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                        {review.user.fullName?.charAt(0) ||
+                          review.user.email.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {review.user.fullName || review.user.email}
+                        </p>
+                        <p className="text-xs text-slate-400">
+                          {new Date(review.createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                    {renderStars(review.rating)}
+                  </div>
+                  {user &&
+                    (user.id === review.userId || user.role === "ADMIN") && (
+                      <button
+                        onClick={() => deleteReviewMutation.mutate(review.id)}
+                        className="text-slate-400 hover:text-red-500 transition-colors p-2">
+                        <Trash2 size={18} />
+                      </button>
+                    )}
+                </div>
+                {review.comment && (
+                  <p className="mt-4 text-slate-600">{review.comment}</p>
+                )}
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

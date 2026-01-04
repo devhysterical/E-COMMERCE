@@ -16,6 +16,8 @@ exports.OrdersController = void 0;
 const common_1 = require("@nestjs/common");
 const orders_service_1 = require("./orders.service");
 const jwt_auth_guard_1 = require("../auth/guards/jwt-auth.guard");
+const roles_guard_1 = require("../common/guards/roles.guard");
+const roles_decorator_1 = require("../common/decorators/roles.decorator");
 const get_user_decorator_1 = require("../common/decorators/get-user.decorator");
 let OrdersController = class OrdersController {
     ordersService;
@@ -30,6 +32,15 @@ let OrdersController = class OrdersController {
     }
     findOne(id, userId) {
         return this.ordersService.findOne(id, userId);
+    }
+    findAllAdmin() {
+        return this.ordersService.findAllAdmin();
+    }
+    getStats() {
+        return this.ordersService.getStats();
+    }
+    updateStatus(id, dto) {
+        return this.ordersService.updateStatus(id, dto.status);
     }
 };
 exports.OrdersController = OrdersController;
@@ -56,6 +67,32 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Get)('admin/all'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "findAllAdmin", null);
+__decorate([
+    (0, common_1.Get)('admin/stats'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "getStats", null);
+__decorate([
+    (0, common_1.Patch)('admin/:id/status'),
+    (0, common_1.UseGuards)(roles_guard_1.RolesGuard),
+    (0, roles_decorator_1.Roles)('ADMIN'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], OrdersController.prototype, "updateStatus", null);
 exports.OrdersController = OrdersController = __decorate([
     (0, common_1.Controller)('orders'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),

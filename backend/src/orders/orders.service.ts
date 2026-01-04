@@ -1,6 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartsService } from '../carts/carts.service';
+import { OrderStatus } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -85,5 +90,70 @@ export class OrdersService {
         },
       },
     });
+  }
+
+  // Admin APIs
+  async findAllAdmin() {
+    return this.prisma.order.findMany({
+      where: { deletedAt: null },
+      include: {
+        user: {
+          select: { id: true, email: true, fullName: true },
+        },
+        orderItems: {
+          include: {
+            product: { select: { id: true, name: true, imageUrl: true } },
+          },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async updateStatus(id: string, status: OrderStatus) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) {
+      throw new NotFoundException('Đơn hàng không tồn tại');
+    }
+
+    return this.prisma.order.update({
+      where: { id },
+      data: { status },
+      include: {
+        user: {
+          select: { id: true, email: true, fullName: true },
+        },
+        orderItems: {
+          include: { product: { select: { id: true, name: true } } },
+        },
+      },
+    });
+  }
+
+  async getStats() {
+    const [totalOrders, totalRevenue, ordersByStatus] = await Promise.all([
+      this.prisma.order.count({ where: { deletedAt: null } }),
+      this.prisma.order.aggregate({
+        where: { deletedAt: null, status: { not: 'CANCELLED' } },
+        _sum: { totalAmount: true },
+      }),
+      this.prisma.order.groupBy({
+        by: ['status'],
+        _count: { status: true },
+        where: { deletedAt: null },
+      }),
+    ]);
+
+    return {
+      totalOrders,
+      totalRevenue: totalRevenue._sum.totalAmount || 0,
+      ordersByStatus: ordersByStatus.reduce(
+        (acc, item) => {
+          acc[item.status] = item._count.status;
+          return acc;
+        },
+        {} as Record<string, number>,
+      ),
+    };
   }
 }
