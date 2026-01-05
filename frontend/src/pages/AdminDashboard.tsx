@@ -4,6 +4,7 @@ import {
   ProductService,
   CategoryService,
   AdminService,
+  UploadService,
 } from "../services/api.service";
 import type { Product, Order, UserProfile } from "../services/api.service";
 import {
@@ -834,6 +835,20 @@ const ProductModal = ({
     imageUrl: product?.imageUrl || "",
     categoryId: product?.categoryId || categories[0]?.id || "",
   });
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleFileUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const result = await UploadService.uploadImage(file);
+      setFormData({ ...formData, imageUrl: result.url });
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert("Tải ảnh lên thất bại. Vui lòng thử lại.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -946,43 +961,37 @@ const ProductModal = ({
             <div className="space-y-3">
               {/* File Upload Button */}
               <div className="flex items-center gap-3">
-                <label className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-700 rounded-xl font-medium hover:bg-slate-200 transition-colors cursor-pointer">
-                  <Upload size={18} />
-                  Chọn hình ảnh
+                <label
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl font-medium transition-colors cursor-pointer ${
+                    isUploading
+                      ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}>
+                  {isUploading ? (
+                    <>
+                      <Loader size={18} className="animate-spin" />
+                      Đang tải lên...
+                    </>
+                  ) : (
+                    <>
+                      <Upload size={18} />
+                      Chọn hình ảnh
+                    </>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
+                    disabled={isUploading}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setFormData({
-                            ...formData,
-                            imageUrl: reader.result as string,
-                          });
-                        };
-                        reader.readAsDataURL(file);
+                        handleFileUpload(file);
                       }
                     }}
                   />
                 </label>
-                <span className="text-sm text-slate-400">hoặc</span>
               </div>
-
-              {/* URL Input */}
-              <input
-                type="url"
-                value={
-                  formData.imageUrl.startsWith("data:") ? "" : formData.imageUrl
-                }
-                onChange={(e) =>
-                  setFormData({ ...formData, imageUrl: e.target.value })
-                }
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-                placeholder="Nhập URL hình ảnh..."
-              />
             </div>
           </div>
 

@@ -10,10 +10,13 @@ import { CartsModule } from './carts/carts.module';
 import { OrdersModule } from './orders/orders.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { AdminModule } from './admin/admin.module';
+import { SupabaseModule } from './supabase/supabase.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
     PrismaModule,
+    SupabaseModule,
     UsersModule,
     AuthModule,
     CategoriesModule,
@@ -22,6 +25,7 @@ import { AdminModule } from './admin/admin.module';
     OrdersModule,
     ReviewsModule,
     AdminModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],
