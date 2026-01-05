@@ -15,6 +15,11 @@ export class CategoriesService {
   async findAll() {
     return this.prisma.category.findMany({
       where: { deletedAt: null },
+      include: {
+        _count: {
+          select: { products: true },
+        },
+      },
     });
   }
 
