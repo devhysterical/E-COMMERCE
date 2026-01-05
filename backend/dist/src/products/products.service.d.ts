@@ -5,36 +5,36 @@ export declare class ProductsService {
     constructor(prisma: PrismaService);
     create(dto: CreateProductDto): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         categoryId: string;
     }>;
     findAll(categoryId?: string, search?: string, page?: number, limit?: number): Promise<{
         data: ({
             category: {
                 id: string;
-                name: string;
-                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
+                name: string;
+                description: string | null;
             };
         } & {
             id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             name: string;
             description: string | null;
             price: number;
             stock: number;
             imageUrl: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
             categoryId: string;
         })[];
         meta: {
@@ -45,57 +45,57 @@ export declare class ProductsService {
         };
     }>;
     findOne(id: string): Promise<{
-        category: {
-            id: string;
-            name: string;
-            description: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-        };
         reviews: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
             rating: number;
             comment: string | null;
-            userId: string;
             productId: string;
+            userId: string;
         }[];
+        category: {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+            name: string;
+            description: string | null;
+        };
     } & {
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         categoryId: string;
     }>;
     update(id: string, dto: UpdateProductDto): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         categoryId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         categoryId: string;
     }>;
 }
