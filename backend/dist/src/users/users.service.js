@@ -115,6 +115,24 @@ let UsersService = class UsersService {
             orderBy: { createdAt: 'desc' },
         });
     }
+    async updateRole(userId, role) {
+        const user = await this.findById(userId);
+        if (!user) {
+            throw new common_1.NotFoundException('Người dùng không tồn tại');
+        }
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userId },
+            data: { role },
+            select: {
+                id: true,
+                email: true,
+                fullName: true,
+                role: true,
+                createdAt: true,
+            },
+        });
+        return updatedUser;
+    }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([

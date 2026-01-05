@@ -41,4 +41,11 @@ export declare class UsersService {
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
     }[]>;
+    updateRole(userId: string, role: 'USER' | 'ADMIN'): Promise<{
+        id: string;
+        email: string;
+        fullName: string | null;
+        role: import("@prisma/client").$Enums.Role;
+        createdAt: Date;
+    }>;
 }

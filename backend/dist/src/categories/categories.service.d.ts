@@ -5,11 +5,11 @@ export declare class CategoriesService {
     constructor(prisma: PrismaService);
     create(dto: CreateCategoryDto): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
     }>;
     findAll(): Promise<({
         _count: {
@@ -17,34 +17,34 @@ export declare class CategoriesService {
         };
     } & {
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
     })[]>;
     findOne(id: string): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
     }>;
     update(id: string, dto: UpdateCategoryDto): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
     }>;
     remove(id: string): Promise<{
         id: string;
-        name: string;
-        description: string | null;
         createdAt: Date;
         updatedAt: Date;
         deletedAt: Date | null;
+        name: string;
+        description: string | null;
     }>;
 }

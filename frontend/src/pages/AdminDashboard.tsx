@@ -181,6 +181,15 @@ const AdminDashboard = () => {
     },
   });
 
+  // User Role Mutation
+  const updateUserRoleMutation = useMutation({
+    mutationFn: ({ id, role }: { id: string; role: string }) =>
+      AdminService.updateUserRole(id, role),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+    },
+  });
+
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setShowProductModal(true);
@@ -571,14 +580,22 @@ const AdminDashboard = () => {
                   </td>
                   <td className="px-6 py-4 text-slate-600">{user.email}</td>
                   <td className="px-6 py-4">
-                    <span
-                      className={`text-xs font-bold px-2 py-1 rounded-md ${
+                    <select
+                      value={user.role}
+                      onChange={(e) =>
+                        updateUserRoleMutation.mutate({
+                          id: user.id,
+                          role: e.target.value,
+                        })
+                      }
+                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
                         user.role === "ADMIN"
                           ? "bg-purple-100 text-purple-700"
                           : "bg-slate-100 text-slate-600"
                       }`}>
-                      {user.role === "ADMIN" ? "Admin" : "User"}
-                    </span>
+                      <option value="USER">User</option>
+                      <option value="ADMIN">Admin</option>
+                    </select>
                   </td>
                   <td className="px-6 py-4 text-sm text-slate-500">
                     {new Date(user.createdAt).toLocaleDateString("vi-VN")}
