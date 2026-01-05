@@ -93,11 +93,23 @@ export const CategoryService = {
   },
 };
 
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 export const ProductService = {
   getAll: async (params?: {
     categoryId?: string;
     search?: string;
-  }): Promise<Product[]> => {
+    page?: number;
+    limit?: number;
+  }): Promise<PaginatedResponse<Product>> => {
     const response = await api.get("/products", { params });
     return response.data;
   },

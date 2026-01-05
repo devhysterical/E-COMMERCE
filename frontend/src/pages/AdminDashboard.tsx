@@ -28,7 +28,7 @@ import {
   Phone,
 } from "lucide-react";
 
-type TabType = "products" | "orders" | "users";
+type TabType = "products" | "orders" | "users" | "categories";
 
 const statusConfig: Record<
   string,
@@ -67,12 +67,19 @@ const AdminDashboard = () => {
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<{
+    id: string;
+    name: string;
+    description?: string;
+  } | null>(null);
 
   // Queries
-  const { data: products = [] } = useQuery({
+  const { data: productsData } = useQuery({
     queryKey: ["admin-products"],
-    queryFn: () => ProductService.getAll(),
+    queryFn: () => ProductService.getAll({ limit: 100 }),
   });
+  const products = productsData?.data || [];
 
   const { data: categories = [] } = useQuery({
     queryKey: ["admin-categories"],
@@ -143,6 +150,37 @@ const AdminDashboard = () => {
     },
   });
 
+  // Category Mutations
+  const createCategoryMutation = useMutation({
+    mutationFn: CategoryService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+      setShowCategoryModal(false);
+    },
+  });
+
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: { name?: string; description?: string };
+    }) => CategoryService.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+      setShowCategoryModal(false);
+      setEditingCategory(null);
+    },
+  });
+
+  const deleteCategoryMutation = useMutation({
+    mutationFn: CategoryService.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["admin-categories"] });
+    },
+  });
+
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setShowProductModal(true);
@@ -151,6 +189,21 @@ const AdminDashboard = () => {
   const handleDeleteProduct = (id: string) => {
     if (confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
       deleteProductMutation.mutate(id);
+    }
+  };
+
+  const handleEditCategory = (category: {
+    id: string;
+    name: string;
+    description?: string;
+  }) => {
+    setEditingCategory(category);
+    setShowCategoryModal(true);
+  };
+
+  const handleDeleteCategory = (id: string) => {
+    if (confirm("Bạn có chắc muốn xóa danh mục này?")) {
+      deleteCategoryMutation.mutate(id);
     }
   };
 
@@ -222,10 +275,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6">
+      <div className="flex gap-2 mb-6 flex-wrap">
         {[
           { key: "products", label: "Sản phẩm", icon: <Package size={18} /> },
           { key: "orders", label: "Đơn hàng", icon: <ShoppingBag size={18} /> },
+          {
+            key: "categories",
+            label: "Danh mục",
+            icon: <LayoutGrid size={18} />,
+          },
           { key: "users", label: "Người dùng", icon: <Users size={18} /> },
         ].map((tab) => (
           <button
@@ -402,6 +460,81 @@ const AdminDashboard = () => {
           </table>
         )}
 
+        {activeTab === "categories" && (
+          <>
+            <div className="p-4 border-b border-slate-100 flex justify-end">
+              <button
+                onClick={() => {
+                  setEditingCategory(null);
+                  setShowCategoryModal(true);
+                }}
+                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                <Plus size={20} /> Thêm danh mục
+              </button>
+            </div>
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-slate-50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Tên danh mục
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Mô tả
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Số sản phẩm
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
+                    Hành động
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {categories.map(
+                  (category: {
+                    id: string;
+                    name: string;
+                    description?: string;
+                    _count?: { products: number };
+                  }) => (
+                    <tr
+                      key={category.id}
+                      className="hover:bg-slate-50/50 transition-colors">
+                      <td className="px-6 py-4">
+                        <span className="font-bold text-slate-900">
+                          {category.name}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-slate-500">
+                        {category.description || "Chưa có mô tả"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                          {category._count?.products || 0} sản phẩm
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEditCategory(category)}
+                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                            <Edit size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(category.id)}
+                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                )}
+              </tbody>
+            </table>
+          </>
+        )}
+
         {activeTab === "users" && (
           <table className="w-full text-left border-collapse">
             <thead className="bg-slate-50 border-b border-slate-100">
@@ -480,6 +613,30 @@ const AdminDashboard = () => {
           }}
           isPending={
             createProductMutation.isPending || updateProductMutation.isPending
+          }
+        />
+      )}
+
+      {/* Category Modal */}
+      {showCategoryModal && (
+        <CategoryModal
+          category={editingCategory}
+          onClose={() => {
+            setShowCategoryModal(false);
+            setEditingCategory(null);
+          }}
+          onSubmit={(data) => {
+            if (editingCategory) {
+              updateCategoryMutation.mutate({
+                id: editingCategory.id,
+                data,
+              });
+            } else {
+              createCategoryMutation.mutate(data);
+            }
+          }}
+          isPending={
+            createCategoryMutation.isPending || updateCategoryMutation.isPending
           }
         />
       )}
@@ -837,6 +994,91 @@ const ProductModal = ({
             className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400">
             <Save size={20} />
             {isPending ? "Đang lưu..." : product ? "Cập nhật" : "Thêm sản phẩm"}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+// Category Modal Component
+interface CategoryModalProps {
+  category: { id: string; name: string; description?: string } | null;
+  onClose: () => void;
+  onSubmit: (data: { name: string; description?: string }) => void;
+  isPending: boolean;
+}
+
+const CategoryModal = ({
+  category,
+  onClose,
+  onSubmit,
+  isPending,
+}: CategoryModalProps) => {
+  const [formData, setFormData] = useState({
+    name: category?.name || "",
+    description: category?.description || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmit(formData);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md">
+        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+          <h2 className="text-xl font-bold text-slate-900">
+            {category ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            <X size={20} />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+              Tên danh mục
+            </label>
+            <input
+              type="text"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              placeholder="Nhập tên danh mục..."
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+              Mô tả
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData({ ...formData, description: e.target.value })
+              }
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none h-24"
+              placeholder="Nhập mô tả danh mục..."
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isPending}
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400">
+            <Save size={20} />
+            {isPending
+              ? "Đang lưu..."
+              : category
+              ? "Cập nhật"
+              : "Thêm danh mục"}
           </button>
         </form>
       </div>

@@ -22,15 +22,34 @@ let ProductsService = class ProductsService {
             data: dto,
         });
     }
-    async findAll(categoryId, search) {
-        return this.prisma.product.findMany({
-            where: {
-                deletedAt: null,
-                ...(categoryId && { categoryId }),
-                ...(search && { name: { contains: search, mode: 'insensitive' } }),
+    async findAll(categoryId, search, page = 1, limit = 12) {
+        const skip = (page - 1) * limit;
+        const where = {
+            deletedAt: null,
+            ...(categoryId && { categoryId }),
+            ...(search && {
+                name: { contains: search, mode: 'insensitive' },
+            }),
+        };
+        const [products, total] = await Promise.all([
+            this.prisma.product.findMany({
+                where,
+                include: { category: true },
+                skip,
+                take: limit,
+                orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.product.count({ where }),
+        ]);
+        return {
+            data: products,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit),
             },
-            include: { category: true },
-        });
+        };
     }
     async findOne(id) {
         const product = await this.prisma.product.findFirst({

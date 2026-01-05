@@ -12,15 +12,36 @@ export class ProductsService {
     });
   }
 
-  async findAll(categoryId?: string, search?: string) {
-    return this.prisma.product.findMany({
-      where: {
-        deletedAt: null,
-        ...(categoryId && { categoryId }),
-        ...(search && { name: { contains: search, mode: 'insensitive' } }),
+  async findAll(categoryId?: string, search?: string, page = 1, limit = 12) {
+    const skip = (page - 1) * limit;
+    const where = {
+      deletedAt: null,
+      ...(categoryId && { categoryId }),
+      ...(search && {
+        name: { contains: search, mode: 'insensitive' as const },
+      }),
+    };
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        include: { category: true },
+        skip,
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return {
+      data: products,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
       },
-      include: { category: true },
-    });
+    };
   }
 
   async findOne(id: string) {
