@@ -19,6 +19,8 @@ const carts_module_1 = require("./carts/carts.module");
 const orders_module_1 = require("./orders/orders.module");
 const reviews_module_1 = require("./reviews/reviews.module");
 const admin_module_1 = require("./admin/admin.module");
+const supabase_module_1 = require("./supabase/supabase.module");
+const upload_module_1 = require("./upload/upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -26,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
             prisma_module_1.PrismaModule,
+            supabase_module_1.SupabaseModule,
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             categories_module_1.CategoriesModule,
@@ -34,6 +37,7 @@ exports.AppModule = AppModule = __decorate([
             orders_module_1.OrdersModule,
             reviews_module_1.ReviewsModule,
             admin_module_1.AdminModule,
+            upload_module_1.UploadModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
