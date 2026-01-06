@@ -30,13 +30,31 @@ import {
   Package,
   ChevronDown,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    if (showUserMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   // Lấy số lượng sản phẩm trong giỏ hàng
   const { data: cart } = useQuery({
@@ -77,7 +95,7 @@ const Navbar = () => {
             <div className="h-8 w-px bg-slate-100 hidden sm:block"></div>
 
             {/* User Dropdown */}
-            <div className="relative">
+            <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="flex items-center gap-2 text-slate-700 bg-slate-50 px-4 py-2 rounded-full border border-slate-100 hover:bg-slate-100 transition-colors">
