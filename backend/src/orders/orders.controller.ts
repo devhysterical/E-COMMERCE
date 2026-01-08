@@ -12,7 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { GetUser } from '../common/decorators/get-user.decorator';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
@@ -22,9 +22,15 @@ export class OrdersController {
   @Post()
   createOrder(
     @GetUser('userId') userId: string,
-    @Body() dto: { address: string; phone: string },
+    @Body()
+    dto: { address: string; phone: string; paymentMethod?: PaymentMethod },
   ) {
-    return this.ordersService.createOrder(userId, dto.address, dto.phone);
+    return this.ordersService.createOrder(
+      userId,
+      dto.address,
+      dto.phone,
+      dto.paymentMethod || 'COD',
+    );
   }
 
   @Get()
