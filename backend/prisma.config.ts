@@ -7,9 +7,10 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
-    seed: 'ts-node prisma/seed.ts',
   },
   datasource: {
-    url: process.env.DATABASE_URL,
+    // Sử dụng DIRECT_URL cho migrations (không qua pooler)
+    // Fallback về DATABASE_URL nếu không có DIRECT_URL
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL,
   },
 });

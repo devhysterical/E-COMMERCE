@@ -12,6 +12,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { AdminModule } from './admin/admin.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { UploadModule } from './upload/upload.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { UploadModule } from './upload/upload.module';
     ReviewsModule,
     AdminModule,
     UploadModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

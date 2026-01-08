@@ -21,6 +21,7 @@ const reviews_module_1 = require("./reviews/reviews.module");
 const admin_module_1 = require("./admin/admin.module");
 const supabase_module_1 = require("./supabase/supabase.module");
 const upload_module_1 = require("./upload/upload.module");
+const payment_module_1 = require("./payment/payment.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -38,6 +39,7 @@ exports.AppModule = AppModule = __decorate([
             reviews_module_1.ReviewsModule,
             admin_module_1.AdminModule,
             upload_module_1.UploadModule,
+            payment_module_1.PaymentModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

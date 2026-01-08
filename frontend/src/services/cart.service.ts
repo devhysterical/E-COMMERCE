@@ -20,12 +20,23 @@ export const CartService = {
 };
 
 export const OrderService = {
-  create: async (data: { address: string; phone: string }) => {
+  create: async (data: {
+    address: string;
+    phone: string;
+    paymentMethod?: string;
+  }) => {
     const response = await api.post("/orders", data);
     return response.data;
   },
   getAll: async () => {
     const response = await api.get("/orders");
+    return response.data;
+  },
+};
+
+export const PaymentService = {
+  createMoMoPayment: async (orderId: string) => {
+    const response = await api.post("/payment/momo/create", { orderId });
     return response.data;
   },
 };

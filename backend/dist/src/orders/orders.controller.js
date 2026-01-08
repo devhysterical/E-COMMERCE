@@ -25,7 +25,7 @@ let OrdersController = class OrdersController {
         this.ordersService = ordersService;
     }
     createOrder(userId, dto) {
-        return this.ordersService.createOrder(userId, dto.address, dto.phone);
+        return this.ordersService.createOrder(userId, dto.address, dto.phone, dto.paymentMethod || 'COD');
     }
     findAll(userId) {
         return this.ordersService.findAll(userId);

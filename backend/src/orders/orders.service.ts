@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartsService } from '../carts/carts.service';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
@@ -14,7 +14,12 @@ export class OrdersService {
     private cartsService: CartsService,
   ) {}
 
-  async createOrder(userId: string, address: string, phone: string) {
+  async createOrder(
+    userId: string,
+    address: string,
+    phone: string,
+    paymentMethod: PaymentMethod = 'COD',
+  ) {
     const cart = await this.cartsService.getCart(userId);
     if (!cart.cartItems.length) {
       throw new BadRequestException('Giỏ hàng trống');
@@ -34,6 +39,8 @@ export class OrdersService {
           totalAmount,
           address,
           phone,
+          paymentMethod,
+          paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
         },
       });
 
@@ -155,5 +162,19 @@ export class OrdersService {
         {} as Record<string, number>,
       ),
     };
+  }
+
+  async updatePaymentStatus(
+    orderId: string,
+    status: PaymentStatus,
+    momoTransId: string | null,
+  ) {
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        paymentStatus: status,
+        momoTransId: momoTransId,
+      },
+    });
   }
 }

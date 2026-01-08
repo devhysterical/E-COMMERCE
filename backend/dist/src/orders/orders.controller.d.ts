@@ -1,11 +1,12 @@
 import { OrdersService } from './orders.service';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentMethod } from '@prisma/client';
 export declare class OrdersController {
     private readonly ordersService;
     constructor(ordersService: OrdersService);
     createOrder(userId: string, dto: {
         address: string;
         phone: string;
+        paymentMethod?: PaymentMethod;
     }): Promise<{
         id: string;
         createdAt: Date;
@@ -14,6 +15,9 @@ export declare class OrdersController {
         userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
+        paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        momoTransId: string | null;
         address: string;
         phone: string;
     }>;
@@ -46,6 +50,9 @@ export declare class OrdersController {
         userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
+        paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        momoTransId: string | null;
         address: string;
         phone: string;
     })[]>;
@@ -78,6 +85,9 @@ export declare class OrdersController {
         userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
+        paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        momoTransId: string | null;
         address: string;
         phone: string;
     }) | null>;
@@ -108,6 +118,9 @@ export declare class OrdersController {
         userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
+        paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        momoTransId: string | null;
         address: string;
         phone: string;
     })[]>;
@@ -144,6 +157,9 @@ export declare class OrdersController {
         userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
+        paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
+        paymentStatus: import("@prisma/client").$Enums.PaymentStatus;
+        momoTransId: string | null;
         address: string;
         phone: string;
     }>;

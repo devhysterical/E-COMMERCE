@@ -20,7 +20,7 @@ let OrdersService = class OrdersService {
         this.prisma = prisma;
         this.cartsService = cartsService;
     }
-    async createOrder(userId, address, phone) {
+    async createOrder(userId, address, phone, paymentMethod = 'COD') {
         const cart = await this.cartsService.getCart(userId);
         if (!cart.cartItems.length) {
             throw new common_1.BadRequestException('Giỏ hàng trống');
@@ -33,6 +33,8 @@ let OrdersService = class OrdersService {
                     totalAmount,
                     address,
                     phone,
+                    paymentMethod,
+                    paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
                 },
             });
             for (const item of cart.cartItems) {
@@ -134,6 +136,15 @@ let OrdersService = class OrdersService {
                 return acc;
             }, {}),
         };
+    }
+    async updatePaymentStatus(orderId, status, momoTransId) {
+        return this.prisma.order.update({
+            where: { id: orderId },
+            data: {
+                paymentStatus: status,
+                momoTransId: momoTransId,
+            },
+        });
     }
 };
 exports.OrdersService = OrdersService;
