@@ -2,6 +2,10 @@ import { PrismaService } from '../prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
 export interface UpdateProfileDto {
     fullName?: string;
+    phone?: string;
+    address?: string;
+    dateOfBirth?: string;
+    avatarUrl?: string;
 }
 export interface ChangePasswordDto {
     currentPassword: string;
@@ -17,6 +21,10 @@ export declare class UsersService {
         id: string;
         email: string;
         fullName: string | null;
+        phone: string | null;
+        address: string | null;
+        dateOfBirth: Date | null;
+        avatarUrl: string | null;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
         updatedAt: Date;
@@ -29,6 +37,10 @@ export declare class UsersService {
         id: string;
         email: string;
         fullName: string | null;
+        phone: string | null;
+        address: string | null;
+        dateOfBirth: Date | null;
+        avatarUrl: string | null;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
         updatedAt: Date;

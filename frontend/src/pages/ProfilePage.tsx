@@ -1,14 +1,37 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserService } from "../services/api.service";
+import { UserService, UploadService } from "../services/api.service";
 import { useAuthStore } from "../store/useAuthStore";
-import { User, Save, Lock, Eye, EyeOff, Check } from "lucide-react";
+import {
+  User,
+  Save,
+  Lock,
+  Eye,
+  EyeOff,
+  Check,
+  Phone,
+  MapPin,
+  Calendar,
+  Mail,
+  Camera,
+  Loader2,
+} from "lucide-react";
+import { toast } from "react-toastify";
 
 const ProfilePage = () => {
   const queryClient = useQueryClient();
   const { user: authUser, setAuth, token } = useAuthStore();
-  const [fullName, setFullName] = useState("");
+  const avatarInputRef = useRef<HTMLInputElement>(null);
+
+  // Profile form states
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    dateOfBirth: "",
+  });
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
   // Password change states
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -36,6 +59,10 @@ const ProfilePage = () => {
         );
       }
       setIsEditing(false);
+      toast.success("Cập nhật hồ sơ thành công!");
+    },
+    onError: () => {
+      toast.error("Cập nhật hồ sơ thất bại!");
     },
   });
 
@@ -57,12 +84,24 @@ const ProfilePage = () => {
   });
 
   const handleEditProfile = () => {
-    setFullName(profile?.fullName || "");
+    setFormData({
+      fullName: profile?.fullName || "",
+      phone: profile?.phone || "",
+      address: profile?.address || "",
+      dateOfBirth: profile?.dateOfBirth
+        ? profile.dateOfBirth.split("T")[0]
+        : "",
+    });
     setIsEditing(true);
   };
 
   const handleSaveProfile = () => {
-    updateProfileMutation.mutate({ fullName });
+    updateProfileMutation.mutate({
+      fullName: formData.fullName || undefined,
+      phone: formData.phone || undefined,
+      address: formData.address || undefined,
+      dateOfBirth: formData.dateOfBirth || undefined,
+    });
   };
 
   const handleChangePassword = (e: React.FormEvent) => {
@@ -72,6 +111,34 @@ const ProfilePage = () => {
       return;
     }
     changePasswordMutation.mutate({ currentPassword, newPassword });
+  };
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file hình ảnh");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Kích thước file tối đa là 5MB");
+      return;
+    }
+
+    setIsUploadingAvatar(true);
+    try {
+      const result = await UploadService.uploadImage(file);
+      await updateProfileMutation.mutateAsync({ avatarUrl: result.url });
+      toast.success("Cập nhật ảnh đại diện thành công!");
+    } catch {
+      toast.error("Cập nhật ảnh đại diện thất bại!");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   if (isLoading) {
@@ -105,9 +172,37 @@ const ProfilePage = () => {
       <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 overflow-hidden">
         {/* Profile Header */}
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 text-center">
-          <div className="w-24 h-24 bg-white rounded-full mx-auto flex items-center justify-center text-indigo-600 text-4xl font-bold shadow-xl">
-            {profile?.fullName?.charAt(0) ||
-              profile?.email.charAt(0).toUpperCase()}
+          {/* Avatar with upload */}
+          <div className="relative inline-block">
+            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl border-4 border-white/30">
+              {profile?.avatarUrl ? (
+                <img
+                  src={profile.avatarUrl}
+                  alt="Avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-white flex items-center justify-center text-indigo-600 text-4xl font-bold">
+                  {profile?.fullName?.charAt(0) ||
+                    profile?.email.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </div>
+            {/* Upload button */}
+            <label className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors border-2 border-indigo-500">
+              {isUploadingAvatar ? (
+                <Loader2 size={16} className="text-indigo-600 animate-spin" />
+              ) : (
+                <Camera size={16} className="text-indigo-600" />
+              )}
+              <input
+                ref={avatarInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleAvatarUpload}
+                className="hidden"
+              />
+            </label>
           </div>
           <h2 className="mt-4 text-2xl font-bold text-white">
             {profile?.fullName || "Chưa cập nhật tên"}
@@ -120,41 +215,183 @@ const ProfilePage = () => {
 
         {/* Profile Content */}
         <div className="p-8 space-y-6">
-          {/* Full Name */}
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
-              <User size={16} /> Họ và tên
-            </label>
-            {isEditing ? (
-              <div className="flex gap-3">
+          {isEditing ? (
+            /* Edit Mode - Form */
+            <div className="space-y-5">
+              {/* Full Name */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <User size={16} /> Họ và tên
+                </label>
                 <input
                   type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  className="flex-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  value={formData.fullName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, fullName: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
                   placeholder="Nhập họ và tên"
                 />
+              </div>
+
+              {/* Email (read-only) */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Mail size={16} /> Email
+                </label>
+                <input
+                  type="email"
+                  value={profile?.email || ""}
+                  disabled
+                  className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-500"
+                />
+              </div>
+
+              {/* Phone */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Phone size={16} /> Số điện thoại
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) =>
+                    setFormData({ ...formData, phone: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  placeholder="Nhập số điện thoại"
+                />
+              </div>
+
+              {/* Date of Birth */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <Calendar size={16} /> Ngày sinh
+                </label>
+                <input
+                  type="date"
+                  value={formData.dateOfBirth}
+                  onChange={(e) =>
+                    setFormData({ ...formData, dateOfBirth: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                />
+              </div>
+
+              {/* Address */}
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                  <MapPin size={16} /> Địa chỉ
+                </label>
+                <textarea
+                  value={formData.address}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y min-h-[80px]"
+                  placeholder="Nhập địa chỉ nhận hàng mặc định"
+                  rows={2}
+                />
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+                  Hủy
+                </button>
                 <button
                   onClick={handleSaveProfile}
                   disabled={updateProfileMutation.isPending}
-                  className="px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2">
+                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
                   <Save size={18} />
-                  {updateProfileMutation.isPending ? "Đang lưu..." : "Lưu"}
+                  {updateProfileMutation.isPending
+                    ? "Đang lưu..."
+                    : "Lưu thay đổi"}
                 </button>
               </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <p className="text-lg text-slate-900">
-                  {profile?.fullName || "Chưa cập nhật"}
-                </p>
-                <button
-                  onClick={handleEditProfile}
-                  className="text-indigo-600 hover:text-indigo-700 font-medium text-sm">
-                  Chỉnh sửa
-                </button>
+            </div>
+          ) : (
+            /* View Mode */
+            <div className="space-y-5">
+              {/* Full Name */}
+              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <User size={18} className="text-slate-400" />
+                  <div>
+                    <p className="text-sm text-slate-500">Họ và tên</p>
+                    <p className="text-slate-900 font-medium">
+                      {profile?.fullName || "Chưa cập nhật"}
+                    </p>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+
+              {/* Email */}
+              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <Mail size={18} className="text-slate-400" />
+                  <div>
+                    <p className="text-sm text-slate-500">Email</p>
+                    <p className="text-slate-900 font-medium">
+                      {profile?.email}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Phone */}
+              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <Phone size={18} className="text-slate-400" />
+                  <div>
+                    <p className="text-sm text-slate-500">Số điện thoại</p>
+                    <p className="text-slate-900 font-medium">
+                      {profile?.phone || "Chưa cập nhật"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Date of Birth */}
+              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <Calendar size={18} className="text-slate-400" />
+                  <div>
+                    <p className="text-sm text-slate-500">Ngày sinh</p>
+                    <p className="text-slate-900 font-medium">
+                      {profile?.dateOfBirth
+                        ? new Date(profile.dateOfBirth).toLocaleDateString(
+                            "vi-VN"
+                          )
+                        : "Chưa cập nhật"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Address */}
+              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+                <div className="flex items-center gap-3">
+                  <MapPin size={18} className="text-slate-400" />
+                  <div>
+                    <p className="text-sm text-slate-500">Địa chỉ</p>
+                    <p className="text-slate-900 font-medium">
+                      {profile?.address || "Chưa cập nhật"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Edit Button */}
+              <button
+                onClick={handleEditProfile}
+                className="w-full mt-4 px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-colors">
+                Chỉnh sửa thông tin
+              </button>
+            </div>
+          )}
 
           {/* Divider */}
           <hr className="border-slate-100" />

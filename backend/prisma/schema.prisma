@@ -35,6 +35,10 @@ model User {
   email         String    @unique
   password      String
   fullName      String?
+  phone         String?
+  address       String?
+  dateOfBirth   DateTime?
+  avatarUrl     String?
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

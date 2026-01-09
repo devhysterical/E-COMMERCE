@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { OrderService, PaymentService } from "../services/cart.service";
+import { UserService } from "../services/api.service";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -15,13 +16,31 @@ import {
 type PaymentMethod = "COD" | "MOMO";
 
 const CheckoutPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Fetch profile để pre-fill địa chỉ và SĐT
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: UserService.getProfile,
+    staleTime: 60000,
+  });
+
+  // Form states - initialize with profile data if available
   const [formData, setFormData] = useState({ address: "", phone: "" });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD");
   const [error, setError] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  // Pre-fill form một lần khi profile load xong
+  if (profile && !initialized) {
+    setFormData({
+      address: profile.address || formData.address,
+      phone: profile.phone || formData.phone,
+    });
+    setInitialized(true);
+  }
 
   const mutation = useMutation({
     mutationFn: (data: {

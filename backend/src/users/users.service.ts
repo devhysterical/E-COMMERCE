@@ -5,6 +5,10 @@ import * as bcrypt from 'bcrypt';
 
 export interface UpdateProfileDto {
   fullName?: string;
+  phone?: string;
+  address?: string;
+  dateOfBirth?: string; // ISO date string
+  avatarUrl?: string;
 }
 
 export interface ChangePasswordDto {
@@ -42,7 +46,13 @@ export class UsersService {
 
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
-      data: { fullName: dto.fullName },
+      data: {
+        fullName: dto.fullName,
+        phone: dto.phone,
+        address: dto.address,
+        dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
+        avatarUrl: dto.avatarUrl,
+      },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
