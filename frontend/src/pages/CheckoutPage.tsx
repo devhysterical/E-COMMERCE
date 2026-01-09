@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { OrderService, PaymentService } from "../services/cart.service";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   MapPin,
   Phone,
@@ -50,7 +51,7 @@ const CheckoutPage = () => {
         }
       } else {
         // COD - thông báo thành công
-        alert("Đặt hàng thành công!");
+        toast.success("Đặt hàng thành công!");
         navigate("/orders");
       }
     },

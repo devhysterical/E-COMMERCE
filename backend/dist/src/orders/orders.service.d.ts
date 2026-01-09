@@ -7,10 +7,6 @@ export declare class OrdersService {
     constructor(prisma: PrismaService, cartsService: CartsService);
     createOrder(userId: string, address: string, phone: string, paymentMethod?: PaymentMethod): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -18,6 +14,10 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     }>;
     findAll(userId: string): Promise<({
         orderItems: ({
@@ -36,16 +36,12 @@ export declare class OrdersService {
         } & {
             id: string;
             productId: string;
-            price: number;
             quantity: number;
+            price: number;
             orderId: string;
         })[];
     } & {
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -53,6 +49,10 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     })[]>;
     findOne(id: string, userId: string): Promise<({
         orderItems: ({
@@ -71,16 +71,12 @@ export declare class OrdersService {
         } & {
             id: string;
             productId: string;
-            price: number;
             quantity: number;
+            price: number;
             orderId: string;
         })[];
     } & {
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -88,6 +84,10 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     }) | null>;
     findAllAdmin(): Promise<({
         user: {
@@ -104,16 +104,12 @@ export declare class OrdersService {
         } & {
             id: string;
             productId: string;
-            price: number;
             quantity: number;
+            price: number;
             orderId: string;
         })[];
     } & {
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -121,6 +117,10 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     })[]>;
     updateStatus(id: string, status: OrderStatus): Promise<{
         user: {
@@ -136,16 +136,12 @@ export declare class OrdersService {
         } & {
             id: string;
             productId: string;
-            price: number;
             quantity: number;
+            price: number;
             orderId: string;
         })[];
     } & {
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -153,6 +149,10 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     }>;
     getStats(): Promise<{
         totalOrders: number;
@@ -161,10 +161,6 @@ export declare class OrdersService {
     }>;
     updatePaymentStatus(orderId: string, status: PaymentStatus, momoTransId: string | null): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
-        userId: string;
         totalAmount: number;
         status: import("@prisma/client").$Enums.OrderStatus;
         paymentMethod: import("@prisma/client").$Enums.PaymentMethod;
@@ -172,5 +168,9 @@ export declare class OrdersService {
         momoTransId: string | null;
         address: string;
         phone: string;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
+        userId: string;
     }>;
 }

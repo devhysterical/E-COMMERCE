@@ -98,9 +98,38 @@ let OrdersService = class OrdersService {
         });
     }
     async updateStatus(id, status) {
-        const order = await this.prisma.order.findUnique({ where: { id } });
+        const order = await this.prisma.order.findUnique({
+            where: { id },
+            include: {
+                orderItems: {
+                    include: { product: true },
+                },
+            },
+        });
         if (!order) {
             throw new common_1.NotFoundException('Đơn hàng không tồn tại');
+        }
+        if (status === 'CANCELLED' && order.status !== 'CANCELLED') {
+            return this.prisma.$transaction(async (tx) => {
+                for (const item of order.orderItems) {
+                    await tx.product.update({
+                        where: { id: item.productId },
+                        data: { stock: { increment: item.quantity } },
+                    });
+                }
+                return tx.order.update({
+                    where: { id },
+                    data: { status },
+                    include: {
+                        user: {
+                            select: { id: true, email: true, fullName: true },
+                        },
+                        orderItems: {
+                            include: { product: { select: { id: true, name: true } } },
+                        },
+                    },
+                });
+            });
         }
         return this.prisma.order.update({
             where: { id },
