@@ -6,6 +6,7 @@ import {
   AdminService,
   UploadService,
 } from "../services/api.service";
+import { toast } from "react-toastify";
 import type { Product, Order, UserProfile } from "../services/api.service";
 import {
   Plus,
@@ -844,7 +845,7 @@ const ProductModal = ({
       setFormData({ ...formData, imageUrl: result.url });
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Tải ảnh lên thất bại. Vui lòng thử lại.");
+      toast.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
     } finally {
       setIsUploading(false);
     }

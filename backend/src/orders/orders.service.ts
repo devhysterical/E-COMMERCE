@@ -118,11 +118,48 @@ export class OrdersService {
   }
 
   async updateStatus(id: string, status: OrderStatus) {
-    const order = await this.prisma.order.findUnique({ where: { id } });
+    const order = await this.prisma.order.findUnique({
+      where: { id },
+      include: {
+        orderItems: {
+          include: { product: true },
+        },
+      },
+    });
+
     if (!order) {
       throw new NotFoundException('Đơn hàng không tồn tại');
     }
 
+    // Nếu chuyển sang CANCELLED và đơn hàng trước đó không phải CANCELLED
+    // thì hoàn lại tồn kho
+    if (status === 'CANCELLED' && order.status !== 'CANCELLED') {
+      return this.prisma.$transaction(async (tx) => {
+        // Hoàn lại stock cho từng sản phẩm
+        for (const item of order.orderItems) {
+          await tx.product.update({
+            where: { id: item.productId },
+            data: { stock: { increment: item.quantity } },
+          });
+        }
+
+        // Cập nhật status đơn hàng
+        return tx.order.update({
+          where: { id },
+          data: { status },
+          include: {
+            user: {
+              select: { id: true, email: true, fullName: true },
+            },
+            orderItems: {
+              include: { product: { select: { id: true, name: true } } },
+            },
+          },
+        });
+      });
+    }
+
+    // Nếu không phải CANCELLED, chỉ cập nhật status bình thường
     return this.prisma.order.update({
       where: { id },
       data: { status },

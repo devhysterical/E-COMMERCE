@@ -50,8 +50,8 @@ const ProductListPage = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar Filters */}
-        <div className="w-full md:w-64 space-y-6">
+        {/* Sidebar Filters - Desktop */}
+        <div className="hidden md:block w-64 space-y-6">
           <div>
             <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
               <Filter size={20} /> Danh mục
@@ -80,6 +80,25 @@ const ProductListPage = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Category Dropdown - Mobile */}
+        <div className="md:hidden w-full">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter size={18} className="text-slate-600" />
+            <span className="text-sm font-bold text-slate-700">Danh mục</span>
+          </div>
+          <select
+            value={selectedCategory}
+            onChange={(e) => handleCategoryChange(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all appearance-none cursor-pointer">
+            <option value="">Tất cả sản phẩm</option>
+            {categories?.map((cat: { id: string; name: string }) => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Product Grid */}
