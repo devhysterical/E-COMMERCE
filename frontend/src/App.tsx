@@ -32,7 +32,9 @@ import {
   Package,
   ChevronDown,
 } from "lucide-react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useIdleTimeout } from "./hooks/useIdleTimeout";
+import SessionTimeoutModal from "./components/SessionTimeoutModal";
 
 const queryClient = new QueryClient();
 
@@ -156,6 +158,9 @@ const Navbar = () => {
   );
 };
 
+// Idle timeout: 15 phút = 15 * 60 * 1000 ms
+const IDLE_TIMEOUT = 15 * 60 * 1000;
+
 const ProtectedRoute = ({
   children,
   requireAdmin = false,
@@ -163,8 +168,28 @@ const ProtectedRoute = ({
   children: React.ReactNode;
   requireAdmin?: boolean;
 }) => {
-  const { isAuthenticated, user } = useAuthStore();
+  const { isAuthenticated, user, logout } = useAuthStore();
   const location = useLocation();
+  const [showTimeoutModal, setShowTimeoutModal] = useState(false);
+
+  // Callback khi hết thời gian hoạt động
+  const handleIdle = useCallback(() => {
+    if (isAuthenticated) {
+      setShowTimeoutModal(true);
+    }
+  }, [isAuthenticated]);
+
+  // Xử lý khi user xác nhận modal
+  const handleConfirmTimeout = () => {
+    setShowTimeoutModal(false);
+    logout();
+  };
+
+  // Hook theo dõi hoạt động
+  useIdleTimeout({
+    timeout: IDLE_TIMEOUT,
+    onIdle: handleIdle,
+  });
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
@@ -178,6 +203,10 @@ const ProtectedRoute = ({
     <div className="min-h-screen bg-slate-50">
       <Navbar />
       {children}
+      <SessionTimeoutModal
+        isOpen={showTimeoutModal}
+        onConfirm={handleConfirmTimeout}
+      />
     </div>
   );
 };
