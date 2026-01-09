@@ -1,8 +1,18 @@
-import React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CartService } from "../services/cart.service";
 import { Link, useNavigate } from "react-router-dom";
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+
+interface CartItem {
+  id: string;
+  quantity: number;
+  product: {
+    id: string;
+    name: string;
+    price: number;
+    imageUrl: string;
+  };
+}
 
 const CartPage = () => {
   const queryClient = useQueryClient();
@@ -25,7 +35,7 @@ const CartPage = () => {
   });
 
   const totalAmount = cart?.cartItems.reduce(
-    (sum: number, item: any) => sum + item.product.price * item.quantity,
+    (sum: number, item: CartItem) => sum + item.product.price * item.quantity,
     0
   );
 
@@ -56,7 +66,7 @@ const CartPage = () => {
         <div className="flex flex-col lg:flex-row gap-12">
           {/* List Items */}
           <div className="flex-1 space-y-4">
-            {cart.cartItems.map((item: any) => (
+            {cart.cartItems.map((item: CartItem) => (
               <div
                 key={item.id}
                 className="bg-white p-5 rounded-2xl flex items-center gap-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
