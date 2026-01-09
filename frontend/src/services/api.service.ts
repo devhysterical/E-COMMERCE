@@ -23,6 +23,10 @@ export interface UserProfile {
   id: string;
   email: string;
   fullName: string | null;
+  phone: string | null;
+  address: string | null;
+  dateOfBirth: string | null;
+  avatarUrl: string | null;
   role: string;
   createdAt: string;
 }
@@ -174,7 +178,13 @@ export const UserService = {
     const response = await api.get("/users/profile");
     return response.data;
   },
-  updateProfile: async (data: { fullName?: string }): Promise<UserProfile> => {
+  updateProfile: async (data: {
+    fullName?: string;
+    phone?: string;
+    address?: string;
+    dateOfBirth?: string;
+    avatarUrl?: string;
+  }): Promise<UserProfile> => {
     const response = await api.patch("/users/profile", data);
     return response.data;
   },

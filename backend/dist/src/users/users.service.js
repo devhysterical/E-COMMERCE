@@ -73,7 +73,13 @@ let UsersService = class UsersService {
         }
         const updatedUser = await this.prisma.user.update({
             where: { id: userId },
-            data: { fullName: dto.fullName },
+            data: {
+                fullName: dto.fullName,
+                phone: dto.phone,
+                address: dto.address,
+                dateOfBirth: dto.dateOfBirth ? new Date(dto.dateOfBirth) : undefined,
+                avatarUrl: dto.avatarUrl,
+            },
         });
         const { password, ...result } = updatedUser;
         return result;
