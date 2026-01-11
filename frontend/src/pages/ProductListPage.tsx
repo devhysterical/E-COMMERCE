@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import BannerSlider from "../components/BannerSlider";
 
 const ProductListPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -48,7 +49,10 @@ const ProductListPage = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+      {/* Banner Slider */}
+      <BannerSlider />
+
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Filters - Desktop */}
         <div className="hidden md:block w-64 space-y-6">

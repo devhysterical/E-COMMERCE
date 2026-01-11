@@ -247,3 +247,70 @@ export const UploadService = {
     return response.data;
   },
 };
+
+// Banner Types
+export interface Banner {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string;
+  linkUrl: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const BannerService = {
+  // Public: lấy banners đang active
+  getActive: async (): Promise<Banner[]> => {
+    const response = await api.get("/banners");
+    return response.data;
+  },
+
+  // Admin: lấy tất cả banners
+  getAll: async (): Promise<Banner[]> => {
+    const response = await api.get("/banners/admin/all");
+    return response.data;
+  },
+
+  // Admin: lấy một banner
+  getOne: async (id: string): Promise<Banner> => {
+    const response = await api.get(`/banners/admin/${id}`);
+    return response.data;
+  },
+
+  // Admin: tạo banner mới
+  create: async (data: {
+    title: string;
+    description?: string;
+    imageUrl: string;
+    linkUrl?: string;
+    isActive?: boolean;
+    sortOrder?: number;
+  }): Promise<Banner> => {
+    const response = await api.post("/banners/admin", data);
+    return response.data;
+  },
+
+  // Admin: cập nhật banner
+  update: async (
+    id: string,
+    data: Partial<{
+      title: string;
+      description: string;
+      imageUrl: string;
+      linkUrl: string;
+      isActive: boolean;
+      sortOrder: number;
+    }>
+  ): Promise<Banner> => {
+    const response = await api.patch(`/banners/admin/${id}`, data);
+    return response.data;
+  },
+
+  // Admin: xóa banner
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/banners/admin/${id}`);
+  },
+};
