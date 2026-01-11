@@ -8,6 +8,7 @@ import {
 } from "../services/api.service";
 import { toast } from "react-toastify";
 import type { Product, Order, UserProfile } from "../services/api.service";
+import AdminBannersTab from "../components/AdminBannersTab";
 import {
   Plus,
   Edit,
@@ -28,9 +29,10 @@ import {
   Eye,
   MapPin,
   Phone,
+  Image,
 } from "lucide-react";
 
-type TabType = "products" | "orders" | "users" | "categories";
+type TabType = "products" | "orders" | "users" | "categories" | "banners";
 
 const statusConfig: Record<
   string,
@@ -296,6 +298,7 @@ const AdminDashboard = () => {
             icon: <LayoutGrid size={18} />,
           },
           { key: "users", label: "Người dùng", icon: <Users size={18} /> },
+          { key: "banners", label: "Banners", icon: <Image size={18} /> },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -606,6 +609,13 @@ const AdminDashboard = () => {
               ))}
             </tbody>
           </table>
+        )}
+
+        {/* Banners Tab */}
+        {activeTab === "banners" && (
+          <div className="p-6">
+            <AdminBannersTab />
+          </div>
         )}
       </div>
 

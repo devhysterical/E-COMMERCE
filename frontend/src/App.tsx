@@ -82,7 +82,7 @@ const Navbar = () => {
             <Link
               to="/"
               className="text-3xl font-black text-indigo-600 tracking-tighter italic hover:opacity-80 transition-opacity">
-              L-TECH.
+              L-TECH SOLUTIONS.
             </Link>
           </div>
           <div className="flex items-center gap-8">

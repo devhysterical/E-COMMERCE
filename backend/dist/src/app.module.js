@@ -22,6 +22,7 @@ const admin_module_1 = require("./admin/admin.module");
 const supabase_module_1 = require("./supabase/supabase.module");
 const upload_module_1 = require("./upload/upload.module");
 const payment_module_1 = require("./payment/payment.module");
+const banners_module_1 = require("./banners/banners.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             admin_module_1.AdminModule,
             upload_module_1.UploadModule,
             payment_module_1.PaymentModule,
+            banners_module_1.BannersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

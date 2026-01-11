@@ -13,6 +13,7 @@ import { AdminModule } from './admin/admin.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { UploadModule } from './upload/upload.module';
 import { PaymentModule } from './payment/payment.module';
+import { BannersModule } from './banners/banners.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { PaymentModule } from './payment/payment.module';
     AdminModule,
     UploadModule,
     PaymentModule,
+    BannersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
