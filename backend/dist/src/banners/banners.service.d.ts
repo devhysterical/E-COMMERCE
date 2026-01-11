@@ -5,68 +5,68 @@ export declare class BannersService {
     constructor(prisma: PrismaService);
     findAllActive(): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }[]>;
     findAll(): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }[]>;
     findOne(id: string): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     create(dto: CreateBannerDto): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     update(id: string, dto: UpdateBannerDto): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         id: string;
-        title: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        title: string;
         linkUrl: string | null;
         isActive: boolean;
         sortOrder: number;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
 }
