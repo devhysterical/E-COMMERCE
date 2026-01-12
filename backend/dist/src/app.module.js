@@ -23,6 +23,7 @@ const supabase_module_1 = require("./supabase/supabase.module");
 const upload_module_1 = require("./upload/upload.module");
 const payment_module_1 = require("./payment/payment.module");
 const banners_module_1 = require("./banners/banners.module");
+const email_module_1 = require("./email/email.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -31,6 +32,7 @@ exports.AppModule = AppModule = __decorate([
         imports: [
             prisma_module_1.PrismaModule,
             supabase_module_1.SupabaseModule,
+            email_module_1.EmailModule,
             users_module_1.UsersModule,
             auth_module_1.AuthModule,
             categories_module_1.CategoriesModule,

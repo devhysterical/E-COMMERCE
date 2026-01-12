@@ -41,6 +41,31 @@ let SupabaseService = class SupabaseService {
             throw new Error(`Lỗi xóa file: ${error.message}`);
         }
     }
+    async sendPasswordResetEmail(email, redirectUrl) {
+        const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: redirectUrl,
+        });
+        if (error) {
+            throw new Error(`Lỗi gửi email reset: ${error.message}`);
+        }
+    }
+    async getUserFromAccessToken(accessToken) {
+        const { data, error } = await this.supabase.auth.getUser(accessToken);
+        if (error || !data.user) {
+            return null;
+        }
+        const metadata = (data.user.user_metadata || {});
+        return {
+            id: data.user.id,
+            email: data.user.email || '',
+            fullName: metadata.full_name || metadata.name || null,
+            avatarUrl: metadata.avatar_url || metadata.picture || null,
+        };
+    }
+    async sendOtpEmail(email, otp) {
+        console.log(`[OTP] Sending OTP ${otp} to ${email}`);
+        await Promise.resolve();
+    }
 };
 exports.SupabaseService = SupabaseService;
 exports.SupabaseService = SupabaseService = __decorate([

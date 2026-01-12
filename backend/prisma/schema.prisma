@@ -39,6 +39,7 @@ model User {
   address       String?
   dateOfBirth   DateTime?
   avatarUrl     String?
+  authProvider  String    @default("email") // "email" or "google"
   role          Role      @default(USER)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

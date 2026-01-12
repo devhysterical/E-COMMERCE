@@ -5,4 +5,12 @@ export declare class SupabaseService {
         url: string;
     }>;
     deleteImage(bucket: string, path: string): Promise<void>;
+    sendPasswordResetEmail(email: string, redirectUrl: string): Promise<void>;
+    getUserFromAccessToken(accessToken: string): Promise<{
+        id: string;
+        email: string;
+        fullName: string | null;
+        avatarUrl: string | null;
+    } | null>;
+    sendOtpEmail(email: string, otp: string): Promise<void>;
 }

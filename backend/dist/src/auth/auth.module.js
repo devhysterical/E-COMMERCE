@@ -14,6 +14,8 @@ const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const users_module_1 = require("../users/users.module");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
+const supabase_module_1 = require("../supabase/supabase.module");
+const otp_cache_service_1 = require("./otp-cache.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -22,13 +24,14 @@ exports.AuthModule = AuthModule = __decorate([
         imports: [
             users_module_1.UsersModule,
             passport_1.PassportModule,
+            supabase_module_1.SupabaseModule,
             jwt_1.JwtModule.register({
                 global: true,
                 secret: process.env.JWT_SECRET || 'super-secret',
                 signOptions: { expiresIn: '1d' },
             }),
         ],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, otp_cache_service_1.OtpCacheService],
         controllers: [auth_controller_1.AuthController],
     })
 ], AuthModule);
