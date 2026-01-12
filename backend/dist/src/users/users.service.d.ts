@@ -25,6 +25,7 @@ export declare class UsersService {
         address: string | null;
         dateOfBirth: Date | null;
         avatarUrl: string | null;
+        authProvider: string;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
         updatedAt: Date;
@@ -41,6 +42,7 @@ export declare class UsersService {
         address: string | null;
         dateOfBirth: Date | null;
         avatarUrl: string | null;
+        authProvider: string;
         role: import("@prisma/client").$Enums.Role;
         createdAt: Date;
         updatedAt: Date;

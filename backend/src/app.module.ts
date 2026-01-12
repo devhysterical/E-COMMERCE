@@ -14,11 +14,13 @@ import { SupabaseModule } from './supabase/supabase.module';
 import { UploadModule } from './upload/upload.module';
 import { PaymentModule } from './payment/payment.module';
 import { BannersModule } from './banners/banners.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
     PrismaModule,
     SupabaseModule,
+    EmailModule,
     UsersModule,
     AuthModule,
     CategoriesModule,
