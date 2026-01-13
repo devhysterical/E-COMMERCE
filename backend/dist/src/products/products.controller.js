@@ -40,6 +40,18 @@ let ProductsController = class ProductsController {
     remove(id) {
         return this.productsService.remove(id);
     }
+    getImages(id) {
+        return this.productsService.getImages(id);
+    }
+    addImage(id, body) {
+        return this.productsService.addImage(id, body.imageUrl, body.isPrimary);
+    }
+    removeImage(id, imageId) {
+        return this.productsService.removeImage(id, imageId);
+    }
+    setPrimaryImage(id, imageId) {
+        return this.productsService.setPrimaryImage(id, imageId);
+    }
 };
 exports.ProductsController = ProductsController;
 __decorate([
@@ -84,6 +96,40 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ProductsController.prototype, "remove", null);
+__decorate([
+    (0, common_1.Get)(':id/images'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "getImages", null);
+__decorate([
+    (0, common_1.Post)(':id/images'),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "addImage", null);
+__decorate([
+    (0, common_1.Delete)(':id/images/:imageId'),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('imageId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "removeImage", null);
+__decorate([
+    (0, common_1.Patch)(':id/images/:imageId/primary'),
+    (0, roles_decorator_1.Roles)(client_1.Role.ADMIN),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('imageId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:returntype", void 0)
+], ProductsController.prototype, "setPrimaryImage", null);
 exports.ProductsController = ProductsController = __decorate([
     (0, common_1.Controller)('products'),
     (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard),

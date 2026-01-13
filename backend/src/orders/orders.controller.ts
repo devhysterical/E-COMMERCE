@@ -23,13 +23,19 @@ export class OrdersController {
   createOrder(
     @GetUser('userId') userId: string,
     @Body()
-    dto: { address: string; phone: string; paymentMethod?: PaymentMethod },
+    dto: {
+      address: string;
+      phone: string;
+      paymentMethod?: PaymentMethod;
+      couponId?: string;
+    },
   ) {
     return this.ordersService.createOrder(
       userId,
       dto.address,
       dto.phone,
       dto.paymentMethod || 'COD',
+      dto.couponId,
     );
   }
 

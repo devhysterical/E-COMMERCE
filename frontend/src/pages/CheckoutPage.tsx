@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { OrderService, PaymentService } from "../services/cart.service";
-import { UserService } from "../services/api.service";
+import {
+  UserService,
+  type ValidateCouponResult,
+} from "../services/api.service";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
@@ -11,6 +14,7 @@ import {
   ChevronLeft,
   Wallet,
   Banknote,
+  Ticket,
 } from "lucide-react";
 
 type PaymentMethod = "COD" | "MOMO";
@@ -33,6 +37,20 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [initialized, setInitialized] = useState(false);
 
+  // Get applied coupon from sessionStorage (set from CartPage)
+  const [appliedCoupon] = useState<ValidateCouponResult | null>(() => {
+    const storedCoupon = sessionStorage.getItem("appliedCoupon");
+    if (storedCoupon) {
+      try {
+        return JSON.parse(storedCoupon);
+      } catch {
+        sessionStorage.removeItem("appliedCoupon");
+        return null;
+      }
+    }
+    return null;
+  });
+
   // Pre-fill form một lần khi profile load xong
   if (profile && !initialized) {
     setFormData({
@@ -47,9 +65,12 @@ const CheckoutPage = () => {
       address: string;
       phone: string;
       paymentMethod: string;
+      couponId?: string;
     }) => OrderService.create(data),
     onSuccess: async (order) => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      // Clear applied coupon
+      sessionStorage.removeItem("appliedCoupon");
 
       if (paymentMethod === "MOMO") {
         // Nếu chọn MoMo, tạo payment và redirect
@@ -87,7 +108,11 @@ const CheckoutPage = () => {
       return;
     }
     setError("");
-    mutation.mutate({ ...formData, paymentMethod });
+    mutation.mutate({
+      ...formData,
+      paymentMethod,
+      couponId: appliedCoupon?.couponId,
+    });
   };
 
   const isLoading = mutation.isPending || isProcessing;
@@ -110,6 +135,19 @@ const CheckoutPage = () => {
         {error && (
           <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 font-medium">
             {error}
+          </div>
+        )}
+
+        {/* Applied Coupon Display */}
+        {appliedCoupon && (
+          <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-2xl">
+            <Ticket className="text-green-600" size={20} />
+            <div className="flex-1">
+              <p className="font-bold text-green-700">{appliedCoupon.code}</p>
+              <p className="text-sm text-green-600">
+                Giảm {appliedCoupon.discountAmount.toLocaleString("vi-VN")}đ
+              </p>
+            </div>
           </div>
         )}
 

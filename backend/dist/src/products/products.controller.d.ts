@@ -25,6 +25,14 @@ export declare class ProductsController {
                 name: string;
                 description: string | null;
             };
+            images: {
+                id: string;
+                createdAt: Date;
+                productId: string;
+                imageUrl: string;
+                sortOrder: number;
+                isPrimary: boolean;
+            }[];
         } & {
             id: string;
             createdAt: Date;
@@ -62,6 +70,14 @@ export declare class ProductsController {
             name: string;
             description: string | null;
         };
+        images: {
+            id: string;
+            createdAt: Date;
+            productId: string;
+            imageUrl: string;
+            sortOrder: number;
+            isPrimary: boolean;
+        }[];
     } & {
         id: string;
         createdAt: Date;
@@ -97,5 +113,35 @@ export declare class ProductsController {
         stock: number;
         imageUrl: string | null;
         categoryId: string;
+    }>;
+    getImages(id: string): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
+    }[]>;
+    addImage(id: string, body: {
+        imageUrl: string;
+        isPrimary?: boolean;
+    }): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
+    }>;
+    removeImage(id: string, imageId: string): Promise<{
+        message: string;
+    }>;
+    setPrimaryImage(id: string, imageId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
     }>;
 }

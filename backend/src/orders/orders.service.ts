@@ -19,6 +19,7 @@ export class OrdersService {
     address: string,
     phone: string,
     paymentMethod: PaymentMethod = 'COD',
+    couponId?: string,
   ) {
     const cart = await this.cartsService.getCart(userId);
     if (!cart.cartItems.length) {
@@ -30,13 +31,52 @@ export class OrdersService {
       0,
     );
 
+    // Xử lý coupon nếu có
+    let discountAmount = 0;
+    let validCouponId: string | undefined = undefined;
+
+    if (couponId) {
+      const coupon = await this.prisma.coupon.findUnique({
+        where: { id: couponId },
+      });
+
+      if (coupon && coupon.isActive) {
+        // Kiểm tra user đã dùng coupon chưa
+        const existingUsage = await this.prisma.couponUsage.findUnique({
+          where: { couponId_userId: { couponId, userId } },
+        });
+
+        if (!existingUsage) {
+          // Tính discount
+          if (coupon.discountType === 'PERCENTAGE') {
+            discountAmount = Math.floor(
+              (totalAmount * coupon.discountValue) / 100,
+            );
+            if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
+              discountAmount = coupon.maxDiscount;
+            }
+          } else {
+            discountAmount = coupon.discountValue;
+            if (discountAmount > totalAmount) {
+              discountAmount = totalAmount;
+            }
+          }
+          validCouponId = couponId;
+        }
+      }
+    }
+
+    const finalAmount = totalAmount - discountAmount;
+
     // Sử dụng transaction để đảm bảo tính toàn vẹn
     return this.prisma.$transaction(async (tx) => {
       // 1. Tạo Order
       const order = await tx.order.create({
         data: {
           userId,
-          totalAmount,
+          totalAmount: finalAmount,
+          discountAmount,
+          couponId: validCouponId,
           address,
           phone,
           paymentMethod,
@@ -71,6 +111,22 @@ export class OrdersService {
       await tx.cartItem.deleteMany({
         where: { cartId: cart.id },
       });
+
+      // 4. Ghi nhận sử dụng coupon
+      if (validCouponId) {
+        await tx.couponUsage.create({
+          data: {
+            couponId: validCouponId,
+            userId,
+            orderId: order.id,
+          },
+        });
+
+        await tx.coupon.update({
+          where: { id: validCouponId },
+          data: { usedCount: { increment: 1 } },
+        });
+      }
 
       return order;
     });

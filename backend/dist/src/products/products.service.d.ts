@@ -25,6 +25,14 @@ export declare class ProductsService {
                 name: string;
                 description: string | null;
             };
+            images: {
+                id: string;
+                createdAt: Date;
+                productId: string;
+                imageUrl: string;
+                sortOrder: number;
+                isPrimary: boolean;
+            }[];
         } & {
             id: string;
             createdAt: Date;
@@ -62,6 +70,14 @@ export declare class ProductsService {
             name: string;
             description: string | null;
         };
+        images: {
+            id: string;
+            createdAt: Date;
+            productId: string;
+            imageUrl: string;
+            sortOrder: number;
+            isPrimary: boolean;
+        }[];
     } & {
         id: string;
         createdAt: Date;
@@ -98,4 +114,31 @@ export declare class ProductsService {
         imageUrl: string | null;
         categoryId: string;
     }>;
+    addImage(productId: string, imageUrl: string, isPrimary?: boolean): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
+    }>;
+    removeImage(productId: string, imageId: string): Promise<{
+        message: string;
+    }>;
+    setPrimaryImage(productId: string, imageId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
+    }>;
+    getImages(productId: string): Promise<{
+        id: string;
+        createdAt: Date;
+        productId: string;
+        imageUrl: string;
+        sortOrder: number;
+        isPrimary: boolean;
+    }[]>;
 }

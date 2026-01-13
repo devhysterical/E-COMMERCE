@@ -34,7 +34,7 @@ let ProductsService = class ProductsService {
         const [products, total] = await Promise.all([
             this.prisma.product.findMany({
                 where,
-                include: { category: true },
+                include: { category: true, images: { orderBy: { sortOrder: 'asc' } } },
                 skip,
                 take: limit,
                 orderBy: { createdAt: 'desc' },
@@ -54,7 +54,11 @@ let ProductsService = class ProductsService {
     async findOne(id) {
         const product = await this.prisma.product.findFirst({
             where: { id, deletedAt: null },
-            include: { category: true, reviews: true },
+            include: {
+                category: true,
+                reviews: true,
+                images: { orderBy: { sortOrder: 'asc' } },
+            },
         });
         if (!product) {
             throw new common_1.NotFoundException('Không tìm thấy sản phẩm');
@@ -73,6 +77,63 @@ let ProductsService = class ProductsService {
         return this.prisma.product.update({
             where: { id },
             data: { deletedAt: new Date() },
+        });
+    }
+    async addImage(productId, imageUrl, isPrimary = false) {
+        await this.findOne(productId);
+        if (isPrimary) {
+            await this.prisma.productImage.updateMany({
+                where: { productId },
+                data: { isPrimary: false },
+            });
+        }
+        const lastImage = await this.prisma.productImage.findFirst({
+            where: { productId },
+            orderBy: { sortOrder: 'desc' },
+        });
+        const sortOrder = lastImage ? lastImage.sortOrder + 1 : 0;
+        return this.prisma.productImage.create({
+            data: {
+                productId,
+                imageUrl,
+                isPrimary,
+                sortOrder,
+            },
+        });
+    }
+    async removeImage(productId, imageId) {
+        const image = await this.prisma.productImage.findFirst({
+            where: { id: imageId, productId },
+        });
+        if (!image) {
+            throw new common_1.NotFoundException('Ảnh không tồn tại');
+        }
+        await this.prisma.productImage.delete({
+            where: { id: imageId },
+        });
+        return { message: 'Đã xóa ảnh' };
+    }
+    async setPrimaryImage(productId, imageId) {
+        const image = await this.prisma.productImage.findFirst({
+            where: { id: imageId, productId },
+        });
+        if (!image) {
+            throw new common_1.NotFoundException('Ảnh không tồn tại');
+        }
+        await this.prisma.productImage.updateMany({
+            where: { productId },
+            data: { isPrimary: false },
+        });
+        return this.prisma.productImage.update({
+            where: { id: imageId },
+            data: { isPrimary: true },
+        });
+    }
+    async getImages(productId) {
+        await this.findOne(productId);
+        return this.prisma.productImage.findMany({
+            where: { productId },
+            orderBy: { sortOrder: 'asc' },
         });
     }
 };

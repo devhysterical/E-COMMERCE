@@ -48,6 +48,7 @@ model User {
   reviews       Review[]
   orders        Order[]
   cart          Cart?
+  wishlist      WishlistItem[]
 
   @@map("users")
 }
@@ -71,29 +72,47 @@ model Product {
   description   String?
   price         Int       // Định dạng tiền tệ: Số nguyên (Integer)
   stock         Int       @default(0)
-  imageUrl      String?
+  imageUrl      String?   // Ảnh chính (backward compatible)
   categoryId    String
   category      Category  @relation(fields: [categoryId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime? // Soft Delete
 
+  images        ProductImage[]
   reviews       Review[]
   orderItems    OrderItem[]
   cartItems     CartItem[]
+  wishlistItems WishlistItem[]
 
   @@map("products")
 }
+
+model ProductImage {
+  id            String    @id @default(uuid())
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl      String
+  isPrimary     Boolean   @default(false)
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+
+  @@map("product_images")
+}
+
 
 model Order {
   id              String        @id @default(uuid())
   userId          String
   user            User          @relation(fields: [userId], references: [id])
   totalAmount     Int           // Định dạng tiền tệ: Số nguyên (Integer)
+  discountAmount  Int           @default(0) // Số tiền giảm giá từ coupon
   status          OrderStatus   @default(PENDING)
   paymentMethod   PaymentMethod @default(COD)
   paymentStatus   PaymentStatus @default(PENDING)
   momoTransId     String?       // MoMo transaction ID
+  couponId        String?       // Mã giảm giá đã áp dụng
+  coupon          Coupon?       @relation(fields: [couponId], references: [id])
   address         String
   phone           String
   createdAt       DateTime      @default(now())
@@ -104,6 +123,48 @@ model Order {
 
   @@map("orders")
 }
+
+// ===== COUPON SYSTEM =====
+
+enum DiscountType {
+  PERCENTAGE  // Giảm theo phần trăm
+  FIXED       // Giảm số tiền cố định
+}
+
+model Coupon {
+  id              String        @id @default(uuid())
+  code            String        @unique
+  description     String?
+  discountType    DiscountType
+  discountValue   Int           // Giá trị giảm (% hoặc VND)
+  minOrderAmount  Int           @default(0) // Đơn hàng tối thiểu
+  maxDiscount     Int?          // Giảm tối đa (cho PERCENTAGE)
+  maxUses         Int?          // Số lần sử dụng tối đa
+  usedCount       Int           @default(0)
+  startDate       DateTime      @default(now())
+  expiresAt       DateTime?     // Ngày hết hạn
+  isActive        Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  orders          Order[]
+  usages          CouponUsage[]
+
+  @@map("coupons")
+}
+
+model CouponUsage {
+  id            String    @id @default(uuid())
+  couponId      String
+  coupon        Coupon    @relation(fields: [couponId], references: [id])
+  userId        String
+  orderId       String?
+  usedAt        DateTime  @default(now())
+
+  @@unique([couponId, userId]) // Mỗi user chỉ dùng mỗi coupon 1 lần
+  @@map("coupon_usages")
+}
+
 
 model OrderItem {
   id            String    @id @default(uuid())
@@ -166,4 +227,16 @@ model Banner {
   updatedAt     DateTime  @updatedAt
 
   @@map("banners")
+}
+
+model WishlistItem {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId     String
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt     DateTime  @default(now())
+
+  @@unique([userId, productId]) // User chỉ có thể thêm 1 product 1 lần
+  @@map("wishlist_items")
 }

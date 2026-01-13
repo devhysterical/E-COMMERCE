@@ -9,10 +9,10 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }[]>;
     findAll(): Promise<{
         id: string;
@@ -20,10 +20,10 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }[]>;
     findOne(id: string): Promise<{
         id: string;
@@ -31,10 +31,10 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }>;
     create(createBannerDto: CreateBannerDto): Promise<{
         id: string;
@@ -42,10 +42,10 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }>;
     update(id: string, updateBannerDto: UpdateBannerDto): Promise<{
         id: string;
@@ -53,10 +53,10 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -64,9 +64,9 @@ export declare class BannersController {
         updatedAt: Date;
         description: string | null;
         imageUrl: string;
+        sortOrder: number;
         title: string;
         linkUrl: string | null;
         isActive: boolean;
-        sortOrder: number;
     }>;
 }

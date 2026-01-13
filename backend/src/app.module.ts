@@ -15,6 +15,8 @@ import { UploadModule } from './upload/upload.module';
 import { PaymentModule } from './payment/payment.module';
 import { BannersModule } from './banners/banners.module';
 import { EmailModule } from './email/email.module';
+import { WishlistModule } from './wishlist/wishlist.module';
+import { CouponsModule } from './coupons/coupons.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { EmailModule } from './email/email.module';
     UploadModule,
     PaymentModule,
     BannersModule,
+    WishlistModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
