@@ -10,9 +10,9 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }[]>;
     findAll(): Promise<{
         id: string;
@@ -21,9 +21,9 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }[]>;
     findOne(id: string): Promise<{
         id: string;
@@ -32,9 +32,9 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }>;
     create(dto: CreateBannerDto): Promise<{
         id: string;
@@ -43,9 +43,9 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }>;
     update(id: string, dto: UpdateBannerDto): Promise<{
         id: string;
@@ -54,9 +54,9 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }>;
     remove(id: string): Promise<{
         id: string;
@@ -65,8 +65,8 @@ export declare class BannersService {
         description: string | null;
         imageUrl: string;
         sortOrder: number;
+        isActive: boolean;
         title: string;
         linkUrl: string | null;
-        isActive: boolean;
     }>;
 }

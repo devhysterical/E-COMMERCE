@@ -5,8 +5,8 @@ export declare class CouponsController {
     constructor(couponsService: CouponsService);
     getAvailableCoupons(): Promise<{
         id: string;
-        code: string;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -33,8 +33,10 @@ export declare class CouponsController {
         };
     } & {
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -44,8 +46,6 @@ export declare class CouponsController {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         _count: {
@@ -54,8 +54,10 @@ export declare class CouponsController {
         };
     } & {
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -65,13 +67,13 @@ export declare class CouponsController {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     create(dto: CreateCouponDto): Promise<{
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -81,13 +83,13 @@ export declare class CouponsController {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     update(id: string, dto: UpdateCouponDto): Promise<{
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -97,8 +99,6 @@ export declare class CouponsController {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         message: string;

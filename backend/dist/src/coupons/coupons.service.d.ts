@@ -5,8 +5,10 @@ export declare class CouponsService {
     constructor(prisma: PrismaService);
     create(dto: CreateCouponDto): Promise<{
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -16,8 +18,6 @@ export declare class CouponsService {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     findAll(): Promise<({
         _count: {
@@ -26,8 +26,10 @@ export declare class CouponsService {
         };
     } & {
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -37,8 +39,6 @@ export declare class CouponsService {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     })[]>;
     findOne(id: string): Promise<{
         _count: {
@@ -47,8 +47,10 @@ export declare class CouponsService {
         };
     } & {
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -58,13 +60,13 @@ export declare class CouponsService {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     update(id: string, dto: UpdateCouponDto): Promise<{
         id: string;
-        code: string;
+        createdAt: Date;
+        updatedAt: Date;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
@@ -74,16 +76,14 @@ export declare class CouponsService {
         startDate: Date;
         expiresAt: Date | null;
         isActive: boolean;
-        createdAt: Date;
-        updatedAt: Date;
     }>;
     remove(id: string): Promise<{
         message: string;
     }>;
     getAvailableCoupons(): Promise<{
         id: string;
-        code: string;
         description: string | null;
+        code: string;
         discountType: import("@prisma/client").$Enums.DiscountType;
         discountValue: number;
         minOrderAmount: number;
