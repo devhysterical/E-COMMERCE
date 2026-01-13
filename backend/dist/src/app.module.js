@@ -24,6 +24,8 @@ const upload_module_1 = require("./upload/upload.module");
 const payment_module_1 = require("./payment/payment.module");
 const banners_module_1 = require("./banners/banners.module");
 const email_module_1 = require("./email/email.module");
+const wishlist_module_1 = require("./wishlist/wishlist.module");
+const coupons_module_1 = require("./coupons/coupons.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -44,6 +46,8 @@ exports.AppModule = AppModule = __decorate([
             upload_module_1.UploadModule,
             payment_module_1.PaymentModule,
             banners_module_1.BannersModule,
+            wishlist_module_1.WishlistModule,
+            coupons_module_1.CouponsModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

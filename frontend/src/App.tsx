@@ -25,8 +25,10 @@ import CheckoutPage from "./pages/CheckoutPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
+import WishlistPage from "./pages/WishlistPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
+import { WishlistService } from "./services/api.service";
 import {
   LogOut,
   User as UserIcon,
@@ -34,6 +36,7 @@ import {
   Layout,
   Package,
   ChevronDown,
+  Heart,
 } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
@@ -71,11 +74,21 @@ const Navbar = () => {
     staleTime: 0,
   });
 
+  // Lấy số lượng sản phẩm trong wishlist
+  const { data: wishlist } = useQuery({
+    queryKey: ["wishlist"],
+    queryFn: WishlistService.getAll,
+    enabled: isAuthenticated,
+    staleTime: 0,
+  });
+
   const cartItemCount =
     cart?.cartItems?.reduce(
       (sum: number, item: { quantity: number }) => sum + item.quantity,
       0
     ) || 0;
+
+  const wishlistCount = wishlist?.length || 0;
 
   return (
     <nav className="bg-white border-b border-slate-100 sticky top-0 z-50 shadow-sm">
@@ -89,6 +102,17 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="flex items-center gap-8">
+            <Link
+              to="/wishlist"
+              className="relative p-2 text-slate-600 hover:text-red-500 transition-colors"
+              title="Yêu thích">
+              <Heart size={24} />
+              {wishlistCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  {wishlistCount > 99 ? "99+" : wishlistCount}
+                </span>
+              )}
+            </Link>
             <Link
               to="/cart"
               className="relative p-2 text-slate-600 hover:text-indigo-600 transition-colors">
@@ -245,6 +269,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <CartPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/wishlist"
+            element={
+              <ProtectedRoute>
+                <WishlistPage />
               </ProtectedRoute>
             }
           />

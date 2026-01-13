@@ -58,4 +58,32 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
+
+  // ===== Product Images Endpoints =====
+
+  @Get(':id/images')
+  getImages(@Param('id') id: string) {
+    return this.productsService.getImages(id);
+  }
+
+  @Post(':id/images')
+  @Roles(Role.ADMIN)
+  addImage(
+    @Param('id') id: string,
+    @Body() body: { imageUrl: string; isPrimary?: boolean },
+  ) {
+    return this.productsService.addImage(id, body.imageUrl, body.isPrimary);
+  }
+
+  @Delete(':id/images/:imageId')
+  @Roles(Role.ADMIN)
+  removeImage(@Param('id') id: string, @Param('imageId') imageId: string) {
+    return this.productsService.removeImage(id, imageId);
+  }
+
+  @Patch(':id/images/:imageId/primary')
+  @Roles(Role.ADMIN)
+  setPrimaryImage(@Param('id') id: string, @Param('imageId') imageId: string) {
+    return this.productsService.setPrimaryImage(id, imageId);
+  }
 }

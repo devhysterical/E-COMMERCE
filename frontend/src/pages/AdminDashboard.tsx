@@ -9,6 +9,7 @@ import {
 import { toast } from "react-toastify";
 import type { Product, Order, UserProfile } from "../services/api.service";
 import AdminBannersTab from "../components/AdminBannersTab";
+import AdminCouponsTab from "../components/AdminCouponsTab";
 import {
   Plus,
   Edit,
@@ -32,7 +33,13 @@ import {
   Image,
 } from "lucide-react";
 
-type TabType = "products" | "orders" | "users" | "categories" | "banners";
+type TabType =
+  | "products"
+  | "orders"
+  | "users"
+  | "categories"
+  | "banners"
+  | "coupons";
 
 const statusConfig: Record<
   string,
@@ -299,6 +306,11 @@ const AdminDashboard = () => {
           },
           { key: "users", label: "Người dùng", icon: <Users size={18} /> },
           { key: "banners", label: "Banners", icon: <Image size={18} /> },
+          {
+            key: "coupons",
+            label: "Mã giảm giá",
+            icon: <DollarSign size={18} />,
+          },
         ].map((tab) => (
           <button
             key={tab.key}
@@ -615,6 +627,13 @@ const AdminDashboard = () => {
         {activeTab === "banners" && (
           <div className="p-6">
             <AdminBannersTab />
+          </div>
+        )}
+
+        {/* Coupons Tab */}
+        {activeTab === "coupons" && (
+          <div className="p-6">
+            <AdminCouponsTab />
           </div>
         )}
       </div>

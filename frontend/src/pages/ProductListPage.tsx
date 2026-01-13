@@ -2,15 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ProductService, CategoryService } from "../services/api.service";
 import type { Product } from "../services/api.service";
-import { Link } from "react-router-dom";
-import {
-  Search,
-  Filter,
-  ShoppingCart,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Search, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import BannerSlider from "../components/BannerSlider";
+import ProductCard from "../components/ProductCard";
 
 const ProductListPage = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -145,45 +139,7 @@ const ProductListPage = () => {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {products.map((product: Product) => (
-                <Link
-                  key={product.id}
-                  to={`/product/${product.id}`}
-                  className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                  <div className="aspect-video bg-slate-100 relative overflow-hidden">
-                    {product.imageUrl ? (
-                      <img
-                        src={product.imageUrl}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-slate-400">
-                        No Image
-                      </div>
-                    )}
-                    <div className="absolute top-2 right-2">
-                      <span className="bg-white/90 backdrop-blur-sm text-indigo-600 px-3 py-1 rounded-full text-sm font-bold shadow-sm">
-                        {product.category.name}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <h3 className="font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors uppercase italic">
-                      {product.name}
-                    </h3>
-                    <p className="text-slate-500 text-sm line-clamp-2">
-                      {product.description}
-                    </p>
-                    <div className="flex items-center justify-between pt-2">
-                      <span className="text-xl font-black text-slate-900">
-                        {product.price.toLocaleString("vi-VN")} đ
-                      </span>
-                      <button className="bg-slate-900 text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
-                        <ShoppingCart size={20} />
-                      </button>
-                    </div>
-                  </div>
-                </Link>
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
           )}

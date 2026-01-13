@@ -61,6 +61,15 @@ export interface AdminStats {
   ordersByStatus: Record<string, number>;
 }
 
+export interface ProductImage {
+  id: string;
+  productId: string;
+  imageUrl: string;
+  isPrimary: boolean;
+  sortOrder: number;
+  createdAt: string;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -73,6 +82,7 @@ export interface Product {
     id: string;
     name: string;
   };
+  images?: ProductImage[];
 }
 
 export const CategoryService = {
@@ -312,5 +322,142 @@ export const BannerService = {
   // Admin: xóa banner
   delete: async (id: string): Promise<void> => {
     await api.delete(`/banners/admin/${id}`);
+  },
+};
+
+// Wishlist interfaces
+export interface WishlistItem {
+  id: string;
+  productId: string;
+  createdAt: string;
+  product: Product;
+}
+
+export const WishlistService = {
+  // Lấy danh sách wishlist
+  getAll: async (): Promise<WishlistItem[]> => {
+    const response = await api.get("/wishlist");
+    return response.data;
+  },
+
+  // Thêm sản phẩm vào wishlist
+  add: async (productId: string): Promise<WishlistItem> => {
+    const response = await api.post(`/wishlist/${productId}`);
+    return response.data;
+  },
+
+  // Xóa sản phẩm khỏi wishlist
+  remove: async (productId: string): Promise<void> => {
+    await api.delete(`/wishlist/${productId}`);
+  },
+
+  // Toggle wishlist (thêm/xóa)
+  toggle: async (
+    productId: string
+  ): Promise<{ inWishlist: boolean; message: string }> => {
+    const response = await api.post(`/wishlist/${productId}/toggle`);
+    return response.data;
+  },
+
+  // Kiểm tra sản phẩm có trong wishlist
+  check: async (productId: string): Promise<{ inWishlist: boolean }> => {
+    const response = await api.get(`/wishlist/${productId}/check`);
+    return response.data;
+  },
+};
+
+// ===== COUPON SERVICE =====
+
+export type DiscountType = "PERCENTAGE" | "FIXED";
+
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string | null;
+  discountType: DiscountType;
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscount: number | null;
+  maxUses: number | null;
+  usedCount: number;
+  startDate: string;
+  expiresAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  _count?: {
+    usages: number;
+    orders: number;
+  };
+}
+
+export interface ValidateCouponResult {
+  valid: boolean;
+  couponId: string;
+  code: string;
+  discountType: DiscountType;
+  discountValue: number;
+  discountAmount: number;
+  message: string;
+}
+
+export interface CreateCouponDto {
+  code: string;
+  description?: string;
+  discountType: DiscountType;
+  discountValue: number;
+  minOrderAmount?: number;
+  maxDiscount?: number;
+  maxUses?: number;
+  startDate?: string;
+  expiresAt?: string;
+  isActive?: boolean;
+}
+
+export type UpdateCouponDto = Partial<CreateCouponDto>;
+
+export const CouponService = {
+  // User: Get available coupons
+  getAvailable: async (): Promise<Coupon[]> => {
+    const response = await api.get("/coupons/available");
+    return response.data;
+  },
+
+  // User: Validate coupon
+  validate: async (
+    code: string,
+    orderAmount: number
+  ): Promise<ValidateCouponResult> => {
+    const response = await api.post("/coupons/validate", { code, orderAmount });
+    return response.data;
+  },
+
+  // Admin: Get all coupons
+  getAll: async (): Promise<Coupon[]> => {
+    const response = await api.get("/coupons/admin");
+    return response.data;
+  },
+
+  // Admin: Get one coupon
+  getOne: async (id: string): Promise<Coupon> => {
+    const response = await api.get(`/coupons/admin/${id}`);
+    return response.data;
+  },
+
+  // Admin: Create coupon
+  create: async (dto: CreateCouponDto): Promise<Coupon> => {
+    const response = await api.post("/coupons/admin", dto);
+    return response.data;
+  },
+
+  // Admin: Update coupon
+  update: async (id: string, dto: UpdateCouponDto): Promise<Coupon> => {
+    const response = await api.patch(`/coupons/admin/${id}`, dto);
+    return response.data;
+  },
+
+  // Admin: Delete coupon
+  delete: async (id: string): Promise<void> => {
+    await api.delete(`/coupons/admin/${id}`);
   },
 };

@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ProductService, ReviewService } from "../services/api.service";
+import {
+  ProductService,
+  ReviewService,
+  WishlistService,
+} from "../services/api.service";
 import { CartService } from "../services/cart.service";
 import type { Review } from "../services/api.service";
 import { useAuthStore } from "../store/useAuthStore";
@@ -14,7 +18,9 @@ import {
   Star,
   Send,
   Trash2,
+  Heart,
 } from "lucide-react";
+import ImageGallery from "../components/ImageGallery";
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,6 +29,8 @@ const ProductDetailPage = () => {
   const { user, isAuthenticated } = useAuthStore();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [inWishlist, setInWishlist] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -79,6 +87,36 @@ const ProductDetailPage = () => {
     createReviewMutation.mutate({ rating, comment, productId: id });
   };
 
+  // Wishlist logic
+  const checkWishlist = useCallback(async () => {
+    if (!id) return;
+    try {
+      const result = await WishlistService.check(id);
+      setInWishlist(result.inWishlist);
+    } catch (error) {
+      console.error("Error checking wishlist:", error);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    if (isAuthenticated && id) {
+      checkWishlist();
+    }
+  }, [isAuthenticated, id, checkWishlist]);
+
+  const handleToggleWishlist = async () => {
+    if (!id || !isAuthenticated) return;
+    setWishlistLoading(true);
+    try {
+      const result = await WishlistService.toggle(id);
+      setInWishlist(result.inWishlist);
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
+    } finally {
+      setWishlistLoading(false);
+    }
+  };
+
   const renderStars = (count: number, interactive = false) => {
     return (
       <div className="flex gap-1">
@@ -129,19 +167,13 @@ const ProductDetailPage = () => {
       </Link>
 
       <div className="flex flex-col md:flex-row gap-12 items-start">
-        {/* Product Image */}
-        <div className="flex-1 w-full aspect-square rounded-3xl overflow-hidden bg-slate-100 border border-slate-100 shadow-sm">
-          {product.imageUrl ? (
-            <img
-              src={product.imageUrl}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-slate-400">
-              No Image
-            </div>
-          )}
+        {/* Product Image Gallery */}
+        <div className="flex-1 w-full">
+          <ImageGallery
+            images={product.images || []}
+            mainImageUrl={product.imageUrl}
+            productName={product.name}
+          />
         </div>
 
         {/* Product Details */}
@@ -193,15 +225,30 @@ const ProductDetailPage = () => {
               </div>
             )}
 
-            <button
-              onClick={() => addToCartMutation.mutate()}
-              disabled={product.stock <= 0 || addToCartMutation.isPending}
-              className="w-full flex items-center justify-center gap-3 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:bg-slate-300 disabled:shadow-none">
-              <ShoppingCart size={22} />
-              {addToCartMutation.isPending
-                ? "Đang thêm..."
-                : "Thêm vào giỏ hàng"}
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => addToCartMutation.mutate()}
+                disabled={product.stock <= 0 || addToCartMutation.isPending}
+                className="flex-1 flex items-center justify-center gap-3 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:bg-slate-300 disabled:shadow-none">
+                <ShoppingCart size={22} />
+                {addToCartMutation.isPending
+                  ? "Đang thêm..."
+                  : "Thêm vào giỏ hàng"}
+              </button>
+              <button
+                onClick={handleToggleWishlist}
+                disabled={wishlistLoading || !isAuthenticated}
+                className={`p-4 rounded-xl transition-all border-2 ${
+                  inWishlist
+                    ? "bg-red-50 border-red-200 text-red-500"
+                    : "bg-slate-50 border-slate-200 text-slate-500 hover:text-red-500 hover:border-red-200"
+                } ${wishlistLoading ? "opacity-50" : ""}`}
+                title={
+                  inWishlist ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"
+                }>
+                <Heart size={22} fill={inWishlist ? "currentColor" : "none"} />
+              </button>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-slate-100">

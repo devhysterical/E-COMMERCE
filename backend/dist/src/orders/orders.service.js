@@ -20,17 +20,47 @@ let OrdersService = class OrdersService {
         this.prisma = prisma;
         this.cartsService = cartsService;
     }
-    async createOrder(userId, address, phone, paymentMethod = 'COD') {
+    async createOrder(userId, address, phone, paymentMethod = 'COD', couponId) {
         const cart = await this.cartsService.getCart(userId);
         if (!cart.cartItems.length) {
             throw new common_1.BadRequestException('Giỏ hàng trống');
         }
         const totalAmount = cart.cartItems.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+        let discountAmount = 0;
+        let validCouponId = undefined;
+        if (couponId) {
+            const coupon = await this.prisma.coupon.findUnique({
+                where: { id: couponId },
+            });
+            if (coupon && coupon.isActive) {
+                const existingUsage = await this.prisma.couponUsage.findUnique({
+                    where: { couponId_userId: { couponId, userId } },
+                });
+                if (!existingUsage) {
+                    if (coupon.discountType === 'PERCENTAGE') {
+                        discountAmount = Math.floor((totalAmount * coupon.discountValue) / 100);
+                        if (coupon.maxDiscount && discountAmount > coupon.maxDiscount) {
+                            discountAmount = coupon.maxDiscount;
+                        }
+                    }
+                    else {
+                        discountAmount = coupon.discountValue;
+                        if (discountAmount > totalAmount) {
+                            discountAmount = totalAmount;
+                        }
+                    }
+                    validCouponId = couponId;
+                }
+            }
+        }
+        const finalAmount = totalAmount - discountAmount;
         return this.prisma.$transaction(async (tx) => {
             const order = await tx.order.create({
                 data: {
                     userId,
-                    totalAmount,
+                    totalAmount: finalAmount,
+                    discountAmount,
+                    couponId: validCouponId,
                     address,
                     phone,
                     paymentMethod,
@@ -57,6 +87,19 @@ let OrdersService = class OrdersService {
             await tx.cartItem.deleteMany({
                 where: { cartId: cart.id },
             });
+            if (validCouponId) {
+                await tx.couponUsage.create({
+                    data: {
+                        couponId: validCouponId,
+                        userId,
+                        orderId: order.id,
+                    },
+                });
+                await tx.coupon.update({
+                    where: { id: validCouponId },
+                    data: { usedCount: { increment: 1 } },
+                });
+            }
             return order;
         });
     }

@@ -24,6 +24,7 @@ export const OrderService = {
     address: string;
     phone: string;
     paymentMethod?: string;
+    couponId?: string;
   }) => {
     const response = await api.post("/orders", data);
     return response.data;
