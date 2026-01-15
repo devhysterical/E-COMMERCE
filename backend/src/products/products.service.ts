@@ -59,6 +59,57 @@ export class ProductsService {
     };
   }
 
+  // Search Autocomplete - gợi ý sản phẩm khi gõ
+  async searchSuggest(query: string, limit: number = 5) {
+    if (!query.trim()) {
+      return [];
+    }
+
+    return this.prisma.product.findMany({
+      where: {
+        deletedAt: null,
+        name: { contains: query, mode: 'insensitive' },
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        imageUrl: true,
+      },
+      take: limit,
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  // Related Products - sản phẩm cùng category (trừ sản phẩm hiện tại)
+  async getRelatedProducts(productId: string, limit: number = 4) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      select: { categoryId: true },
+    });
+
+    if (!product) {
+      return [];
+    }
+
+    return this.prisma.product.findMany({
+      where: {
+        deletedAt: null,
+        categoryId: product.categoryId,
+        id: { not: productId },
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        imageUrl: true,
+        category: { select: { id: true, name: true } },
+      },
+      take: limit,
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async findOne(id: string) {
     const product = await this.prisma.product.findFirst({
       where: { id, deletedAt: null },

@@ -131,6 +131,31 @@ export const ProductService = {
     const response = await api.get("/products", { params });
     return response.data;
   },
+
+  // Search Autocomplete - gợi ý sản phẩm
+  searchSuggest: async (
+    query: string,
+    limit: number = 5
+  ): Promise<
+    { id: string; name: string; price: number; imageUrl: string | null }[]
+  > => {
+    const response = await api.get("/products/search/suggest", {
+      params: { q: query, limit },
+    });
+    return response.data;
+  },
+
+  // Related Products - sản phẩm liên quan
+  getRelated: async (
+    productId: string,
+    limit: number = 4
+  ): Promise<Product[]> => {
+    const response = await api.get(`/products/related/${productId}`, {
+      params: { limit },
+    });
+    return response.data;
+  },
+
   getOne: async (id: string): Promise<Product> => {
     const response = await api.get(`/products/${id}`);
     return response.data;

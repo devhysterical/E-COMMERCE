@@ -50,6 +50,24 @@ export class ProductsController {
     );
   }
 
+  // Search Autocomplete - gợi ý khi gõ tìm kiếm
+  @Get('search/suggest')
+  searchSuggest(@Query('q') query?: string, @Query('limit') limit?: string) {
+    return this.productsService.searchSuggest(
+      query || '',
+      limit ? parseInt(limit, 10) : 5,
+    );
+  }
+
+  // Related Products - sản phẩm cùng category
+  @Get('related/:id')
+  getRelated(@Param('id') id: string, @Query('limit') limit?: string) {
+    return this.productsService.getRelatedProducts(
+      id,
+      limit ? parseInt(limit, 10) : 4,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);

@@ -21,6 +21,9 @@ import {
   Heart,
 } from "lucide-react";
 import ImageGallery from "../components/ImageGallery";
+import RelatedProducts from "../components/RelatedProducts";
+import RecentlyViewed from "../components/RecentlyViewed";
+import { useRecentlyViewed } from "../hooks/useRecentlyViewed";
 
 const ProductDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -31,6 +34,7 @@ const ProductDetailPage = () => {
   const [comment, setComment] = useState("");
   const [inWishlist, setInWishlist] = useState(false);
   const [wishlistLoading, setWishlistLoading] = useState(false);
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", id],
@@ -103,6 +107,18 @@ const ProductDetailPage = () => {
       checkWishlist();
     }
   }, [isAuthenticated, id, checkWishlist]);
+
+  // Add to recently viewed when product loads
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      });
+    }
+  }, [product, addToRecentlyViewed]);
 
   const handleToggleWishlist = async () => {
     if (!id || !isAuthenticated) return;
@@ -366,6 +382,12 @@ const ProductDetailPage = () => {
           )}
         </div>
       </div>
+
+      {/* Related Products */}
+      {id && <RelatedProducts productId={id} limit={4} />}
+
+      {/* Recently Viewed */}
+      <RecentlyViewed excludeProductId={id} />
     </div>
   );
 };
