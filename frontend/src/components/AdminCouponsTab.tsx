@@ -127,6 +127,36 @@ const AdminCouponsTab = () => {
     return `${coupon.discountValue.toLocaleString("vi-VN")}đ`;
   };
 
+  // Xác định trạng thái thực tế của coupon
+  const getCouponStatus = (coupon: Coupon) => {
+    const now = new Date();
+
+    // Kiểm tra hết hạn
+    if (coupon.expiresAt && new Date(coupon.expiresAt) < now) {
+      return { status: "expired", label: "Hết hạn", color: "text-red-500" };
+    }
+
+    // Kiểm tra hết lượt sử dụng
+    if (coupon.maxUses && coupon.usedCount >= coupon.maxUses) {
+      return {
+        status: "exhausted",
+        label: "Hết lượt",
+        color: "text-orange-500",
+      };
+    }
+
+    // Kiểm tra isActive
+    if (!coupon.isActive) {
+      return { status: "inactive", label: "Đã tắt", color: "text-slate-400" };
+    }
+
+    return {
+      status: "active",
+      label: "Đang hoạt động",
+      color: "text-green-600",
+    };
+  };
+
   if (isLoading) {
     return (
       <div className="animate-pulse space-y-4">
@@ -374,15 +404,19 @@ const AdminCouponsTab = () => {
                     <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-mono font-bold text-lg">
                       {coupon.code}
                     </span>
-                    {coupon.isActive ? (
-                      <span className="flex items-center gap-1 text-sm text-green-600">
-                        <ToggleRight size={16} /> Đang hoạt động
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-1 text-sm text-slate-400">
-                        <ToggleLeft size={16} /> Đã tắt
-                      </span>
-                    )}
+                    {(() => {
+                      const statusInfo = getCouponStatus(coupon);
+                      const Icon =
+                        statusInfo.status === "active"
+                          ? ToggleRight
+                          : ToggleLeft;
+                      return (
+                        <span
+                          className={`flex items-center gap-1 text-sm ${statusInfo.color}`}>
+                          <Icon size={16} /> {statusInfo.label}
+                        </span>
+                      );
+                    })()}
                   </div>
 
                   {coupon.description && (
