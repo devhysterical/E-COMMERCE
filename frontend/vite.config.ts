@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
 
   // Path aliases cho clean imports
@@ -28,6 +28,7 @@ export default defineConfig({
       "lucide-react",
       "axios",
       "zustand",
+      "@supabase/supabase-js",
     ],
   },
 
@@ -47,7 +48,8 @@ export default defineConfig({
 
   // esbuild options
   esbuild: {
-    drop: process.env.NODE_ENV === "production" ? ["console", "debugger"] : [],
+    // Sử dụng mode của Vite để an toàn hơn process.env
+    drop: mode === "production" ? ["console", "debugger"] : [],
     target: "esnext",
   },
 
@@ -64,11 +66,11 @@ export default defineConfig({
         },
       },
     },
-    chunkSizeWarningLimit: 600,
+    chunkSizeWarningLimit: 1000,
     sourcemap: false,
   },
 
   css: {
     devSourcemap: false,
   },
-});
+}));
