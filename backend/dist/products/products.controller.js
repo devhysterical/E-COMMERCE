@@ -36,6 +36,14 @@ let ProductsController = class ProductsController {
     findAll(categoryId, search, page, limit, sortBy, sortOrder, minPrice, maxPrice) {
         return this.productsService.findAll(categoryId, search, page ? parseInt(page, 10) : 1, limit ? parseInt(limit, 10) : 12, sortBy || 'createdAt', sortOrder || 'desc', minPrice ? parseInt(minPrice, 10) : undefined, maxPrice ? parseInt(maxPrice, 10) : undefined);
     }
+    // Search Autocomplete - gợi ý khi gõ tìm kiếm
+    searchSuggest(query, limit) {
+        return this.productsService.searchSuggest(query || '', limit ? parseInt(limit, 10) : 5);
+    }
+    // Related Products - sản phẩm cùng category
+    getRelated(id, limit) {
+        return this.productsService.getRelatedProducts(id, limit ? parseInt(limit, 10) : 4);
+    }
     findOne(id) {
         return this.productsService.findOne(id);
     }
@@ -95,6 +103,28 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", void 0)
 ], ProductsController.prototype, "findAll", null);
+_ts_decorate([
+    (0, _common.Get)('search/suggest'),
+    _ts_param(0, (0, _common.Query)('q')),
+    _ts_param(1, (0, _common.Query)('limit')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ProductsController.prototype, "searchSuggest", null);
+_ts_decorate([
+    (0, _common.Get)('related/:id'),
+    _ts_param(0, (0, _common.Param)('id')),
+    _ts_param(1, (0, _common.Query)('limit')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ProductsController.prototype, "getRelated", null);
 _ts_decorate([
     (0, _common.Get)(':id'),
     _ts_param(0, (0, _common.Param)('id')),
