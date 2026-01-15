@@ -12,13 +12,28 @@ export class ProductsService {
     });
   }
 
-  async findAll(categoryId?: string, search?: string, page = 1, limit = 12) {
+  async findAll(
+    categoryId?: string,
+    search?: string,
+    page = 1,
+    limit = 12,
+    sortBy: 'price' | 'name' | 'createdAt' = 'createdAt',
+    sortOrder: 'asc' | 'desc' = 'desc',
+    minPrice?: number,
+    maxPrice?: number,
+  ) {
     const skip = (page - 1) * limit;
     const where = {
       deletedAt: null,
       ...(categoryId && { categoryId }),
       ...(search && {
         name: { contains: search, mode: 'insensitive' as const },
+      }),
+      ...((minPrice !== undefined || maxPrice !== undefined) && {
+        price: {
+          ...(minPrice !== undefined && { gte: minPrice }),
+          ...(maxPrice !== undefined && { lte: maxPrice }),
+        },
       }),
     };
 
@@ -28,7 +43,7 @@ export class ProductsService {
         include: { category: true, images: { orderBy: { sortOrder: 'asc' } } },
         skip,
         take: limit,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
       }),
       this.prisma.product.count({ where }),
     ]);

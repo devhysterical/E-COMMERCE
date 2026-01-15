@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartsService } from '../carts/carts.service';
+import { EmailService } from '../email/email.service';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class OrdersService {
   constructor(
     private prisma: PrismaService,
     private cartsService: CartsService,
+    private emailService: EmailService,
   ) {}
 
   async createOrder(
@@ -128,6 +130,23 @@ export class OrdersService {
         });
       }
 
+      // 5. Gửi email xác nhận đơn hàng
+      const user = await tx.user.findUnique({ where: { id: userId } });
+      if (user?.email) {
+        void this.emailService.sendOrderConfirmationEmail(user.email, {
+          orderId: order.id,
+          totalAmount: finalAmount,
+          discountAmount,
+          items: cart.cartItems.map((item) => ({
+            name: item.product.name,
+            quantity: item.quantity,
+            price: item.product.price * item.quantity,
+          })),
+          address,
+          paymentMethod,
+        });
+      }
+
       return order;
     });
   }
@@ -216,7 +235,7 @@ export class OrdersService {
     }
 
     // Nếu không phải CANCELLED, chỉ cập nhật status bình thường
-    return this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: { id },
       data: { status },
       include: {
@@ -228,6 +247,27 @@ export class OrdersService {
         },
       },
     });
+
+    // Gửi email thông báo cập nhật status
+    if (updatedOrder.user?.email) {
+      const statusLabels: Record<string, string> = {
+        PENDING: 'Chờ xử lý',
+        PROCESSING: 'Đang xử lý',
+        SHIPPED: 'Đang giao hàng',
+        DELIVERED: 'Đã giao hàng',
+        CANCELLED: 'Đã hủy',
+      };
+      void this.emailService.sendOrderStatusUpdateEmail(
+        updatedOrder.user.email,
+        {
+          orderId: id,
+          status,
+          statusLabel: statusLabels[status] || status,
+        },
+      );
+    }
+
+    return updatedOrder;
   }
 
   async getStats() {

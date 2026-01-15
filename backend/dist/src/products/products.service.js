@@ -22,13 +22,19 @@ let ProductsService = class ProductsService {
             data: dto,
         });
     }
-    async findAll(categoryId, search, page = 1, limit = 12) {
+    async findAll(categoryId, search, page = 1, limit = 12, sortBy = 'createdAt', sortOrder = 'desc', minPrice, maxPrice) {
         const skip = (page - 1) * limit;
         const where = {
             deletedAt: null,
             ...(categoryId && { categoryId }),
             ...(search && {
                 name: { contains: search, mode: 'insensitive' },
+            }),
+            ...((minPrice !== undefined || maxPrice !== undefined) && {
+                price: {
+                    ...(minPrice !== undefined && { gte: minPrice }),
+                    ...(maxPrice !== undefined && { lte: maxPrice }),
+                },
             }),
         };
         const [products, total] = await Promise.all([
@@ -37,7 +43,7 @@ let ProductsService = class ProductsService {
                 include: { category: true, images: { orderBy: { sortOrder: 'asc' } } },
                 skip,
                 take: limit,
-                orderBy: { createdAt: 'desc' },
+                orderBy: { [sortBy]: sortOrder },
             }),
             this.prisma.product.count({ where }),
         ]);

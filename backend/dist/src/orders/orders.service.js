@@ -13,12 +13,15 @@ exports.OrdersService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
 const carts_service_1 = require("../carts/carts.service");
+const email_service_1 = require("../email/email.service");
 let OrdersService = class OrdersService {
     prisma;
     cartsService;
-    constructor(prisma, cartsService) {
+    emailService;
+    constructor(prisma, cartsService, emailService) {
         this.prisma = prisma;
         this.cartsService = cartsService;
+        this.emailService = emailService;
     }
     async createOrder(userId, address, phone, paymentMethod = 'COD', couponId) {
         const cart = await this.cartsService.getCart(userId);
@@ -100,6 +103,21 @@ let OrdersService = class OrdersService {
                     data: { usedCount: { increment: 1 } },
                 });
             }
+            const user = await tx.user.findUnique({ where: { id: userId } });
+            if (user?.email) {
+                void this.emailService.sendOrderConfirmationEmail(user.email, {
+                    orderId: order.id,
+                    totalAmount: finalAmount,
+                    discountAmount,
+                    items: cart.cartItems.map((item) => ({
+                        name: item.product.name,
+                        quantity: item.quantity,
+                        price: item.product.price * item.quantity,
+                    })),
+                    address,
+                    paymentMethod,
+                });
+            }
             return order;
         });
     }
@@ -174,7 +192,7 @@ let OrdersService = class OrdersService {
                 });
             });
         }
-        return this.prisma.order.update({
+        const updatedOrder = await this.prisma.order.update({
             where: { id },
             data: { status },
             include: {
@@ -186,6 +204,21 @@ let OrdersService = class OrdersService {
                 },
             },
         });
+        if (updatedOrder.user?.email) {
+            const statusLabels = {
+                PENDING: 'Chờ xử lý',
+                PROCESSING: 'Đang xử lý',
+                SHIPPED: 'Đang giao hàng',
+                DELIVERED: 'Đã giao hàng',
+                CANCELLED: 'Đã hủy',
+            };
+            void this.emailService.sendOrderStatusUpdateEmail(updatedOrder.user.email, {
+                orderId: id,
+                status,
+                statusLabel: statusLabels[status] || status,
+            });
+        }
+        return updatedOrder;
     }
     async getStats() {
         const [totalOrders, totalRevenue, ordersByStatus] = await Promise.all([
@@ -223,6 +256,7 @@ exports.OrdersService = OrdersService;
 exports.OrdersService = OrdersService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [prisma_service_1.PrismaService,
-        carts_service_1.CartsService])
+        carts_service_1.CartsService,
+        email_service_1.EmailService])
 ], OrdersService);
 //# sourceMappingURL=orders.service.js.map

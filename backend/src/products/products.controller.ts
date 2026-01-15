@@ -33,12 +33,20 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
+    @Query('sortBy') sortBy?: 'price' | 'name' | 'createdAt',
+    @Query('sortOrder') sortOrder?: 'asc' | 'desc',
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
   ) {
     return this.productsService.findAll(
       categoryId,
       search,
       page ? parseInt(page, 10) : 1,
       limit ? parseInt(limit, 10) : 12,
+      sortBy || 'createdAt',
+      sortOrder || 'desc',
+      minPrice ? parseInt(minPrice, 10) : undefined,
+      maxPrice ? parseInt(maxPrice, 10) : undefined,
     );
   }
 

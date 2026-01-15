@@ -5,44 +5,44 @@ export declare class ProductsController {
     constructor(productsService: ProductsService);
     create(createProductDto: CreateProductDto): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         categoryId: string;
     }>;
-    findAll(categoryId?: string, search?: string, page?: string, limit?: string): Promise<{
+    findAll(categoryId?: string, search?: string, page?: string, limit?: string, sortBy?: 'price' | 'name' | 'createdAt', sortOrder?: 'asc' | 'desc', minPrice?: string, maxPrice?: string): Promise<{
         data: ({
             category: {
                 id: string;
+                name: string;
+                description: string | null;
                 createdAt: Date;
                 updatedAt: Date;
                 deletedAt: Date | null;
-                name: string;
-                description: string | null;
             };
             images: {
                 id: string;
-                createdAt: Date;
-                productId: string;
                 imageUrl: string;
+                createdAt: Date;
                 sortOrder: number;
+                productId: string;
                 isPrimary: boolean;
             }[];
         } & {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
             name: string;
             description: string | null;
             price: number;
             stock: number;
             imageUrl: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
             categoryId: string;
         })[];
         meta: {
@@ -53,73 +53,73 @@ export declare class ProductsController {
         };
     }>;
     findOne(id: string): Promise<{
+        category: {
+            id: string;
+            name: string;
+            description: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+            deletedAt: Date | null;
+        };
+        images: {
+            id: string;
+            imageUrl: string;
+            createdAt: Date;
+            sortOrder: number;
+            productId: string;
+            isPrimary: boolean;
+        }[];
         reviews: {
             id: string;
             createdAt: Date;
             updatedAt: Date;
+            productId: string;
             rating: number;
             comment: string | null;
-            productId: string;
             userId: string;
-        }[];
-        category: {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-            name: string;
-            description: string | null;
-        };
-        images: {
-            id: string;
-            createdAt: Date;
-            productId: string;
-            imageUrl: string;
-            sortOrder: number;
-            isPrimary: boolean;
         }[];
     } & {
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         categoryId: string;
     }>;
     update(id: string, updateProductDto: UpdateProductDto): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         categoryId: string;
     }>;
     remove(id: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        deletedAt: Date | null;
         name: string;
         description: string | null;
         price: number;
         stock: number;
         imageUrl: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        deletedAt: Date | null;
         categoryId: string;
     }>;
     getImages(id: string): Promise<{
         id: string;
-        createdAt: Date;
-        productId: string;
         imageUrl: string;
+        createdAt: Date;
         sortOrder: number;
+        productId: string;
         isPrimary: boolean;
     }[]>;
     addImage(id: string, body: {
@@ -127,10 +127,10 @@ export declare class ProductsController {
         isPrimary?: boolean;
     }): Promise<{
         id: string;
-        createdAt: Date;
-        productId: string;
         imageUrl: string;
+        createdAt: Date;
         sortOrder: number;
+        productId: string;
         isPrimary: boolean;
     }>;
     removeImage(id: string, imageId: string): Promise<{
@@ -138,10 +138,10 @@ export declare class ProductsController {
     }>;
     setPrimaryImage(id: string, imageId: string): Promise<{
         id: string;
-        createdAt: Date;
-        productId: string;
         imageUrl: string;
+        createdAt: Date;
         sortOrder: number;
+        productId: string;
         isPrimary: boolean;
     }>;
 }
