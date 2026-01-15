@@ -11,12 +11,13 @@ const common_1 = require("@nestjs/common");
 const orders_controller_1 = require("./orders.controller");
 const orders_service_1 = require("./orders.service");
 const carts_module_1 = require("../carts/carts.module");
+const email_module_1 = require("../email/email.module");
 let OrdersModule = class OrdersModule {
 };
 exports.OrdersModule = OrdersModule;
 exports.OrdersModule = OrdersModule = __decorate([
     (0, common_1.Module)({
-        imports: [carts_module_1.CartsModule],
+        imports: [carts_module_1.CartsModule, email_module_1.EmailModule],
         controllers: [orders_controller_1.OrdersController],
         providers: [orders_service_1.OrdersService],
         exports: [orders_service_1.OrdersService],

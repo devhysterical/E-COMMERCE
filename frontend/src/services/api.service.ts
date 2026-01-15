@@ -123,6 +123,10 @@ export const ProductService = {
     search?: string;
     page?: number;
     limit?: number;
+    sortBy?: "price" | "name" | "createdAt";
+    sortOrder?: "asc" | "desc";
+    minPrice?: number;
+    maxPrice?: number;
   }): Promise<PaginatedResponse<Product>> => {
     const response = await api.get("/products", { params });
     return response.data;
