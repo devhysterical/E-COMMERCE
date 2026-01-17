@@ -17,6 +17,7 @@ import { BannersModule } from './banners/banners.module';
 import { EmailModule } from './email/email.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CouponsModule } from './coupons/coupons.module';
     BannersModule,
     WishlistModule,
     CouponsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

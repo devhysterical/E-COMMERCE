@@ -68,6 +68,14 @@ export class ProductsController {
     );
   }
 
+  // Low Stock Products - sản phẩm tồn kho thấp (Admin)
+  @Get('low-stock')
+  getLowStock(@Query('threshold') threshold?: string) {
+    return this.productsService.getLowStockProducts(
+      threshold ? parseInt(threshold, 10) : 10,
+    );
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);

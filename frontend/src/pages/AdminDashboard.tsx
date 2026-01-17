@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import type { Product, Order, UserProfile } from "../services/api.service";
 import AdminBannersTab from "../components/AdminBannersTab";
 import AdminCouponsTab from "../components/AdminCouponsTab";
+import LowStockAlert from "../components/LowStockAlert";
 import {
   Plus,
   Edit,
@@ -28,6 +29,7 @@ import {
   Save,
   Upload,
   Eye,
+  Download,
   MapPin,
   Phone,
   Image,
@@ -234,16 +236,57 @@ const AdminDashboard = () => {
         <h1 className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">
           Hệ thống quản trị
         </h1>
-        {activeTab === "products" && (
-          <button
-            onClick={() => {
-              setEditingProduct(null);
-              setShowProductModal(true);
-            }}
-            className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-            <Plus size={20} /> Thêm sản phẩm
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {/* Export Dropdown */}
+          <div className="relative group">
+            <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+              <Download size={18} /> Xuất báo cáo
+            </button>
+            <div className="absolute right-0 top-full mt-2 bg-white rounded-xl border border-slate-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-48">
+              <button
+                onClick={async () => {
+                  try {
+                    const { ReportsService } =
+                      await import("../services/api.service");
+                    await ReportsService.exportOrders();
+                    toast.success("Đã tải xuống báo cáo đơn hàng!");
+                  } catch {
+                    toast.error("Không thể tải báo cáo");
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 rounded-t-xl text-slate-700 font-medium w-full text-left">
+                <ShoppingBag size={16} className="text-blue-500" />
+                Xuất đơn hàng
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    const { ReportsService } =
+                      await import("../services/api.service");
+                    await ReportsService.exportProducts();
+                    toast.success("Đã tải xuống báo cáo tồn kho!");
+                  } catch {
+                    toast.error("Không thể tải báo cáo");
+                  }
+                }}
+                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 rounded-b-xl text-slate-700 font-medium w-full text-left">
+                <Package size={16} className="text-indigo-500" />
+                Xuất tồn kho
+              </button>
+            </div>
+          </div>
+
+          {activeTab === "products" && (
+            <button
+              onClick={() => {
+                setEditingProduct(null);
+                setShowProductModal(true);
+              }}
+              className="flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+              <Plus size={20} /> Thêm sản phẩm
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -292,6 +335,14 @@ const AdminDashboard = () => {
             {categories.length}
           </p>
         </div>
+      </div>
+
+      {/* Low Stock Alert */}
+      <div className="mb-8">
+        <LowStockAlert
+          threshold={10}
+          onViewProducts={() => setActiveTab("products")}
+        />
       </div>
 
       {/* Tabs */}
@@ -554,7 +605,7 @@ const AdminDashboard = () => {
                         </div>
                       </td>
                     </tr>
-                  )
+                  ),
                 )}
               </tbody>
             </table>
@@ -655,7 +706,7 @@ const AdminDashboard = () => {
               });
             } else {
               createProductMutation.mutate(
-                data as Parameters<typeof ProductService.create>[0]
+                data as Parameters<typeof ProductService.create>[0],
               );
             }
           }}
@@ -804,7 +855,7 @@ const AdminDashboard = () => {
                         <div className="text-right">
                           <p className="font-bold text-slate-900">
                             {(item.price * item.quantity).toLocaleString(
-                              "vi-VN"
+                              "vi-VN",
                             )}{" "}
                             đ
                           </p>
@@ -813,7 +864,7 @@ const AdminDashboard = () => {
                           </p>
                         </div>
                       </div>
-                    )
+                    ),
                   )}
                 </div>
               </div>
@@ -1134,8 +1185,8 @@ const CategoryModal = ({
             {isPending
               ? "Đang lưu..."
               : category
-              ? "Cập nhật"
-              : "Thêm danh mục"}
+                ? "Cập nhật"
+                : "Thêm danh mục"}
           </button>
         </form>
       </div>

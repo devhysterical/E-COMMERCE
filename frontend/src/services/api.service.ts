@@ -135,7 +135,7 @@ export const ProductService = {
   // Search Autocomplete - gợi ý sản phẩm
   searchSuggest: async (
     query: string,
-    limit: number = 5
+    limit: number = 5,
   ): Promise<
     { id: string; name: string; price: number; imageUrl: string | null }[]
   > => {
@@ -148,10 +148,31 @@ export const ProductService = {
   // Related Products - sản phẩm liên quan
   getRelated: async (
     productId: string,
-    limit: number = 4
+    limit: number = 4,
   ): Promise<Product[]> => {
     const response = await api.get(`/products/related/${productId}`, {
       params: { limit },
+    });
+    return response.data;
+  },
+
+  // Low Stock Products - sản phẩm tồn kho thấp (Admin)
+  getLowStock: async (
+    threshold: number = 10,
+  ): Promise<{
+    products: {
+      id: string;
+      name: string;
+      price: number;
+      stock: number;
+      imageUrl: string | null;
+      category: { id: string; name: string };
+    }[];
+    total: number;
+    threshold: number;
+  }> => {
+    const response = await api.get("/products/low-stock", {
+      params: { threshold },
     });
     return response.data;
   },
@@ -180,7 +201,7 @@ export const ProductService = {
       stock: number;
       imageUrl: string;
       categoryId: string;
-    }>
+    }>,
   ) => {
     const response = await api.patch(`/products/${id}`, data);
     return response.data;
@@ -342,7 +363,7 @@ export const BannerService = {
       linkUrl: string;
       isActive: boolean;
       sortOrder: number;
-    }>
+    }>,
   ): Promise<Banner> => {
     const response = await api.patch(`/banners/admin/${id}`, data);
     return response.data;
@@ -382,7 +403,7 @@ export const WishlistService = {
 
   // Toggle wishlist (thêm/xóa)
   toggle: async (
-    productId: string
+    productId: string,
   ): Promise<{ inWishlist: boolean; message: string }> => {
     const response = await api.post(`/wishlist/${productId}/toggle`);
     return response.data;
@@ -455,7 +476,7 @@ export const CouponService = {
   // User: Validate coupon
   validate: async (
     code: string,
-    orderAmount: number
+    orderAmount: number,
   ): Promise<ValidateCouponResult> => {
     const response = await api.post("/coupons/validate", { code, orderAmount });
     return response.data;
@@ -488,5 +509,39 @@ export const CouponService = {
   // Admin: Delete coupon
   delete: async (id: string): Promise<void> => {
     await api.delete(`/coupons/admin/${id}`);
+  },
+};
+
+// Reports Service - Export Excel
+export const ReportsService = {
+  exportOrders: async (startDate?: string, endDate?: string): Promise<void> => {
+    const response = await api.get("/reports/export/orders", {
+      params: { startDate, endDate },
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `orders_${Date.now()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
+
+  exportProducts: async (): Promise<void> => {
+    const response = await api.get("/reports/export/products", {
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `products_inventory_${Date.now()}.xlsx`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
   },
 };
