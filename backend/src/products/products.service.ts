@@ -110,6 +110,31 @@ export class ProductsService {
     });
   }
 
+  // Low Stock Products - sản phẩm tồn kho thấp
+  async getLowStockProducts(threshold: number = 10) {
+    const products = await this.prisma.product.findMany({
+      where: {
+        deletedAt: null,
+        stock: { lte: threshold },
+      },
+      select: {
+        id: true,
+        name: true,
+        price: true,
+        stock: true,
+        imageUrl: true,
+        category: { select: { id: true, name: true } },
+      },
+      orderBy: { stock: 'asc' },
+    });
+
+    return {
+      products,
+      total: products.length,
+      threshold,
+    };
+  }
+
   async findOne(id: string) {
     const product = await this.prisma.product.findFirst({
       where: { id, deletedAt: null },

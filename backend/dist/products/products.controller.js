@@ -44,6 +44,10 @@ let ProductsController = class ProductsController {
     getRelated(id, limit) {
         return this.productsService.getRelatedProducts(id, limit ? parseInt(limit, 10) : 4);
     }
+    // Low Stock Products - sản phẩm tồn kho thấp (Admin)
+    getLowStock(threshold) {
+        return this.productsService.getLowStockProducts(threshold ? parseInt(threshold, 10) : 10);
+    }
     findOne(id) {
         return this.productsService.findOne(id);
     }
@@ -125,6 +129,15 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", void 0)
 ], ProductsController.prototype, "getRelated", null);
+_ts_decorate([
+    (0, _common.Get)('low-stock'),
+    _ts_param(0, (0, _common.Query)('threshold')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ProductsController.prototype, "getLowStock", null);
 _ts_decorate([
     (0, _common.Get)(':id'),
     _ts_param(0, (0, _common.Param)('id')),
