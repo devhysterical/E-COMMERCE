@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ProductService, CategoryService } from "../services/api.service";
 import type { Product } from "../services/api.service";
 import {
@@ -14,53 +15,62 @@ import ProductCard from "../components/ProductCard";
 import SearchAutocomplete from "../components/SearchAutocomplete";
 import RecentlyViewed from "../components/RecentlyViewed";
 
-type SortOption = {
-  value: string;
-  label: string;
-  sortBy: "price" | "name" | "createdAt";
-  sortOrder: "asc" | "desc";
-};
-
-const SORT_OPTIONS: SortOption[] = [
-  {
-    value: "newest",
-    label: "Mới nhất",
-    sortBy: "createdAt",
-    sortOrder: "desc",
-  },
-  { value: "oldest", label: "Cũ nhất", sortBy: "createdAt", sortOrder: "asc" },
-  {
-    value: "price_asc",
-    label: "Giá: Thấp đến cao",
-    sortBy: "price",
-    sortOrder: "asc",
-  },
-  {
-    value: "price_desc",
-    label: "Giá: Cao đến thấp",
-    sortBy: "price",
-    sortOrder: "desc",
-  },
-  { value: "name_asc", label: "Tên: A-Z", sortBy: "name", sortOrder: "asc" },
-  { value: "name_desc", label: "Tên: Z-A", sortBy: "name", sortOrder: "desc" },
-];
-
-const PRICE_RANGES = [
-  { label: "Tất cả giá", min: undefined, max: undefined },
-  { label: "Dưới 1 triệu", min: undefined, max: 1000000 },
-  { label: "1 - 5 triệu", min: 1000000, max: 5000000 },
-  { label: "5 - 10 triệu", min: 5000000, max: 10000000 },
-  { label: "10 - 20 triệu", min: 10000000, max: 20000000 },
-  { label: "Trên 20 triệu", min: 20000000, max: undefined },
-];
-
 const ProductListPage = () => {
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [sortOption, setSortOption] = useState("newest");
-  const [priceRange, setPriceRange] = useState(0); // index of PRICE_RANGES
+  const [priceRange, setPriceRange] = useState(0);
   const limit = 12;
+
+  const SORT_OPTIONS = [
+    {
+      value: "newest",
+      label: t("product.sortBy.newest"),
+      sortBy: "createdAt" as const,
+      sortOrder: "desc" as const,
+    },
+    {
+      value: "oldest",
+      label: t("product.sortBy.oldest"),
+      sortBy: "createdAt" as const,
+      sortOrder: "asc" as const,
+    },
+    {
+      value: "price_asc",
+      label: t("product.sortBy.priceAsc"),
+      sortBy: "price" as const,
+      sortOrder: "asc" as const,
+    },
+    {
+      value: "price_desc",
+      label: t("product.sortBy.priceDesc"),
+      sortBy: "price" as const,
+      sortOrder: "desc" as const,
+    },
+    {
+      value: "name_asc",
+      label: t("product.sortBy.nameAsc"),
+      sortBy: "name" as const,
+      sortOrder: "asc" as const,
+    },
+    {
+      value: "name_desc",
+      label: t("product.sortBy.nameDesc"),
+      sortBy: "name" as const,
+      sortOrder: "desc" as const,
+    },
+  ];
+
+  const PRICE_RANGES = [
+    { label: t("product.allPrices"), min: undefined, max: undefined },
+    { label: t("product.under1M"), min: undefined, max: 1000000 },
+    { label: t("product.1to5M"), min: 1000000, max: 5000000 },
+    { label: t("product.5to10M"), min: 5000000, max: 10000000 },
+    { label: t("product.10to20M"), min: 10000000, max: 20000000 },
+    { label: t("product.over20M"), min: 20000000, max: undefined },
+  ];
 
   const selectedSort =
     SORT_OPTIONS.find((opt) => opt.value === sortOption) || SORT_OPTIONS[0];
@@ -127,8 +137,8 @@ const ProductListPage = () => {
         <div className="hidden md:block w-64 space-y-6">
           {/* Category Filter */}
           <div>
-            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <Filter size={20} /> Danh mục
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <Filter size={20} /> {t("product.category")}
             </h3>
             <div className="space-y-2">
               <button
@@ -136,9 +146,9 @@ const ProductListPage = () => {
                 className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                   selectedCategory === ""
                     ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                    : "hover:bg-slate-100 text-slate-600"
+                    : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                 }`}>
-                Tất cả sản phẩm
+                {t("product.allProducts")}
               </button>
               {categories?.map((cat: { id: string; name: string }) => (
                 <button
@@ -147,7 +157,7 @@ const ProductListPage = () => {
                   className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                     selectedCategory === cat.id
                       ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
-                      : "hover:bg-slate-100 text-slate-600"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                   }`}>
                   {cat.name}
                 </button>
@@ -157,8 +167,8 @@ const ProductListPage = () => {
 
           {/* Price Range Filter */}
           <div>
-            <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <SlidersHorizontal size={20} /> Khoảng giá
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+              <SlidersHorizontal size={20} /> {t("product.priceRange")}
             </h3>
             <div className="space-y-2">
               {PRICE_RANGES.map((range, index) => (
@@ -168,7 +178,7 @@ const ProductListPage = () => {
                   className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
                     priceRange === index
                       ? "bg-green-600 text-white shadow-md shadow-green-100"
-                      : "hover:bg-slate-100 text-slate-600"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                   }`}>
                   {range.label}
                 </button>
@@ -186,7 +196,7 @@ const ProductListPage = () => {
               value={selectedCategory}
               onChange={(e) => handleCategoryChange(e.target.value)}
               className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
-              <option value="">Tất cả danh mục</option>
+              <option value="">{t("product.allCategories")}</option>
               {categories?.map((cat: { id: string; name: string }) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -217,12 +227,13 @@ const ProductListPage = () => {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">
-                  Sản phẩm của chúng tôi
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                  {t("product.ourProducts")}
                 </h1>
                 {meta && (
-                  <p className="text-sm text-slate-500 mt-1">
-                    Hiển thị {products.length} / {meta.total} sản phẩm
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    {t("product.showing")} {products.length} {t("product.of")}{" "}
+                    {meta.total}
                   </p>
                 )}
               </div>
@@ -234,7 +245,9 @@ const ProductListPage = () => {
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
               <ArrowUpDown size={18} className="text-slate-500" />
-              <span className="text-sm text-slate-600">Sắp xếp:</span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                {t("product.sort")}:
+              </span>
               <select
                 value={sortOption}
                 onChange={(e) => handleSortChange(e.target.value)}
@@ -264,9 +277,9 @@ const ProductListPage = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-16 bg-slate-50 rounded-2xl">
-              <p className="text-slate-500">
-                Không tìm thấy sản phẩm nào phù hợp.
+            <div className="text-center py-16 bg-slate-50 dark:bg-slate-800 rounded-2xl">
+              <p className="text-slate-500 dark:text-slate-400">
+                {t("product.noProductsFound")}
               </p>
             </div>
           )}
@@ -286,7 +299,7 @@ const ProductListPage = () => {
                   (p) =>
                     p === 1 ||
                     p === meta.totalPages ||
-                    (p >= page - 1 && p <= page + 1)
+                    (p >= page - 1 && p <= page + 1),
                 )
                 .map((p, idx, arr) => (
                   <span key={p}>

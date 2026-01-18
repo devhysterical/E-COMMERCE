@@ -86,7 +86,7 @@ const SearchAutocomplete = ({
           ref={inputRef}
           type="text"
           placeholder={placeholder}
-          className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
+          className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -103,9 +103,9 @@ const SearchAutocomplete = ({
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl border border-slate-200 shadow-xl shadow-slate-200/50 overflow-hidden z-50">
+        <div className="absolute top-full left-0 right-0 mt-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl shadow-slate-200/50 dark:shadow-slate-900/50 overflow-hidden z-50">
           {isLoading ? (
-            <div className="flex items-center justify-center py-6 text-slate-500">
+            <div className="flex items-center justify-center py-6 text-slate-500 dark:text-slate-400">
               <Loader2 size={20} className="animate-spin mr-2" />
               Đang tìm kiếm...
             </div>
@@ -131,17 +131,17 @@ const SearchAutocomplete = ({
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">
+                      <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
                         {product.name}
                       </p>
-                      <p className="text-sm text-indigo-600 font-semibold">
+                      <p className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
                         {product.price.toLocaleString("vi-VN")}đ
                       </p>
                     </div>
                   </Link>
                 </li>
               ))}
-              <li className="border-t border-slate-100 mt-2 pt-2">
+              <li className="border-t border-slate-100 dark:border-slate-700 mt-2 pt-2">
                 <button
                   onClick={() => {
                     onSearch(query);
@@ -153,7 +153,7 @@ const SearchAutocomplete = ({
               </li>
             </ul>
           ) : (
-            <div className="py-8 text-center text-slate-500">
+            <div className="py-8 text-center text-slate-500 dark:text-slate-400">
               Không tìm thấy sản phẩm phù hợp
             </div>
           )}

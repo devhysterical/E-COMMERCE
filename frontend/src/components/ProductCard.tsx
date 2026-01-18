@@ -66,9 +66,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="group bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+    <div className="group bg-white dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
       <Link to={`/product/${product.id}`}>
-        <div className="aspect-video bg-slate-100 relative overflow-hidden">
+        <div className="aspect-video bg-slate-100 dark:bg-slate-700 relative overflow-hidden">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -101,20 +101,20 @@ const ProductCard = ({ product }: ProductCardProps) => {
       </Link>
       <div className="p-5 space-y-3">
         <Link to={`/product/${product.id}`}>
-          <h3 className="font-bold text-slate-900 line-clamp-1 group-hover:text-indigo-600 transition-colors uppercase italic">
+          <h3 className="font-bold text-slate-900 dark:text-white line-clamp-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase italic">
             {product.name}
           </h3>
         </Link>
-        <p className="text-slate-500 text-sm line-clamp-2">
+        <p className="text-slate-500 dark:text-slate-400 text-sm line-clamp-2">
           {product.description}
         </p>
         <div className="flex items-center justify-between pt-2">
-          <span className="text-xl font-black text-slate-900">
+          <span className="text-xl font-black text-slate-900 dark:text-white">
             {product.price.toLocaleString("vi-VN")} đ
           </span>
           <button
             onClick={handleAddToCart}
-            className="bg-slate-900 text-white p-2 rounded-lg hover:bg-slate-800 transition-colors">
+            className="bg-slate-900 dark:bg-indigo-600 text-white p-2 rounded-lg hover:bg-slate-800 dark:hover:bg-indigo-700 transition-colors">
             <ShoppingCart size={20} />
           </button>
         </div>

@@ -1,0 +1,137 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "products": "Sản phẩm",
+    "cart": "Giỏ hàng",
+    "orders": "Đơn hàng",
+    "profile": "Hồ sơ",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "search": "Tìm kiếm",
+    "loading": "Đang tải...",
+    "save": "Lưu",
+    "cancel": "Hủy",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "confirm": "Xác nhận",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "all": "Tất cả",
+    "noResults": "Không có kết quả"
+  },
+  "header": {
+    "searchPlaceholder": "Tìm kiếm sản phẩm...",
+    "wishlist": "Yêu thích",
+    "admin": "Quản trị"
+  },
+  "product": {
+    "addToCart": "Thêm vào giỏ",
+    "buyNow": "Mua ngay",
+    "outOfStock": "Hết hàng",
+    "inStock": "Còn hàng",
+    "stock": "Tồn kho",
+    "price": "Giá",
+    "description": "Mô tả",
+    "reviews": "Đánh giá",
+    "relatedProducts": "Sản phẩm liên quan",
+    "recentlyViewed": "Đã xem gần đây",
+    "category": "Danh mục",
+    "filter": "Lọc",
+    "sort": "Sắp xếp",
+    "ourProducts": "Sản phẩm của chúng tôi",
+    "allProducts": "Tất cả sản phẩm",
+    "allCategories": "Tất cả danh mục",
+    "priceRange": "Khoảng giá",
+    "allPrices": "Tất cả giá",
+    "under1M": "Dưới 1 triệu",
+    "1to5M": "1 - 5 triệu",
+    "5to10M": "5 - 10 triệu",
+    "10to20M": "10 - 20 triệu",
+    "over20M": "Trên 20 triệu",
+    "showing": "Hiển thị",
+    "of": "trong số",
+    "noProductsFound": "Không tìm thấy sản phẩm nào phù hợp.",
+    "sortBy": {
+      "newest": "Mới nhất",
+      "oldest": "Cũ nhất",
+      "priceAsc": "Giá: Thấp đến cao",
+      "priceDesc": "Giá: Cao đến thấp",
+      "nameAsc": "Tên: A-Z",
+      "nameDesc": "Tên: Z-A"
+    }
+  },
+  "cart": {
+    "title": "Giỏ hàng của bạn",
+    "empty": "Giỏ hàng trống",
+    "total": "Tổng cộng",
+    "subtotal": "Tạm tính",
+    "discount": "Giảm giá",
+    "checkout": "Thanh toán",
+    "continueShopping": "Tiếp tục mua sắm",
+    "remove": "Xóa",
+    "quantity": "Số lượng",
+    "applyCoupon": "Áp dụng mã giảm giá",
+    "couponPlaceholder": "Nhập mã giảm giá"
+  },
+  "checkout": {
+    "title": "Thanh toán",
+    "shippingInfo": "Thông tin giao hàng",
+    "paymentMethod": "Phương thức thanh toán",
+    "orderSummary": "Tóm tắt đơn hàng",
+    "placeOrder": "Đặt hàng",
+    "cod": "Thanh toán khi nhận hàng",
+    "momo": "Thanh toán qua MoMo",
+    "fullName": "Họ và tên",
+    "phone": "Số điện thoại",
+    "address": "Địa chỉ"
+  },
+  "order": {
+    "title": "Đơn hàng của bạn",
+    "orderHistory": "Lịch sử đơn hàng",
+    "orderDetails": "Chi tiết đơn hàng",
+    "orderDate": "Ngày đặt",
+    "status": {
+      "pending": "Chờ xử lý",
+      "processing": "Đang xử lý",
+      "shipped": "Đang giao",
+      "delivered": "Đã giao",
+      "cancelled": "Đã hủy"
+    },
+    "empty": "Chưa có đơn hàng nào"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mật khẩu",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "forgotPassword": "Quên mật khẩu?",
+    "rememberMe": "Ghi nhớ đăng nhập",
+    "loginWith": "Hoặc đăng nhập với",
+    "noAccount": "Chưa có tài khoản?",
+    "hasAccount": "Đã có tài khoản?",
+    "registerHere": "Đăng ký ngay"
+  },
+  "review": {
+    "writeReview": "Viết đánh giá",
+    "yourRating": "Đánh giá của bạn",
+    "yourReview": "Nhận xét của bạn",
+    "submit": "Gửi đánh giá",
+    "noReviews": "Chưa có đánh giá nào"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "theme": "Giao diện",
+    "language": "Ngôn ngữ",
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Theo hệ thống"
+  },
+  "footer": {
+    "rights": "Mọi quyền được bảo lưu",
+    "contact": "Liên hệ",
+    "about": "Về chúng tôi",
+    "terms": "Điều khoản sử dụng",
+    "privacy": "Chính sách bảo mật"
+  }
+}

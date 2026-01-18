@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { OrderService } from "../services/api.service";
 import type { Order } from "../services/api.service";
 import {
@@ -12,49 +13,55 @@ import {
   Loader,
 } from "lucide-react";
 
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ReactNode }
-> = {
-  PENDING: {
-    label: "Chờ xử lý",
-    color: "bg-yellow-100 text-yellow-700",
-    icon: <Clock size={16} />,
-  },
-  PROCESSING: {
-    label: "Đang xử lý",
-    color: "bg-blue-100 text-blue-700",
-    icon: <Loader size={16} />,
-  },
-  SHIPPED: {
-    label: "Đang giao",
-    color: "bg-indigo-100 text-indigo-700",
-    icon: <Truck size={16} />,
-  },
-  DELIVERED: {
-    label: "Đã giao",
-    color: "bg-green-100 text-green-700",
-    icon: <CheckCircle size={16} />,
-  },
-  CANCELLED: {
-    label: "Đã hủy",
-    color: "bg-red-100 text-red-700",
-    icon: <XCircle size={16} />,
-  },
-};
-
 const OrderHistoryPage = () => {
+  const { t } = useTranslation();
   const { data: orders = [], isLoading } = useQuery({
     queryKey: ["myOrders"],
     queryFn: OrderService.getMyOrders,
   });
 
+  const statusConfig: Record<
+    string,
+    { label: string; color: string; icon: React.ReactNode }
+  > = {
+    PENDING: {
+      label: t("order.status.pending"),
+      color:
+        "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400",
+      icon: <Clock size={16} />,
+    },
+    PROCESSING: {
+      label: t("order.status.processing"),
+      color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      icon: <Loader size={16} />,
+    },
+    SHIPPED: {
+      label: t("order.status.shipped"),
+      color:
+        "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400",
+      icon: <Truck size={16} />,
+    },
+    DELIVERED: {
+      label: t("order.status.delivered"),
+      color:
+        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+      icon: <CheckCircle size={16} />,
+    },
+    CANCELLED: {
+      label: t("order.status.cancelled"),
+      color: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
+      icon: <XCircle size={16} />,
+    },
+  };
+
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-12 animate-pulse">
-        <div className="h-8 w-48 bg-slate-200 rounded mb-8"></div>
+        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-8"></div>
         {[1, 2, 3].map((i) => (
-          <div key={i} className="bg-white rounded-2xl p-6 mb-4 h-32"></div>
+          <div
+            key={i}
+            className="bg-white dark:bg-slate-800 rounded-2xl p-6 mb-4 h-32"></div>
         ))}
       </div>
     );
@@ -62,24 +69,27 @@ const OrderHistoryPage = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-8 flex items-center gap-3">
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-3">
         <Package className="text-indigo-600" />
-        Lịch sử đơn hàng
+        {t("order.orderHistory")}
       </h1>
 
       {orders.length === 0 ? (
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 p-12 text-center">
-          <Package className="mx-auto text-slate-300 mb-4" size={64} />
-          <h2 className="text-xl font-semibold text-slate-500">
-            Bạn chưa có đơn hàng nào
+        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-12 text-center">
+          <Package
+            className="mx-auto text-slate-300 dark:text-slate-600 mb-4"
+            size={64}
+          />
+          <h2 className="text-xl font-semibold text-slate-500 dark:text-slate-400">
+            {t("order.empty")}
           </h2>
-          <p className="text-slate-400 mt-2">
-            Hãy khám phá các sản phẩm của chúng tôi!
+          <p className="text-slate-400 dark:text-slate-500 mt-2">
+            {t("cart.continueShopping")}
           </p>
           <Link
             to="/"
             className="inline-block mt-6 px-8 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
-            Mua sắm ngay
+            {t("product.ourProducts")}
           </Link>
         </div>
       ) : (
@@ -89,21 +99,21 @@ const OrderHistoryPage = () => {
             return (
               <div
                 key={order.id}
-                className="bg-white rounded-2xl shadow-lg shadow-slate-100 border border-slate-100 p-6 hover:shadow-xl transition-shadow">
+                className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-6 hover:shadow-xl transition-shadow">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-400">
-                        Mã đơn hàng:
+                      <span className="text-sm text-slate-400 dark:text-slate-500">
+                        {t("order.orderDetails")}:
                       </span>
-                      <span className="font-mono text-sm text-slate-600">
+                      <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
                         #{order.id.slice(0, 8)}
                       </span>
                     </div>
-                    <p className="text-xl font-bold text-slate-900">
+                    <p className="text-xl font-bold text-slate-900 dark:text-white">
                       {order.totalAmount.toLocaleString("vi-VN")} đ
                     </p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       {new Date(order.createdAt).toLocaleDateString("vi-VN", {
                         year: "numeric",
                         month: "long",

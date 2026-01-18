@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { CartService } from "../services/cart.service";
 import {
   CouponService,
@@ -36,13 +37,14 @@ interface CartItem {
 }
 
 const CartPage = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   // Coupon states
   const [couponCode, setCouponCode] = useState("");
   const [couponResult, setCouponResult] = useState<ValidateCouponResult | null>(
-    null
+    null,
   );
   const [couponError, setCouponError] = useState("");
   const [validatingCoupon, setValidatingCoupon] = useState(false);
@@ -80,7 +82,7 @@ const CartPage = () => {
           cart.cartItems.reduce(
             (sum: number, item: CartItem) =>
               sum + item.product.price * item.quantity,
-            0
+            0,
           ) - (couponResult?.discountAmount || 0);
         if (newTotal < 0) {
           handleRemoveCoupon();
@@ -91,7 +93,7 @@ const CartPage = () => {
 
   const totalAmount = cart?.cartItems.reduce(
     (sum: number, item: CartItem) => sum + item.product.price * item.quantity,
-    0
+    0,
   );
 
   const finalAmount = (totalAmount || 0) - (couponResult?.discountAmount || 0);
@@ -116,7 +118,7 @@ const CartPage = () => {
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
       setCouponError(
-        error.response?.data?.message || "Mã giảm giá không hợp lệ"
+        error.response?.data?.message || "Mã giảm giá không hợp lệ",
       );
       setCouponResult(null);
     } finally {
@@ -153,26 +155,30 @@ const CartPage = () => {
   };
 
   if (isLoading)
-    return <div className="p-8 text-center">Đang tải giỏ hàng...</div>;
+    return (
+      <div className="p-8 text-center text-slate-600 dark:text-slate-400">
+        {t("common.loading")}
+      </div>
+    );
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="flex items-center gap-3 mb-8">
         <ShoppingBag className="text-indigo-600" size={32} />
-        <h1 className="text-3xl font-black text-slate-900 italic uppercase">
-          Giỏ hàng của bạn
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white italic uppercase">
+          {t("cart.title")}
         </h1>
       </div>
 
       {!cart?.cartItems.length ? (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-          <p className="text-slate-500 mb-6 text-lg">
-            Giỏ hàng của bạn đang trống.
+        <div className="text-center py-20 bg-white dark:bg-slate-800 rounded-3xl border border-dashed border-slate-200 dark:border-slate-700">
+          <p className="text-slate-500 dark:text-slate-400 mb-6 text-lg">
+            {t("cart.empty")}
           </p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 uppercase">
-            Tiếp tục mua sắm
+            {t("cart.continueShopping")}
           </Link>
         </div>
       ) : (
@@ -182,8 +188,8 @@ const CartPage = () => {
             {cart.cartItems.map((item: CartItem) => (
               <div
                 key={item.id}
-                className="bg-white p-5 rounded-2xl flex items-center gap-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow">
-                <div className="w-24 h-24 bg-slate-100 rounded-xl overflow-hidden flex-shrink-0">
+                className="bg-white dark:bg-slate-800 p-5 rounded-2xl flex items-center gap-6 border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-24 h-24 bg-slate-100 dark:bg-slate-700 rounded-xl overflow-hidden flex-shrink-0">
                   <img
                     src={item.product.imageUrl}
                     alt={item.product.name}
@@ -191,14 +197,14 @@ const CartPage = () => {
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-slate-900 uppercase italic">
+                  <h3 className="font-bold text-slate-900 dark:text-white uppercase italic">
                     {item.product.name}
                   </h3>
-                  <p className="text-indigo-600 font-bold mt-1">
+                  <p className="text-indigo-600 dark:text-indigo-400 font-bold mt-1">
                     {item.product.price.toLocaleString("vi-VN")} đ
                   </p>
                 </div>
-                <div className="flex items-center gap-4 bg-slate-50 p-2 rounded-xl">
+                <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-700 p-2 rounded-xl">
                   <button
                     onClick={() =>
                       updateMutation.mutate({
@@ -349,7 +355,7 @@ const CartPage = () => {
                                   }`}>
                                   Đơn tối thiểu{" "}
                                   {coupon.minOrderAmount.toLocaleString(
-                                    "vi-VN"
+                                    "vi-VN",
                                   )}
                                   đ
                                 </p>
