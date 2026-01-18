@@ -38,7 +38,7 @@ const BannerSlider = () => {
 
   if (isLoading) {
     return (
-      <div className="w-full min-h-[200px] bg-slate-100 rounded-2xl animate-pulse" />
+      <div className="w-full min-h-[200px] bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse" />
     );
   }
 
@@ -47,7 +47,7 @@ const BannerSlider = () => {
   }
 
   return (
-    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 group">
+    <div className="relative w-full overflow-hidden rounded-2xl bg-slate-100 dark:bg-slate-800 group">
       {/* Slides */}
       <div
         className="flex transition-transform duration-500 ease-out"

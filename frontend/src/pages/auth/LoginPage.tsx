@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../../api/axios";
 import { useAuthStore } from "../../store/useAuthStore";
 import { signInWithGoogle } from "../../services/supabase";
 import { Eye, EyeOff } from "lucide-react";
 
 const LoginPage = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,7 +31,8 @@ const LoginPage = () => {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
-        error.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại."
+        error.response?.data?.message ||
+          "Đăng nhập thất bại. Vui lòng thử lại.",
       );
     } finally {
       setLoading(false);
@@ -49,19 +52,19 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-indigo-50 to-slate-100 px-4">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl shadow-indigo-100 p-10 space-y-8 border border-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-indigo-50 to-slate-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 px-4">
+      <div className="max-w-md w-full bg-white dark:bg-slate-800 rounded-3xl shadow-2xl shadow-indigo-100 dark:shadow-slate-900/50 p-10 space-y-8 border border-slate-100 dark:border-slate-700">
         <div className="text-center">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight italic uppercase">
-            Chào mừng trở lại
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight italic uppercase">
+            {t("common.login")}
           </h1>
-          <p className="text-slate-500 mt-3">
-            Vui lòng đăng nhập vào tài khoản của bạn
+          <p className="text-slate-500 dark:text-slate-400 mt-3">
+            {t("auth.loginWith")}
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm border border-red-100 font-medium">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-2xl text-sm border border-red-100 dark:border-red-800 font-medium">
             {error}
           </div>
         )}

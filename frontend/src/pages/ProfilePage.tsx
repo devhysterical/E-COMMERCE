@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { UserService, UploadService } from "../services/api.service";
 import { useAuthStore } from "../store/useAuthStore";
 import {
@@ -19,6 +20,7 @@ import {
 import { toast } from "react-toastify";
 
 const ProfilePage = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { user: authUser, setAuth, token } = useAuthStore();
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -55,7 +57,7 @@ const ProfilePage = () => {
       if (authUser && token) {
         setAuth(
           { ...authUser, fullName: data.fullName || authUser.fullName },
-          token
+          token,
         );
       }
       setIsEditing(false);
@@ -78,7 +80,7 @@ const ProfilePage = () => {
     },
     onError: () => {
       setPasswordMessage(
-        "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại."
+        "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.",
       );
     },
   });
@@ -144,11 +146,11 @@ const ProfilePage = () => {
   if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 animate-pulse">
-        <div className="h-8 w-48 bg-slate-200 rounded mb-8"></div>
-        <div className="bg-white rounded-2xl p-8 space-y-6">
-          <div className="h-24 w-24 bg-slate-200 rounded-full mx-auto"></div>
-          <div className="h-6 w-1/2 bg-slate-200 rounded mx-auto"></div>
-          <div className="h-4 w-1/3 bg-slate-200 rounded mx-auto"></div>
+        <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded mb-8"></div>
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-8 space-y-6">
+          <div className="h-24 w-24 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto"></div>
+          <div className="h-6 w-1/2 bg-slate-200 dark:bg-slate-700 rounded mx-auto"></div>
+          <div className="h-4 w-1/3 bg-slate-200 dark:bg-slate-700 rounded mx-auto"></div>
         </div>
       </div>
     );
@@ -156,20 +158,23 @@ const ProfilePage = () => {
 
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-      <h1 className="text-3xl font-bold text-slate-900 mb-8">Hồ sơ cá nhân</h1>
+      <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
+        {t("common.profile")}
+      </h1>
 
       {passwordMessage && (
         <div
           className={`mb-6 p-4 rounded-xl ${
-            passwordMessage.includes("thành công")
-              ? "bg-green-50 text-green-600"
-              : "bg-red-50 text-red-600"
+            passwordMessage.includes("thành công") ||
+            passwordMessage.includes("success")
+              ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
+              : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"
           }`}>
           {passwordMessage}
         </div>
       )}
 
-      <div className="bg-white rounded-3xl shadow-xl shadow-slate-100 border border-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 overflow-hidden">
         {/* Profile Header */}
         <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 text-center">
           {/* Avatar with upload */}
@@ -363,7 +368,7 @@ const ProfilePage = () => {
                     <p className="text-slate-900 font-medium">
                       {profile?.dateOfBirth
                         ? new Date(profile.dateOfBirth).toLocaleDateString(
-                            "vi-VN"
+                            "vi-VN",
                           )
                         : "Chưa cập nhật"}
                     </p>
@@ -457,8 +462,8 @@ const ProfilePage = () => {
                       confirmPassword && confirmPassword !== newPassword
                         ? "border-red-300"
                         : confirmPassword && confirmPassword === newPassword
-                        ? "border-green-300"
-                        : "border-slate-200"
+                          ? "border-green-300"
+                          : "border-slate-200"
                     }`}
                     required
                   />

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { OrderService, PaymentService } from "../services/cart.service";
 import {
   UserService,
@@ -20,6 +21,7 @@ import {
 type PaymentMethod = "COD" | "MOMO";
 
 const CheckoutPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -77,7 +79,7 @@ const CheckoutPage = () => {
         try {
           setIsProcessing(true);
           const paymentResult = await PaymentService.createMoMoPayment(
-            order.id
+            order.id,
           );
           if (paymentResult.success && paymentResult.payUrl) {
             window.location.href = paymentResult.payUrl;
@@ -121,19 +123,19 @@ const CheckoutPage = () => {
     <div className="max-w-3xl mx-auto px-4 py-12">
       <button
         onClick={() => navigate("/cart")}
-        className="flex items-center gap-2 text-slate-500 hover:text-indigo-600 mb-8 font-medium">
-        <ChevronLeft size={20} /> Quay lại giỏ hàng
+        className="flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 mb-8 font-medium">
+        <ChevronLeft size={20} /> {t("common.back")}
       </button>
 
-      <h1 className="text-3xl font-black text-slate-900 mb-8 italic uppercase">
-        Thông tin đặt hàng
+      <h1 className="text-3xl font-black text-slate-900 dark:text-white mb-8 italic uppercase">
+        {t("checkout.title")}
       </h1>
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-8 bg-white p-10 rounded-3xl border border-slate-100 shadow-xl shadow-slate-100">
+        className="space-y-8 bg-white dark:bg-slate-800 p-10 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-xl shadow-slate-100 dark:shadow-slate-900/50">
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-xl text-sm border border-red-100 font-medium">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-100 dark:border-red-800 font-medium">
             {error}
           </div>
         )}
@@ -254,8 +256,8 @@ const CheckoutPage = () => {
               ? "Đang chuyển đến MoMo..."
               : "Đang xử lý..."
             : paymentMethod === "MOMO"
-            ? "Thanh toán với MoMo"
-            : "Xác nhận đặt hàng"}
+              ? "Thanh toán với MoMo"
+              : "Xác nhận đặt hàng"}
         </button>
       </form>
     </div>
