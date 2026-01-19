@@ -120,7 +120,10 @@ const LoginPage = () => {
               />
               <input
                 type="email"
+                id="email"
+                name="email"
                 required
+                autoComplete="email"
                 className="w-full pl-12 pr-4 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="name@example.com"
                 value={email}
@@ -148,7 +151,10 @@ const LoginPage = () => {
               />
               <input
                 type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
                 required
+                autoComplete="current-password"
                 className="w-full pl-12 pr-14 py-4 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="••••••••"
                 value={password}

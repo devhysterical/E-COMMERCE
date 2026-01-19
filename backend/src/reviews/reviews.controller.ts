@@ -20,10 +20,10 @@ export class ReviewsController {
   @UseGuards(JwtAuthGuard)
   @Post()
   create(
-    @Request() req: { user: { sub: string } },
+    @Request() req: { user: { userId: string } },
     @Body() dto: CreateReviewDto,
   ) {
-    return this.reviewsService.create(req.user.sub, dto);
+    return this.reviewsService.create(req.user.userId, dto);
   }
 
   @Get('product/:productId')
@@ -45,18 +45,18 @@ export class ReviewsController {
   @Patch(':id')
   update(
     @Param('id') id: string,
-    @Request() req: { user: { sub: string; role: string } },
+    @Request() req: { user: { userId: string; role: string } },
     @Body() dto: UpdateReviewDto,
   ) {
-    return this.reviewsService.update(id, req.user.sub, req.user.role, dto);
+    return this.reviewsService.update(id, req.user.userId, req.user.role, dto);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   remove(
     @Param('id') id: string,
-    @Request() req: { user: { sub: string; role: string } },
+    @Request() req: { user: { userId: string; role: string } },
   ) {
-    return this.reviewsService.remove(id, req.user.sub, req.user.role);
+    return this.reviewsService.remove(id, req.user.userId, req.user.role);
   }
 }

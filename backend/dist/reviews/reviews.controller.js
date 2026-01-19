@@ -28,7 +28,7 @@ function _ts_param(paramIndex, decorator) {
 }
 let ReviewsController = class ReviewsController {
     create(req, dto) {
-        return this.reviewsService.create(req.user.sub, dto);
+        return this.reviewsService.create(req.user.userId, dto);
     }
     findByProduct(productId) {
         return this.reviewsService.findByProduct(productId);
@@ -40,10 +40,10 @@ let ReviewsController = class ReviewsController {
         return this.reviewsService.findOne(id);
     }
     update(id, req, dto) {
-        return this.reviewsService.update(id, req.user.sub, req.user.role, dto);
+        return this.reviewsService.update(id, req.user.userId, req.user.role, dto);
     }
     remove(id, req) {
-        return this.reviewsService.remove(id, req.user.sub, req.user.role);
+        return this.reviewsService.remove(id, req.user.userId, req.user.role);
     }
     constructor(reviewsService){
         this.reviewsService = reviewsService;
