@@ -226,8 +226,10 @@ const RegisterPage = () => {
               />
               <input
                 type="text"
+                id="fullName"
                 name="fullName"
                 required
+                autoComplete="name"
                 className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="Nguyễn Văn A"
                 value={formData.fullName}
@@ -248,8 +250,10 @@ const RegisterPage = () => {
               />
               <input
                 type="email"
+                id="register-email"
                 name="email"
                 required
+                autoComplete="email"
                 className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="name@example.com"
                 value={formData.email}
@@ -270,8 +274,10 @@ const RegisterPage = () => {
               />
               <input
                 type={showPassword ? "text" : "password"}
+                id="register-password"
                 name="password"
                 required
+                autoComplete="new-password"
                 className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="••••••••"
                 value={formData.password}
