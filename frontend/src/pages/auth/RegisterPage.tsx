@@ -1,10 +1,24 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../../api/axios";
 import { signInWithGoogle } from "../../services/supabase";
-import { Eye, EyeOff, Check, X, Send } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  Check,
+  X,
+  Send,
+  Mail,
+  Lock,
+  User,
+  ArrowRight,
+  Loader2,
+} from "lucide-react";
+import AuthLayout from "../../components/AuthLayout";
 
 const RegisterPage = () => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,7 +37,6 @@ const RegisterPage = () => {
 
   const navigate = useNavigate();
 
-  // Countdown timer
   useEffect(() => {
     if (countdown > 0) {
       const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
@@ -31,7 +44,6 @@ const RegisterPage = () => {
     }
   }, [countdown]);
 
-  // Kiểm tra mật khẩu
   const passwordValidation = useMemo(() => {
     const { password } = formData;
     return {
@@ -71,7 +83,7 @@ const RegisterPage = () => {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
         error.response?.data?.message ||
-          "Gửi mã OTP thất bại. Vui lòng thử lại."
+          "Gửi mã OTP thất bại. Vui lòng thử lại.",
       );
     } finally {
       setOtpSending(false);
@@ -105,7 +117,7 @@ const RegisterPage = () => {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
-        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
+        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.",
       );
     } finally {
       setLoading(false);
@@ -135,28 +147,25 @@ const RegisterPage = () => {
     text: string;
   }) => (
     <div
-      className={`flex items-center gap-2 text-sm ${
-        valid ? "text-green-600" : "text-slate-400"
+      className={`flex items-center gap-2 text-sm transition-colors ${
+        valid
+          ? "text-green-600 dark:text-green-400"
+          : "text-slate-400 dark:text-slate-500"
       }`}>
-      {valid ? <Check size={16} /> : <X size={16} />}
+      {valid ? <Check size={14} /> : <X size={14} />}
       <span>{text}</span>
     </div>
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 via-indigo-50 to-slate-100 px-4 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl shadow-indigo-100 p-10 space-y-8 border border-slate-100">
-        <div className="text-center">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight italic uppercase">
-            Tạo tài khoản
-          </h1>
-          <p className="text-slate-500 mt-3">
-            Tham gia cùng chúng tôi ngay hôm nay
-          </p>
-        </div>
-
+    <AuthLayout
+      title={t("common.register")}
+      subtitle="Tham gia cùng chúng tôi ngay hôm nay">
+      <div className="space-y-5">
+        {/* Error Message */}
         {error && (
-          <div className="bg-red-50 text-red-600 p-4 rounded-2xl text-sm border border-red-100 font-medium">
+          <div className="bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-4 rounded-xl text-sm border border-red-100 dark:border-red-800 font-medium flex items-center gap-2">
+            <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
             {error}
           </div>
         )}
@@ -165,77 +174,105 @@ const RegisterPage = () => {
         <button
           onClick={handleGoogleRegister}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 bg-white border-2 border-slate-200 text-slate-700 py-4 rounded-2xl font-semibold text-lg hover:bg-slate-50 hover:border-slate-300 transition-all disabled:opacity-50">
-          <svg className="w-6 h-6" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            />
-          </svg>
-          {googleLoading ? "Đang xử lý..." : "Đăng ký với Google"}
+          className="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-200 py-3.5 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-600 hover:border-slate-300 dark:hover:border-slate-500 transition-all disabled:opacity-50 cursor-pointer">
+          {googleLoading ? (
+            <Loader2 size={22} className="animate-spin" />
+          ) : (
+            <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <path
+                fill="#4285F4"
+                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+              />
+              <path
+                fill="#34A853"
+                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+              />
+              <path
+                fill="#EA4335"
+                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+              />
+            </svg>
+          )}
+          <span>{googleLoading ? "Đang xử lý..." : "Tiếp tục với Google"}</span>
         </button>
 
+        {/* Divider */}
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-slate-200"></div>
+            <div className="w-full border-t border-slate-200 dark:border-slate-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-4 bg-white text-slate-400">hoặc</span>
+            <span className="px-4 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500">
+              hoặc đăng ký với email
+            </span>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Full Name */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Họ và tên
             </label>
-            <input
-              type="text"
-              name="fullName"
-              required
-              className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg"
-              placeholder="Nguyễn Văn A"
-              value={formData.fullName}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              required
-              className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg"
-              placeholder="name@example.com"
-              value={formData.email}
-              onChange={handleChange}
-            />
+            <div className="relative group">
+              <User
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+              />
+              <input
+                type="text"
+                name="fullName"
+                required
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
+                placeholder="Nguyễn Văn A"
+                value={formData.fullName}
+                onChange={handleChange}
+              />
+            </div>
           </div>
 
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">
+          {/* Email */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+              Email
+            </label>
+            <div className="relative group">
+              <Mail
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+              />
+              <input
+                type="email"
+                name="email"
+                required
+                className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mật khẩu
             </label>
-            <div className="relative">
+            <div className="relative group">
+              <Lock
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+              />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 required
-                className="w-full px-5 py-4 rounded-2xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg pr-14"
+                className="w-full pl-11 pr-12 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={handleChange}
@@ -243,57 +280,63 @@ const RegisterPage = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1">
-                {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-0.5 cursor-pointer">
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
 
-            {/* Hiển thị yêu cầu mật khẩu */}
+            {/* Password Requirements */}
             {formData.password && (
-              <div className="mt-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">
+              <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600 space-y-1.5">
+                <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
                   Yêu cầu mật khẩu:
                 </p>
-                <ValidationItem
-                  valid={passwordValidation.length}
-                  text="Từ 8-16 ký tự"
-                />
-                <ValidationItem
-                  valid={passwordValidation.uppercase}
-                  text="Có ít nhất 1 chữ hoa (A-Z)"
-                />
-                <ValidationItem
-                  valid={passwordValidation.lowercase}
-                  text="Có ít nhất 1 chữ thường (a-z)"
-                />
-                <ValidationItem
-                  valid={passwordValidation.number}
-                  text="Có ít nhất 1 số (0-9)"
-                />
-                <ValidationItem
-                  valid={passwordValidation.special}
-                  text="Có ít nhất 1 ký tự đặc biệt (!@#$%...)"
-                />
+                <div className="grid grid-cols-2 gap-1.5">
+                  <ValidationItem
+                    valid={passwordValidation.length}
+                    text="8-16 ký tự"
+                  />
+                  <ValidationItem
+                    valid={passwordValidation.uppercase}
+                    text="Chữ hoa (A-Z)"
+                  />
+                  <ValidationItem
+                    valid={passwordValidation.lowercase}
+                    text="Chữ thường (a-z)"
+                  />
+                  <ValidationItem
+                    valid={passwordValidation.number}
+                    text="Số (0-9)"
+                  />
+                  <ValidationItem
+                    valid={passwordValidation.special}
+                    text="Ký tự đặc biệt"
+                  />
+                </div>
               </div>
             )}
           </div>
 
-          {/* Nhập lại mật khẩu */}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">
+          {/* Confirm Password */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Nhập lại mật khẩu
             </label>
-            <div className="relative">
+            <div className="relative group">
+              <Lock
+                size={18}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors"
+              />
               <input
                 type={showConfirmPassword ? "text" : "password"}
                 required
-                className={`w-full px-5 py-4 rounded-2xl border focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg pr-14 ${
+                className={`w-full pl-11 pr-12 py-3.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400 ${
                   confirmPassword && !passwordsMatch
-                    ? "border-red-300 bg-red-50"
+                    ? "border-red-300 dark:border-red-700 bg-red-50 dark:bg-red-900/20"
                     : confirmPassword && passwordsMatch
-                    ? "border-green-300 bg-green-50"
-                    : "border-slate-200"
-                }`}
+                      ? "border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20"
+                      : "border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50"
+                } text-slate-900 dark:text-white`}
                 placeholder="••••••••"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -301,37 +344,37 @@ const RegisterPage = () => {
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 transition-colors p-1">
-                {showConfirmPassword ? <EyeOff size={22} /> : <Eye size={22} />}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors p-0.5 cursor-pointer">
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
             {confirmPassword && !passwordsMatch && (
-              <p className="mt-2 text-sm text-red-500 font-medium flex items-center gap-1">
-                <X size={16} /> Mật khẩu không khớp
+              <p className="text-sm text-red-500 dark:text-red-400 font-medium flex items-center gap-1">
+                <X size={14} /> Mật khẩu không khớp
               </p>
             )}
             {confirmPassword && passwordsMatch && (
-              <p className="mt-2 text-sm text-green-600 font-medium flex items-center gap-1">
-                <Check size={16} /> Mật khẩu khớp
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
+                <Check size={14} /> Mật khẩu khớp
               </p>
             )}
           </div>
 
-          {/* OTP Input */}
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wider">
+          {/* OTP */}
+          <div className="space-y-1.5">
+            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
               Mã xác thực OTP
             </label>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <input
                 type="text"
                 name="otp"
                 maxLength={6}
-                className={`flex-1 px-5 py-4 rounded-2xl border focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all text-lg tracking-widest text-center font-mono ${
+                className={`flex-1 px-4 py-3.5 rounded-xl border focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all tracking-widest text-center font-mono ${
                   formData.otp.length === 6
-                    ? "border-green-300 bg-green-50"
-                    : "border-slate-200"
-                }`}
+                    ? "border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-900/20"
+                    : "border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50"
+                } text-slate-900 dark:text-white`}
                 placeholder="ABC123"
                 value={formData.otp}
                 onChange={handleChange}
@@ -340,22 +383,23 @@ const RegisterPage = () => {
                 type="button"
                 onClick={handleSendOtp}
                 disabled={otpSending || countdown > 0 || !isEmailValid}
-                className="px-5 py-4 rounded-2xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap">
-                <Send size={18} />
+                className="px-4 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap cursor-pointer">
+                <Send size={16} />
                 {otpSending
-                  ? "Đang gửi..."
+                  ? "..."
                   : countdown > 0
-                  ? `${countdown}s`
-                  : "Nhận mã"}
+                    ? `${countdown}s`
+                    : "Gửi mã"}
               </button>
             </div>
             {otpSent && countdown > 0 && (
-              <p className="mt-2 text-sm text-green-600 font-medium">
+              <p className="text-sm text-green-600 dark:text-green-400 font-medium">
                 Mã OTP đã được gửi đến email của bạn
               </p>
             )}
           </div>
 
+          {/* Submit */}
           <button
             type="submit"
             disabled={
@@ -364,21 +408,32 @@ const RegisterPage = () => {
               !passwordsMatch ||
               formData.otp.length !== 6
             }
-            className="w-full bg-slate-900 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 disabled:bg-slate-300 uppercase tracking-widest">
-            {loading ? "Đang xử lý..." : "Đăng ký"}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-indigo-500/25 hover:shadow-xl hover:shadow-indigo-500/30 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer group mt-6">
+            {loading ? (
+              <Loader2 size={22} className="animate-spin" />
+            ) : (
+              <>
+                <span>Đăng ký</span>
+                <ArrowRight
+                  size={20}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              </>
+            )}
           </button>
         </form>
 
-        <div className="text-center text-sm text-slate-600">
+        {/* Login Link */}
+        <div className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
           Đã có tài khoản?{" "}
           <Link
             to="/login"
-            className="text-indigo-600 font-bold hover:underline">
+            className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
             Đăng nhập
           </Link>
         </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
