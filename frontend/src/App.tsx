@@ -25,6 +25,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import AdminDashboard from "./pages/AdminDashboard";
 import ProfilePage from "./pages/ProfilePage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
+import OrderDetailPage from "./pages/OrderDetailPage";
 import WishlistPage from "./pages/WishlistPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
@@ -312,6 +313,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrderHistoryPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders/:id"
+              element={
+                <ProtectedRoute>
+                  <OrderDetailPage />
                 </ProtectedRoute>
               }
             />
