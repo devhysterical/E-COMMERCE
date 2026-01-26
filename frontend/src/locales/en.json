@@ -19,7 +19,9 @@
     "next": "Next",
     "previous": "Previous",
     "all": "All",
-    "noResults": "No results found"
+    "noResults": "No results found",
+    "moreItems": "more items",
+    "free": "Free"
   },
   "header": {
     "searchPlaceholder": "Search products...",
@@ -98,7 +100,21 @@
     "title": "Your Orders",
     "orderHistory": "Order History",
     "orderDetails": "Order Details",
+    "orderDetail": "Order Detail",
     "orderDate": "Order Date",
+    "notFound": "Order not found",
+    "backToHistory": "Back to order history",
+    "timeline": "Order Timeline",
+    "cancelled": "Order has been cancelled",
+    "items": "Items",
+    "quantity": "Quantity",
+    "deliveryInfo": "Delivery Information",
+    "paymentSummary": "Payment Summary",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "total": "Total",
+    "downloadInvoice": "Download Invoice",
+    "viewDetail": "View Detail",
     "status": {
       "pending": "Pending",
       "processing": "Processing",

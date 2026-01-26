@@ -97,9 +97,10 @@ const OrderHistoryPage = () => {
           {orders.map((order: Order) => {
             const status = statusConfig[order.status] || statusConfig.PENDING;
             return (
-              <div
+              <Link
+                to={`/orders/${order.id}`}
                 key={order.id}
-                className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-6 hover:shadow-xl transition-shadow">
+                className="block bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-6 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
@@ -130,18 +131,18 @@ const OrderHistoryPage = () => {
                       {status.icon}
                       {status.label}
                     </span>
-                    <ChevronRight className="text-slate-300" />
+                    <ChevronRight className="text-slate-300 dark:text-slate-600" />
                   </div>
                 </div>
 
                 {/* Order Items Preview */}
-                <div className="mt-4 pt-4 border-t border-slate-100">
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
                   <div className="flex items-center gap-4 overflow-x-auto pb-2">
                     {order.orderItems.slice(0, 4).map((item) => (
                       <div
                         key={item.id}
-                        className="flex-shrink-0 flex items-center gap-3 bg-slate-50 rounded-xl p-3">
-                        <div className="w-12 h-12 bg-slate-200 rounded-lg overflow-hidden">
+                        className="flex-shrink-0 flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3">
+                        <div className="w-12 h-12 bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden">
                           {item.product.imageUrl ? (
                             <img
                               src={item.product.imageUrl}
@@ -155,23 +156,23 @@ const OrderHistoryPage = () => {
                           )}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-slate-700 line-clamp-1">
+                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 line-clamp-1">
                             {item.product.name}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-400 dark:text-slate-500">
                             x{item.quantity}
                           </p>
                         </div>
                       </div>
                     ))}
                     {order.orderItems.length > 4 && (
-                      <span className="text-sm text-slate-400">
-                        +{order.orderItems.length - 4} sản phẩm khác
+                      <span className="text-sm text-slate-400 dark:text-slate-500">
+                        +{order.orderItems.length - 4} {t("common.moreItems")}
                       </span>
                     )}
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

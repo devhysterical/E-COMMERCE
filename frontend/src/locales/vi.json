@@ -19,7 +19,9 @@
     "next": "Tiếp theo",
     "previous": "Trước",
     "all": "Tất cả",
-    "noResults": "Không có kết quả"
+    "noResults": "Không có kết quả",
+    "moreItems": "sản phẩm khác",
+    "free": "Miễn phí"
   },
   "header": {
     "searchPlaceholder": "Tìm kiếm sản phẩm...",
@@ -98,7 +100,21 @@
     "title": "Đơn hàng của bạn",
     "orderHistory": "Lịch sử đơn hàng",
     "orderDetails": "Chi tiết đơn hàng",
+    "orderDetail": "Chi tiết đơn hàng",
     "orderDate": "Ngày đặt",
+    "notFound": "Không tìm thấy đơn hàng",
+    "backToHistory": "Quay lại lịch sử đơn hàng",
+    "timeline": "Tiến trình đơn hàng",
+    "cancelled": "Đơn hàng đã bị hủy",
+    "items": "Sản phẩm",
+    "quantity": "Số lượng",
+    "deliveryInfo": "Thông tin giao hàng",
+    "paymentSummary": "Tóm tắt thanh toán",
+    "subtotal": "Tạm tính",
+    "shipping": "Phí vận chuyển",
+    "total": "Tổng cộng",
+    "downloadInvoice": "Tải hóa đơn",
+    "viewDetail": "Xem chi tiết",
     "status": {
       "pending": "Chờ xử lý",
       "processing": "Đang xử lý",
