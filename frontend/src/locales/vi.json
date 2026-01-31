@@ -114,6 +114,8 @@
     "shipping": "Phí vận chuyển",
     "total": "Tổng cộng",
     "downloadInvoice": "Tải hóa đơn",
+    "invoiceDownloaded": "Đã tải hóa đơn thành công",
+    "invoiceError": "Không thể tải hóa đơn. Vui lòng thử lại.",
     "viewDetail": "Xem chi tiết",
     "status": {
       "pending": "Chờ xử lý",

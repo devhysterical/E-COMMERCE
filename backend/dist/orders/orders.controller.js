@@ -10,6 +10,7 @@ Object.defineProperty(exports, "OrdersController", {
 });
 const _common = require("@nestjs/common");
 const _ordersservice = require("./orders.service");
+const _invoiceservice = require("./invoice.service");
 const _jwtauthguard = require("../auth/guards/jwt-auth.guard");
 const _rolesguard = require("../common/guards/roles.guard");
 const _rolesdecorator = require("../common/decorators/roles.decorator");
@@ -38,6 +39,9 @@ let OrdersController = class OrdersController {
     findOne(id, userId) {
         return this.ordersService.findOne(id, userId);
     }
+    async downloadInvoice(id, userId, res) {
+        return this.invoiceService.generateInvoice(id, userId, res);
+    }
     // Admin APIs
     findAllAdmin() {
         return this.ordersService.findAllAdmin();
@@ -48,8 +52,9 @@ let OrdersController = class OrdersController {
     updateStatus(id, dto) {
         return this.ordersService.updateStatus(id, dto.status);
     }
-    constructor(ordersService){
+    constructor(ordersService, invoiceService){
         this.ordersService = ordersService;
+        this.invoiceService = invoiceService;
     }
 };
 _ts_decorate([
@@ -84,6 +89,19 @@ _ts_decorate([
     _ts_metadata("design:returntype", void 0)
 ], OrdersController.prototype, "findOne", null);
 _ts_decorate([
+    (0, _common.Get)(':id/invoice'),
+    _ts_param(0, (0, _common.Param)('id')),
+    _ts_param(1, (0, _getuserdecorator.GetUser)('userId')),
+    _ts_param(2, (0, _common.Res)()),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String,
+        String,
+        typeof Response === "undefined" ? Object : Response
+    ]),
+    _ts_metadata("design:returntype", Promise)
+], OrdersController.prototype, "downloadInvoice", null);
+_ts_decorate([
     (0, _common.Get)('admin/all'),
     (0, _common.UseGuards)(_rolesguard.RolesGuard),
     (0, _rolesdecorator.Roles)('ADMIN'),
@@ -117,7 +135,8 @@ OrdersController = _ts_decorate([
     (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
-        typeof _ordersservice.OrdersService === "undefined" ? Object : _ordersservice.OrdersService
+        typeof _ordersservice.OrdersService === "undefined" ? Object : _ordersservice.OrdersService,
+        typeof _invoiceservice.InvoiceService === "undefined" ? Object : _invoiceservice.InvoiceService
     ])
 ], OrdersController);
 

@@ -1,7 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { OrderService } from "../services/api.service";
+import { toast } from "react-toastify";
 import {
   Package,
   ArrowLeft,
@@ -34,6 +35,17 @@ const OrderDetailPage = () => {
     queryKey: ["order", id],
     queryFn: () => OrderService.getOne(id!),
     enabled: !!id,
+  });
+
+  // Download invoice mutation
+  const downloadMutation = useMutation({
+    mutationFn: () => OrderService.downloadInvoice(id!),
+    onSuccess: () => {
+      toast.success(t("order.invoiceDownloaded"));
+    },
+    onError: () => {
+      toast.error(t("order.invoiceError"));
+    },
   });
 
   const statusConfig: Record<
@@ -319,13 +331,20 @@ const OrderDetailPage = () => {
 
           {/* Actions */}
           <button
-            onClick={() => {
-              // TODO: Implement invoice download
-              alert("Invoice download coming soon!");
-            }}
-            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/25">
-            <Download size={20} />
-            {t("order.downloadInvoice")}
+            onClick={() => downloadMutation.mutate()}
+            disabled={downloadMutation.isPending}
+            className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-3 rounded-xl font-semibold transition-all shadow-lg shadow-indigo-500/25 disabled:opacity-50 disabled:cursor-not-allowed">
+            {downloadMutation.isPending ? (
+              <>
+                <Loader size={20} className="animate-spin" />
+                {t("common.loading")}
+              </>
+            ) : (
+              <>
+                <Download size={20} />
+                {t("order.downloadInvoice")}
+              </>
+            )}
           </button>
         </div>
       </div>

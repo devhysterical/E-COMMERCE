@@ -270,6 +270,20 @@ export const OrderService = {
     const response = await api.get(`/orders/${id}`);
     return response.data;
   },
+  downloadInvoice: async (orderId: string): Promise<void> => {
+    const response = await api.get(`/orders/${orderId}/invoice`, {
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", `invoice-${orderId.slice(0, 8)}.pdf`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  },
 };
 
 export const AdminService = {
