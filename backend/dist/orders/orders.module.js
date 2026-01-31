@@ -11,6 +11,7 @@ Object.defineProperty(exports, "OrdersModule", {
 const _common = require("@nestjs/common");
 const _orderscontroller = require("./orders.controller");
 const _ordersservice = require("./orders.service");
+const _invoiceservice = require("./invoice.service");
 const _cartsmodule = require("../carts/carts.module");
 const _emailmodule = require("../email/email.module");
 function _ts_decorate(decorators, target, key, desc) {
@@ -31,7 +32,8 @@ OrdersModule = _ts_decorate([
             _orderscontroller.OrdersController
         ],
         providers: [
-            _ordersservice.OrdersService
+            _ordersservice.OrdersService,
+            _invoiceservice.InvoiceService
         ],
         exports: [
             _ordersservice.OrdersService

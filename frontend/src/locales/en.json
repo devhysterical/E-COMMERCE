@@ -114,6 +114,8 @@
     "shipping": "Shipping",
     "total": "Total",
     "downloadInvoice": "Download Invoice",
+    "invoiceDownloaded": "Invoice downloaded successfully",
+    "invoiceError": "Failed to download invoice. Please try again.",
     "viewDetail": "View Detail",
     "status": {
       "pending": "Pending",

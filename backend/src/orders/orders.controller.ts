@@ -6,8 +6,11 @@ import {
   Param,
   UseGuards,
   Patch,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import { OrdersService } from './orders.service';
+import { InvoiceService } from './invoice.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -17,7 +20,10 @@ import { OrderStatus, PaymentMethod } from '@prisma/client';
 @Controller('orders')
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly invoiceService: InvoiceService,
+  ) {}
 
   @Post()
   createOrder(
@@ -47,6 +53,15 @@ export class OrdersController {
   @Get(':id')
   findOne(@Param('id') id: string, @GetUser('userId') userId: string) {
     return this.ordersService.findOne(id, userId);
+  }
+
+  @Get(':id/invoice')
+  async downloadInvoice(
+    @Param('id') id: string,
+    @GetUser('userId') userId: string,
+    @Res() res: Response,
+  ) {
+    return this.invoiceService.generateInvoice(id, userId, res);
   }
 
   // Admin APIs
