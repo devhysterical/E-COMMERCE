@@ -49,6 +49,7 @@ model User {
   orders        Order[]
   cart          Cart?
   wishlist      WishlistItem[]
+  addresses     Address[]
 
   @@map("users")
 }
@@ -239,4 +240,22 @@ model WishlistItem {
 
   @@unique([userId, productId]) // User chỉ có thể thêm 1 product 1 lần
   @@map("wishlist_items")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String   // "Home", "Office", "Other"
+  fullName    String
+  phone       String
+  province    String
+  district    String
+  ward        String?
+  street      String   // Full address line
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("addresses")
 }

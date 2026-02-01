@@ -28,6 +28,7 @@ const _emailmodule = require("./email/email.module");
 const _wishlistmodule = require("./wishlist/wishlist.module");
 const _couponsmodule = require("./coupons/coupons.module");
 const _reportsmodule = require("./reports/reports.module");
+const _addressesmodule = require("./addresses/addresses.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -55,7 +56,8 @@ AppModule = _ts_decorate([
             _bannersmodule.BannersModule,
             _wishlistmodule.WishlistModule,
             _couponsmodule.CouponsModule,
-            _reportsmodule.ReportsModule
+            _reportsmodule.ReportsModule,
+            _addressesmodule.AddressesModule
         ],
         controllers: [
             _appcontroller.AppController

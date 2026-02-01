@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { UserService, UploadService } from "../services/api.service";
@@ -16,6 +17,7 @@ import {
   Mail,
   Camera,
   Loader2,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -401,7 +403,27 @@ const ProfilePage = () => {
           {/* Divider */}
           <hr className="border-slate-100" />
 
-          {/* Change Password */}
+          {/* Link to Addresses */}
+          <Link
+            to="/addresses"
+            className="flex items-center justify-between py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors group">
+            <div className="flex items-center gap-3">
+              <MapPin size={20} className="text-indigo-600" />
+              <div>
+                <p className="font-medium text-slate-900">Địa chỉ giao hàng</p>
+                <p className="text-sm text-slate-500">
+                  Quản lý địa chỉ nhận hàng
+                </p>
+              </div>
+            </div>
+            <ChevronDown
+              size={18}
+              className="text-slate-400 -rotate-90 group-hover:translate-x-1 transition-transform"
+            />
+          </Link>
+
+          {/* Divider */}
+          <hr className="border-slate-100" />
           <div className="space-y-4">
             <button
               onClick={() => setShowPasswordForm(!showPasswordForm)}
