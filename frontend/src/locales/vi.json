@@ -21,7 +21,8 @@
     "all": "Tất cả",
     "noResults": "Không có kết quả",
     "moreItems": "sản phẩm khác",
-    "free": "Miễn phí"
+    "free": "Miễn phí",
+    "saving": "Đang lưu..."
   },
   "header": {
     "searchPlaceholder": "Tìm kiếm sản phẩm...",
@@ -158,5 +159,34 @@
     "about": "Về chúng tôi",
     "terms": "Điều khoản sử dụng",
     "privacy": "Chính sách bảo mật"
+  },
+  "address": {
+    "title": "Địa chỉ giao hàng",
+    "add": "Thêm địa chỉ",
+    "edit": "Sửa địa chỉ",
+    "addFirst": "Thêm địa chỉ đầu tiên",
+    "addNew": "Thêm địa chỉ mới",
+    "addShipping": "Thêm địa chỉ giao hàng",
+    "selectShipping": "Chọn địa chỉ giao hàng",
+    "empty": "Chưa có địa chỉ nào được lưu",
+    "default": "Mặc định",
+    "setDefault": "Đặt làm địa chỉ mặc định",
+    "setAsDefault": "Đặt làm mặc định",
+    "label": "Nhãn địa chỉ",
+    "fullName": "Họ và tên người nhận",
+    "phone": "Số điện thoại",
+    "province": "Tỉnh/Thành phố",
+    "district": "Quận/Huyện",
+    "ward": "Phường/Xã",
+    "street": "Địa chỉ chi tiết",
+    "streetPlaceholder": "Số nhà, tên đường...",
+    "labels": {
+      "home": "Nhà riêng",
+      "office": "Văn phòng",
+      "other": "Khác"
+    },
+    "deleted": "Đã xóa địa chỉ",
+    "saved": "Đã lưu địa chỉ",
+    "confirmDelete": "Bạn có chắc muốn xóa địa chỉ này?"
   }
 }

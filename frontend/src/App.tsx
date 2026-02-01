@@ -27,6 +27,7 @@ import ProfilePage from "./pages/ProfilePage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import WishlistPage from "./pages/WishlistPage";
+import AddressesPage from "./pages/AddressesPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
 import { WishlistService } from "./services/api.service";
@@ -305,6 +306,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfilePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/addresses"
+              element={
+                <ProtectedRoute>
+                  <AddressesPage />
                 </ProtectedRoute>
               }
             />
