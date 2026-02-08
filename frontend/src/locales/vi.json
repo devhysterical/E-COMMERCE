@@ -91,11 +91,18 @@
     "paymentMethod": "Phương thức thanh toán",
     "orderSummary": "Tóm tắt đơn hàng",
     "placeOrder": "Đặt hàng",
-    "cod": "Thanh toán khi nhận hàng",
-    "momo": "Thanh toán qua MoMo",
+    "cod": "Thanh toán khi nhận hàng (COD)",
+    "codDescription": "Thanh toán bằng tiền mặt khi nhận hàng",
+    "momo": "Ví MoMo",
+    "momoDescription": "Thanh toán qua ví điện tử MoMo",
     "fullName": "Họ và tên",
     "phone": "Số điện thoại",
-    "address": "Địa chỉ"
+    "address": "Địa chỉ",
+    "addressPlaceholder": "VD: 123 Đường ABC, Quận X, TP. Y",
+    "processing": "Đang xử lý...",
+    "processingMomo": "Đang chuyển đến MoMo...",
+    "payWithMomo": "Thanh toán với MoMo",
+    "confirmOrder": "Xác nhận đặt hàng"
   },
   "order": {
     "title": "Đơn hàng của bạn",

@@ -91,11 +91,18 @@
     "paymentMethod": "Payment Method",
     "orderSummary": "Order Summary",
     "placeOrder": "Place Order",
-    "cod": "Cash on Delivery",
-    "momo": "Pay with MoMo",
+    "cod": "Cash on Delivery (COD)",
+    "codDescription": "Pay with cash when you receive your order",
+    "momo": "MoMo Wallet",
+    "momoDescription": "Pay via MoMo e-wallet",
     "fullName": "Full Name",
     "phone": "Phone Number",
-    "address": "Address"
+    "address": "Address",
+    "addressPlaceholder": "E.g.: 123 ABC Street, District X, City Y",
+    "processing": "Processing...",
+    "processingMomo": "Redirecting to MoMo...",
+    "payWithMomo": "Pay with MoMo",
+    "confirmOrder": "Confirm Order"
   },
   "order": {
     "title": "Your Orders",
