@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CartsService } from '../carts/carts.service';
 import { EmailService } from '../email/email.service';
+import { ShippingService } from '../shipping/shipping.service';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
@@ -14,6 +15,7 @@ export class OrdersService {
     private prisma: PrismaService,
     private cartsService: CartsService,
     private emailService: EmailService,
+    private shippingService: ShippingService,
   ) {}
 
   async createOrder(
@@ -22,6 +24,7 @@ export class OrdersService {
     phone: string,
     paymentMethod: PaymentMethod = 'COD',
     couponId?: string,
+    province?: string,
   ) {
     const cart = await this.cartsService.getCart(userId);
     if (!cart.cartItems.length) {
@@ -68,7 +71,17 @@ export class OrdersService {
       }
     }
 
-    const finalAmount = totalAmount - discountAmount;
+    // Tính phí vận chuyển
+    let shippingFee = 0;
+    if (province) {
+      const shippingResult = await this.shippingService.calculateFee(
+        province,
+        totalAmount - discountAmount,
+      );
+      shippingFee = shippingResult.fee;
+    }
+
+    const finalAmount = totalAmount - discountAmount + shippingFee;
 
     // Sử dụng transaction để đảm bảo tính toàn vẹn
     return this.prisma.$transaction(async (tx) => {
@@ -78,6 +91,7 @@ export class OrdersService {
           userId,
           totalAmount: finalAmount,
           discountAmount,
+          shippingFee,
           couponId: validCouponId,
           address,
           phone,

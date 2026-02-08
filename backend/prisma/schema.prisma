@@ -108,6 +108,7 @@ model Order {
   user            User          @relation(fields: [userId], references: [id])
   totalAmount     Int           // Định dạng tiền tệ: Số nguyên (Integer)
   discountAmount  Int           @default(0) // Số tiền giảm giá từ coupon
+  shippingFee     Int           @default(0) // Phí vận chuyển
   status          OrderStatus   @default(PENDING)
   paymentMethod   PaymentMethod @default(COD)
   paymentStatus   PaymentStatus @default(PENDING)
@@ -258,4 +259,30 @@ model Address {
   updatedAt   DateTime @updatedAt
 
   @@map("addresses")
+}
+
+// ===== SHIPPING ZONES =====
+
+model ShippingZone {
+  id            String   @id @default(uuid())
+  name          String   @unique  // "Nội thành HCM", "Miền Bắc"
+  fee           Int      // Phí ship (VND)
+  minOrderFree  Int?     // Miễn phí nếu đơn >= số này
+  estimatedDays String?  // "1-2 ngày"
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  provinces     ShippingProvince[]
+
+  @@map("shipping_zones")
+}
+
+model ShippingProvince {
+  id        String       @id @default(uuid())
+  zoneId    String
+  zone      ShippingZone @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  province  String       @unique  // "Hồ Chí Minh"
+
+  @@map("shipping_provinces")
 }

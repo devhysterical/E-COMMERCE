@@ -14,6 +14,7 @@ const _ordersservice = require("./orders.service");
 const _invoiceservice = require("./invoice.service");
 const _cartsmodule = require("../carts/carts.module");
 const _emailmodule = require("../email/email.module");
+const _shippingmodule = require("../shipping/shipping.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -26,7 +27,8 @@ OrdersModule = _ts_decorate([
     (0, _common.Module)({
         imports: [
             _cartsmodule.CartsModule,
-            _emailmodule.EmailModule
+            _emailmodule.EmailModule,
+            _shippingmodule.ShippingModule
         ],
         controllers: [
             _orderscontroller.OrdersController

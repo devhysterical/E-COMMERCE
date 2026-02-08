@@ -31,7 +31,7 @@ function _ts_param(paramIndex, decorator) {
 }
 let OrdersController = class OrdersController {
     createOrder(userId, dto) {
-        return this.ordersService.createOrder(userId, dto.address, dto.phone, dto.paymentMethod || 'COD', dto.couponId);
+        return this.ordersService.createOrder(userId, dto.address, dto.phone, dto.paymentMethod || 'COD', dto.couponId, dto.province);
     }
     findAll(userId) {
         return this.ordersService.findAll(userId);
