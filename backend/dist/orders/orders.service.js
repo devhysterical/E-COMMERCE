@@ -12,6 +12,7 @@ const _common = require("@nestjs/common");
 const _prismaservice = require("../prisma/prisma.service");
 const _cartsservice = require("../carts/carts.service");
 const _emailservice = require("../email/email.service");
+const _shippingservice = require("../shipping/shipping.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -22,7 +23,7 @@ function _ts_metadata(k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 }
 let OrdersService = class OrdersService {
-    async createOrder(userId, address, phone, paymentMethod = 'COD', couponId) {
+    async createOrder(userId, address, phone, paymentMethod = 'COD', couponId, province) {
         const cart = await this.cartsService.getCart(userId);
         if (!cart.cartItems.length) {
             throw new _common.BadRequestException('Giỏ hàng trống');
@@ -64,7 +65,13 @@ let OrdersService = class OrdersService {
                 }
             }
         }
-        const finalAmount = totalAmount - discountAmount;
+        // Tính phí vận chuyển
+        let shippingFee = 0;
+        if (province) {
+            const shippingResult = await this.shippingService.calculateFee(province, totalAmount - discountAmount);
+            shippingFee = shippingResult.fee;
+        }
+        const finalAmount = totalAmount - discountAmount + shippingFee;
         // Sử dụng transaction để đảm bảo tính toàn vẹn
         return this.prisma.$transaction(async (tx)=>{
             // 1. Tạo Order
@@ -73,6 +80,7 @@ let OrdersService = class OrdersService {
                     userId,
                     totalAmount: finalAmount,
                     discountAmount,
+                    shippingFee,
                     couponId: validCouponId,
                     address,
                     phone,
@@ -374,10 +382,11 @@ let OrdersService = class OrdersService {
             }
         });
     }
-    constructor(prisma, cartsService, emailService){
+    constructor(prisma, cartsService, emailService, shippingService){
         this.prisma = prisma;
         this.cartsService = cartsService;
         this.emailService = emailService;
+        this.shippingService = shippingService;
     }
 };
 OrdersService = _ts_decorate([
@@ -386,7 +395,8 @@ OrdersService = _ts_decorate([
     _ts_metadata("design:paramtypes", [
         typeof _prismaservice.PrismaService === "undefined" ? Object : _prismaservice.PrismaService,
         typeof _cartsservice.CartsService === "undefined" ? Object : _cartsservice.CartsService,
-        typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService
+        typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService,
+        typeof _shippingservice.ShippingService === "undefined" ? Object : _shippingservice.ShippingService
     ])
 ], OrdersService);
 

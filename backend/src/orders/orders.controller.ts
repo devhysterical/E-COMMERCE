@@ -34,6 +34,7 @@ export class OrdersController {
       phone: string;
       paymentMethod?: PaymentMethod;
       couponId?: string;
+      province?: string;
     },
   ) {
     return this.ordersService.createOrder(
@@ -42,6 +43,7 @@ export class OrdersController {
       dto.phone,
       dto.paymentMethod || 'COD',
       dto.couponId,
+      dto.province,
     );
   }
 
