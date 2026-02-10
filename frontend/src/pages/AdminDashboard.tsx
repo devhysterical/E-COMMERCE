@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import type { Product, Order, UserProfile } from "../services/api.service";
 import AdminBannersTab from "../components/AdminBannersTab";
 import AdminCouponsTab from "../components/AdminCouponsTab";
+import AdminShippingTab from "../components/AdminShippingTab";
 import LowStockAlert from "../components/LowStockAlert";
 import {
   Plus,
@@ -41,7 +42,8 @@ type TabType =
   | "users"
   | "categories"
   | "banners"
-  | "coupons";
+  | "coupons"
+  | "shipping";
 
 const statusConfig: Record<
   string,
@@ -361,6 +363,11 @@ const AdminDashboard = () => {
             key: "coupons",
             label: "Mã giảm giá",
             icon: <DollarSign size={18} />,
+          },
+          {
+            key: "shipping",
+            label: "Vận chuyển",
+            icon: <Truck size={18} />,
           },
         ].map((tab) => (
           <button
@@ -685,6 +692,13 @@ const AdminDashboard = () => {
         {activeTab === "coupons" && (
           <div className="p-6">
             <AdminCouponsTab />
+          </div>
+        )}
+
+        {/* Shipping Tab */}
+        {activeTab === "shipping" && (
+          <div className="p-6">
+            <AdminShippingTab />
           </div>
         )}
       </div>

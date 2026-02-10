@@ -5,7 +5,9 @@ import { OrderService, PaymentService } from "../services/cart.service";
 import {
   UserService,
   AddressService,
+  ShippingService,
   type ValidateCouponResult,
+  type ShippingFeeResult,
   type Address,
   type CreateAddressData,
 } from "../services/api.service";
@@ -19,6 +21,7 @@ import {
   Wallet,
   Banknote,
   Ticket,
+  Truck,
 } from "lucide-react";
 import AddressSelector from "../components/AddressSelector";
 import AddressForm from "../components/AddressForm";
@@ -54,6 +57,9 @@ const CheckoutPage = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [addressInitialized, setAddressInitialized] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState<ShippingFeeResult | null>(
+    null,
+  );
 
   // Set default address once when addresses load
   if (addresses.length > 0 && !addressInitialized) {
@@ -95,6 +101,7 @@ const CheckoutPage = () => {
       phone: string;
       paymentMethod: string;
       couponId?: string;
+      province?: string;
     }) => OrderService.create(data),
     onSuccess: async (order) => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -164,13 +171,26 @@ const CheckoutPage = () => {
       phone: finalPhone,
       paymentMethod,
       couponId: appliedCoupon?.couponId,
+      province: selectedAddr?.province || undefined,
     });
+  };
+
+  const fetchShippingFee = async (province: string) => {
+    try {
+      const result = await ShippingService.calculateFee(province);
+      setShippingInfo(result);
+    } catch {
+      setShippingInfo(null);
+    }
   };
 
   const handleAddressSelect = (addr: Address) => {
     setSelectedAddressId(addr.id);
     setManualAddress("");
     setManualPhone("");
+    if (addr.province) {
+      fetchShippingFee(addr.province);
+    }
   };
 
   const handleAddNewAddress = () => {
@@ -341,6 +361,58 @@ const CheckoutPage = () => {
             </div>
           </div>
         </div>
+
+        {/* Shipping Fee Display */}
+        {shippingInfo && (
+          <div className="pt-6 border-t border-slate-100 dark:border-slate-700">
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300 mb-3 uppercase tracking-wider">
+              <Truck size={18} className="text-indigo-600" />
+              {t("checkout.shippingFee")}
+            </div>
+            <div className="bg-slate-50 dark:bg-slate-700 rounded-2xl p-4 space-y-2">
+              {shippingInfo.zone && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">
+                    {t("checkout.shippingZone")}
+                  </span>
+                  <span className="font-semibold text-slate-700 dark:text-slate-300">
+                    {shippingInfo.zone.name}
+                  </span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-slate-500">
+                  {t("checkout.shippingCost")}
+                </span>
+                <span
+                  className={`font-bold ${
+                    shippingInfo.isFreeShipping
+                      ? "text-green-600"
+                      : "text-slate-900 dark:text-white"
+                  }`}>
+                  {shippingInfo.isFreeShipping
+                    ? t("checkout.freeShipping")
+                    : `${shippingInfo.fee.toLocaleString("vi-VN")}d`}
+                </span>
+              </div>
+              {shippingInfo.zone?.estimatedDays && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-slate-500">
+                    {t("checkout.estimatedDelivery")}
+                  </span>
+                  <span className="text-slate-600 dark:text-slate-400">
+                    {shippingInfo.zone.estimatedDays}
+                  </span>
+                </div>
+              )}
+              {shippingInfo.message && (
+                <p className="text-xs text-green-600 mt-1">
+                  {shippingInfo.message}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
 
         <button
           type="submit"
