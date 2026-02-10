@@ -102,7 +102,12 @@
     "processing": "Processing...",
     "processingMomo": "Redirecting to MoMo...",
     "payWithMomo": "Pay with MoMo",
-    "confirmOrder": "Confirm Order"
+    "confirmOrder": "Confirm Order",
+    "shippingFee": "Shipping Fee",
+    "shippingZone": "Shipping Zone",
+    "shippingCost": "Shipping Cost",
+    "freeShipping": "Free Shipping",
+    "estimatedDelivery": "Estimated Delivery"
   },
   "order": {
     "title": "Your Orders",
