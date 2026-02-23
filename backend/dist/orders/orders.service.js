@@ -13,6 +13,7 @@ const _prismaservice = require("../prisma/prisma.service");
 const _cartsservice = require("../carts/carts.service");
 const _emailservice = require("../email/email.service");
 const _shippingservice = require("../shipping/shipping.service");
+const _flashsaleservice = require("../flash-sale/flash-sale.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -28,7 +29,19 @@ let OrdersService = class OrdersService {
         if (!cart.cartItems.length) {
             throw new _common.BadRequestException('Giỏ hàng trống');
         }
-        const totalAmount = cart.cartItems.reduce((sum, item)=>sum + item.product.price * item.quantity, 0);
+        // Kiểm tra flash sale price cho từng sản phẩm
+        const flashSaleMap = new Map();
+        for (const item of cart.cartItems){
+            const flashSaleInfo = await this.flashSaleService.checkFlashSalePrice(item.productId, userId);
+            if (flashSaleInfo) {
+                flashSaleMap.set(item.productId, flashSaleInfo);
+            }
+        }
+        const totalAmount = cart.cartItems.reduce((sum, item)=>{
+            const flashInfo = flashSaleMap.get(item.productId);
+            const price = flashInfo ? flashInfo.salePrice : item.product.price;
+            return sum + price * item.quantity;
+        }, 0);
         // Xử lý coupon nếu có
         let discountAmount = 0;
         let validCouponId = undefined;
@@ -98,7 +111,7 @@ let OrdersService = class OrdersService {
                         orderId: order.id,
                         productId: item.productId,
                         quantity: item.quantity,
-                        price: item.product.price
+                        price: flashSaleMap.get(item.productId)?.salePrice ?? item.product.price
                     }
                 });
                 await tx.product.update({
@@ -110,13 +123,20 @@ let OrdersService = class OrdersService {
                     }
                 });
             }
-            // 3. Xóa giỏ hàng
+            // 3. Cập nhật soldQty cho flash sale items
+            for (const [productId, flashInfo] of flashSaleMap){
+                const cartItem = cart.cartItems.find((ci)=>ci.productId === productId);
+                if (cartItem) {
+                    await this.flashSaleService.incrementSoldQty(flashInfo.flashSaleItemId, cartItem.quantity);
+                }
+            }
+            // 4. Xóa giỏ hàng
             await tx.cartItem.deleteMany({
                 where: {
                     cartId: cart.id
                 }
             });
-            // 4. Ghi nhận sử dụng coupon
+            // 5. Ghi nhận sử dụng coupon
             if (validCouponId) {
                 await tx.couponUsage.create({
                     data: {
@@ -136,7 +156,7 @@ let OrdersService = class OrdersService {
                     }
                 });
             }
-            // 5. Gửi email xác nhận đơn hàng
+            // 6. Gửi email xác nhận đơn hàng
             const user = await tx.user.findUnique({
                 where: {
                     id: userId
@@ -382,11 +402,12 @@ let OrdersService = class OrdersService {
             }
         });
     }
-    constructor(prisma, cartsService, emailService, shippingService){
+    constructor(prisma, cartsService, emailService, shippingService, flashSaleService){
         this.prisma = prisma;
         this.cartsService = cartsService;
         this.emailService = emailService;
         this.shippingService = shippingService;
+        this.flashSaleService = flashSaleService;
     }
 };
 OrdersService = _ts_decorate([
@@ -396,7 +417,8 @@ OrdersService = _ts_decorate([
         typeof _prismaservice.PrismaService === "undefined" ? Object : _prismaservice.PrismaService,
         typeof _cartsservice.CartsService === "undefined" ? Object : _cartsservice.CartsService,
         typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService,
-        typeof _shippingservice.ShippingService === "undefined" ? Object : _shippingservice.ShippingService
+        typeof _shippingservice.ShippingService === "undefined" ? Object : _shippingservice.ShippingService,
+        typeof _flashsaleservice.FlashSaleService === "undefined" ? Object : _flashsaleservice.FlashSaleService
     ])
 ], OrdersService);
 

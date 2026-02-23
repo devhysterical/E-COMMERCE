@@ -20,6 +20,7 @@ import { CouponsModule } from './coupons/coupons.module';
 import { ReportsModule } from './reports/reports.module';
 import { AddressesModule } from './addresses/addresses.module';
 import { ShippingModule } from './shipping/shipping.module';
+import { FlashSaleModule } from './flash-sale/flash-sale.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { ShippingModule } from './shipping/shipping.module';
     ReportsModule,
     AddressesModule,
     ShippingModule,
+    FlashSaleModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -5,9 +5,10 @@ import { InvoiceService } from './invoice.service';
 import { CartsModule } from '../carts/carts.module';
 import { EmailModule } from '../email/email.module';
 import { ShippingModule } from '../shipping/shipping.module';
+import { FlashSaleModule } from '../flash-sale/flash-sale.module';
 
 @Module({
-  imports: [CartsModule, EmailModule, ShippingModule],
+  imports: [CartsModule, EmailModule, ShippingModule, FlashSaleModule],
   controllers: [OrdersController],
   providers: [OrdersService, InvoiceService],
   exports: [OrdersService],
