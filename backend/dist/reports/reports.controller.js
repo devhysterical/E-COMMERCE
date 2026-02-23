@@ -47,6 +47,25 @@ let ReportsController = class ReportsController {
         });
         return file;
     }
+    // ===== ANALYTICS v2 =====
+    getRevenueChart(period) {
+        return this.reportsService.getRevenueChart(period || '30d');
+    }
+    getOrderChart(period) {
+        return this.reportsService.getOrderChart(period || '30d');
+    }
+    getTopProducts(limit) {
+        return this.reportsService.getTopProducts(limit ? parseInt(limit, 10) : 10);
+    }
+    getTopCustomers(limit) {
+        return this.reportsService.getTopCustomers(limit ? parseInt(limit, 10) : 10);
+    }
+    getCategoryBreakdown() {
+        return this.reportsService.getCategoryBreakdown();
+    }
+    getConversionStats() {
+        return this.reportsService.getConversionStats();
+    }
     constructor(reportsService){
         this.reportsService = reportsService;
     }
@@ -77,6 +96,54 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", Promise)
 ], ReportsController.prototype, "exportProducts", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/revenue'),
+    _ts_param(0, (0, _common.Query)('period')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getRevenueChart", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/orders'),
+    _ts_param(0, (0, _common.Query)('period')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getOrderChart", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/top-products'),
+    _ts_param(0, (0, _common.Query)('limit')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getTopProducts", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/top-customers'),
+    _ts_param(0, (0, _common.Query)('limit')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getTopCustomers", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/categories'),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", []),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getCategoryBreakdown", null);
+_ts_decorate([
+    (0, _common.Get)('analytics/conversion'),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", []),
+    _ts_metadata("design:returntype", void 0)
+], ReportsController.prototype, "getConversionStats", null);
 ReportsController = _ts_decorate([
     (0, _common.Controller)('reports'),
     (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard, _rolesguard.RolesGuard),
