@@ -11,6 +11,7 @@ import type { Product, Order, UserProfile } from "../services/api.service";
 import AdminBannersTab from "../components/AdminBannersTab";
 import AdminCouponsTab from "../components/AdminCouponsTab";
 import AdminShippingTab from "../components/AdminShippingTab";
+import AdminAnalyticsTab from "../components/AdminAnalyticsTab";
 import LowStockAlert from "../components/LowStockAlert";
 import {
   Plus,
@@ -34,6 +35,7 @@ import {
   MapPin,
   Phone,
   Image,
+  BarChart3,
 } from "lucide-react";
 
 type TabType =
@@ -43,7 +45,8 @@ type TabType =
   | "categories"
   | "banners"
   | "coupons"
-  | "shipping";
+  | "shipping"
+  | "analytics";
 
 const statusConfig: Record<
   string,
@@ -347,226 +350,71 @@ const AdminDashboard = () => {
         />
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
-        {[
-          { key: "products", label: "Sản phẩm", icon: <Package size={18} /> },
-          { key: "orders", label: "Đơn hàng", icon: <ShoppingBag size={18} /> },
-          {
-            key: "categories",
-            label: "Danh mục",
-            icon: <LayoutGrid size={18} />,
-          },
-          { key: "users", label: "Người dùng", icon: <Users size={18} /> },
-          { key: "banners", label: "Banners", icon: <Image size={18} /> },
-          {
-            key: "coupons",
-            label: "Mã giảm giá",
-            icon: <DollarSign size={18} />,
-          },
-          {
-            key: "shipping",
-            label: "Vận chuyển",
-            icon: <Truck size={18} />,
-          },
-        ].map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key as TabType)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${
-              activeTab === tab.key
-                ? "bg-slate-900 text-white shadow-lg"
-                : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-100"
-            }`}>
-            {tab.icon}
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {/* Tabs + Content Layout */}
+      <div className="flex gap-6">
+        {/* Sidebar Tabs */}
+        <div className="flex flex-col gap-1.5 w-52 shrink-0">
+          {[
+            { key: "products", label: "Sản phẩm", icon: <Package size={18} /> },
+            {
+              key: "orders",
+              label: "Đơn hàng",
+              icon: <ShoppingBag size={18} />,
+            },
+            {
+              key: "categories",
+              label: "Danh mục",
+              icon: <LayoutGrid size={18} />,
+            },
+            { key: "users", label: "Người dùng", icon: <Users size={18} /> },
+            { key: "banners", label: "Banners", icon: <Image size={18} /> },
+            {
+              key: "coupons",
+              label: "Mã giảm giá",
+              icon: <DollarSign size={18} />,
+            },
+            {
+              key: "shipping",
+              label: "Vận chuyển",
+              icon: <Truck size={18} />,
+            },
+            {
+              key: "analytics",
+              label: "Thống kê",
+              icon: <BarChart3 size={18} />,
+            },
+          ].map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key as TabType)}
+              className={`flex items-center gap-2.5 px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
+                activeTab === tab.key
+                  ? "bg-slate-900 text-white shadow-lg"
+                  : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-100"
+              }`}>
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-      {/* Content */}
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-        {activeTab === "products" && (
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Sản phẩm
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Danh mục
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Giá
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Kho
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {products.map((product: Product) => (
-                <tr
-                  key={product.id}
-                  className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden">
-                        {product.imageUrl && (
-                          <img
-                            src={product.imageUrl}
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                      <span className="font-bold text-slate-900">
-                        {product.name}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
-                      {product.category.name}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 font-bold text-slate-700">
-                    {product.price.toLocaleString("vi-VN")} đ
-                  </td>
-                  <td className="px-6 py-4">
-                    <span
-                      className={`font-bold ${
-                        product.stock > 0 ? "text-green-600" : "text-red-500"
-                      }`}>
-                      {product.stock}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEditProduct(product)}
-                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
-                        <Edit size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteProduct(product.id)}
-                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        {activeTab === "orders" && (
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Mã đơn
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Khách hàng
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Tổng tiền
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Trạng thái
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Ngày đặt
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-                  Hành động
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {orders.map((order: Order) => (
-                <tr
-                  key={order.id}
-                  className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-sm text-slate-600">
-                    #{order.id.slice(0, 8)}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div>
-                      <p className="font-bold text-slate-900">
-                        {order.user?.fullName || "N/A"}
-                      </p>
-                      <p className="text-sm text-slate-400">
-                        {order.user?.email}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 font-bold text-slate-700">
-                    {order.totalAmount.toLocaleString("vi-VN")} đ
-                  </td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={order.status}
-                      onChange={(e) =>
-                        updateOrderStatusMutation.mutate({
-                          id: order.id,
-                          status: e.target.value,
-                        })
-                      }
-                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
-                        statusConfig[order.status]?.color || "bg-slate-100"
-                      }`}>
-                      <option value="PENDING">Chờ xử lý</option>
-                      <option value="PROCESSING">Đang xử lý</option>
-                      <option value="SHIPPED">Đang giao</option>
-                      <option value="DELIVERED">Đã giao</option>
-                      <option value="CANCELLED">Đã hủy</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(order.createdAt).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button
-                      onClick={() => setSelectedOrder(order)}
-                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
-                      <Eye size={18} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-
-        {activeTab === "categories" && (
-          <>
-            <div className="p-4 border-b border-slate-100 flex justify-end">
-              <button
-                onClick={() => {
-                  setEditingCategory(null);
-                  setShowCategoryModal(true);
-                }}
-                className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
-                <Plus size={20} /> Thêm danh mục
-              </button>
-            </div>
+        {/* Content */}
+        <div className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-w-0">
+          {activeTab === "products" && (
             <table className="w-full text-left border-collapse">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr>
                   <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    Tên danh mục
+                    Sản phẩm
                   </th>
                   <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    Mô tả
+                    Danh mục
                   </th>
                   <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                    Số sản phẩm
+                    Giá
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Kho
                   </th>
                   <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
                     Hành động
@@ -574,133 +422,307 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
-                {categories.map(
-                  (category: {
-                    id: string;
-                    name: string;
-                    description?: string;
-                    _count?: { products: number };
-                  }) => (
-                    <tr
-                      key={category.id}
-                      className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4">
-                        <span className="font-bold text-slate-900">
-                          {category.name}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-slate-500">
-                        {category.description || "Chưa có mô tả"}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
-                          {category._count?.products || 0} sản phẩm
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleEditCategory(category)}
-                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
-                            <Edit size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCategory(category.id)}
-                            className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
-                            <Trash2 size={18} />
-                          </button>
+                {products.map((product: Product) => (
+                  <tr
+                    key={product.id}
+                    className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-slate-100 overflow-hidden">
+                          {product.imageUrl && (
+                            <img
+                              src={product.imageUrl}
+                              alt=""
+                              className="w-full h-full object-cover"
+                            />
+                          )}
                         </div>
-                      </td>
-                    </tr>
-                  ),
-                )}
+                        <span className="font-bold text-slate-900">
+                          {product.name}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-md">
+                        {product.category.name}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-slate-700">
+                      {product.price.toLocaleString("vi-VN")} đ
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`font-bold ${
+                          product.stock > 0 ? "text-green-600" : "text-red-500"
+                        }`}>
+                        {product.stock}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEditProduct(product)}
+                          className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                          <Edit size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
-          </>
-        )}
+          )}
 
-        {activeTab === "users" && (
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Người dùng
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Vai trò
-                </th>
-                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-                  Ngày tạo
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {users.map((user: UserProfile) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
-                        {user.fullName?.charAt(0) ||
-                          user.email.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="font-bold text-slate-900">
-                        {user.fullName || "N/A"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">{user.email}</td>
-                  <td className="px-6 py-4">
-                    <select
-                      value={user.role}
-                      onChange={(e) =>
-                        updateUserRoleMutation.mutate({
-                          id: user.id,
-                          role: e.target.value,
-                        })
-                      }
-                      className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
-                        user.role === "ADMIN"
-                          ? "bg-purple-100 text-purple-700"
-                          : "bg-slate-100 text-slate-600"
-                      }`}>
-                      <option value="USER">User</option>
-                      <option value="ADMIN">Admin</option>
-                    </select>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(user.createdAt).toLocaleDateString("vi-VN")}
-                  </td>
+          {activeTab === "orders" && (
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-slate-50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Mã đơn
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Khách hàng
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Tổng tiền
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Trạng thái
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Ngày đặt
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
+                    Hành động
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {orders.map((order: Order) => (
+                  <tr
+                    key={order.id}
+                    className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4 font-mono text-sm text-slate-600">
+                      #{order.id.slice(0, 8)}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div>
+                        <p className="font-bold text-slate-900">
+                          {order.user?.fullName || "N/A"}
+                        </p>
+                        <p className="text-sm text-slate-400">
+                          {order.user?.email}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-slate-700">
+                      {order.totalAmount.toLocaleString("vi-VN")} đ
+                    </td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          updateOrderStatusMutation.mutate({
+                            id: order.id,
+                            status: e.target.value,
+                          })
+                        }
+                        className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
+                          statusConfig[order.status]?.color || "bg-slate-100"
+                        }`}>
+                        <option value="PENDING">Chờ xử lý</option>
+                        <option value="PROCESSING">Đang xử lý</option>
+                        <option value="SHIPPED">Đang giao</option>
+                        <option value="DELIVERED">Đã giao</option>
+                        <option value="CANCELLED">Đã hủy</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">
+                      {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <button
+                        onClick={() => setSelectedOrder(order)}
+                        className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                        <Eye size={18} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
-        {/* Banners Tab */}
-        {activeTab === "banners" && (
-          <div className="p-6">
-            <AdminBannersTab />
-          </div>
-        )}
+          {activeTab === "categories" && (
+            <>
+              <div className="p-4 border-b border-slate-100 flex justify-end">
+                <button
+                  onClick={() => {
+                    setEditingCategory(null);
+                    setShowCategoryModal(true);
+                  }}
+                  className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+                  <Plus size={20} /> Thêm danh mục
+                </button>
+              </div>
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-slate-50 border-b border-slate-100">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                      Tên danh mục
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                      Mô tả
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                      Số sản phẩm
+                    </th>
+                    <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
+                      Hành động
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {categories.map(
+                    (category: {
+                      id: string;
+                      name: string;
+                      description?: string;
+                      _count?: { products: number };
+                    }) => (
+                      <tr
+                        key={category.id}
+                        className="hover:bg-slate-50/50 transition-colors">
+                        <td className="px-6 py-4">
+                          <span className="font-bold text-slate-900">
+                            {category.name}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-slate-500">
+                          {category.description || "Chưa có mô tả"}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                            {category._count?.products || 0} sản phẩm
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleEditCategory(category)}
+                              className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                              <Edit size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteCategory(category.id)}
+                              className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              </table>
+            </>
+          )}
 
-        {/* Coupons Tab */}
-        {activeTab === "coupons" && (
-          <div className="p-6">
-            <AdminCouponsTab />
-          </div>
-        )}
+          {activeTab === "users" && (
+            <table className="w-full text-left border-collapse">
+              <thead className="bg-slate-50 border-b border-slate-100">
+                <tr>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Người dùng
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Email
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Vai trò
+                  </th>
+                  <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
+                    Ngày tạo
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-50">
+                {users.map((user: UserProfile) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold">
+                          {user.fullName?.charAt(0) ||
+                            user.email.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-bold text-slate-900">
+                          {user.fullName || "N/A"}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">{user.email}</td>
+                    <td className="px-6 py-4">
+                      <select
+                        value={user.role}
+                        onChange={(e) =>
+                          updateUserRoleMutation.mutate({
+                            id: user.id,
+                            role: e.target.value,
+                          })
+                        }
+                        className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
+                          user.role === "ADMIN"
+                            ? "bg-purple-100 text-purple-700"
+                            : "bg-slate-100 text-slate-600"
+                        }`}>
+                        <option value="USER">User</option>
+                        <option value="ADMIN">Admin</option>
+                      </select>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-slate-500">
+                      {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
 
-        {/* Shipping Tab */}
-        {activeTab === "shipping" && (
-          <div className="p-6">
-            <AdminShippingTab />
-          </div>
-        )}
+          {/* Banners Tab */}
+          {activeTab === "banners" && (
+            <div className="p-6">
+              <AdminBannersTab />
+            </div>
+          )}
+
+          {/* Coupons Tab */}
+          {activeTab === "coupons" && (
+            <div className="p-6">
+              <AdminCouponsTab />
+            </div>
+          )}
+
+          {/* Shipping Tab */}
+          {activeTab === "shipping" && (
+            <div className="p-6">
+              <AdminShippingTab />
+            </div>
+          )}
+
+          {/* Analytics Tab */}
+          {activeTab === "analytics" && (
+            <div className="p-6">
+              <AdminAnalyticsTab />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Product Modal */}

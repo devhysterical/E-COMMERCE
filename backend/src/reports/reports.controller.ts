@@ -44,4 +44,38 @@ export class ReportsController {
 
     return file;
   }
+
+  // ===== ANALYTICS v2 =====
+
+  @Get('analytics/revenue')
+  getRevenueChart(@Query('period') period?: string) {
+    return this.reportsService.getRevenueChart(period || '30d');
+  }
+
+  @Get('analytics/orders')
+  getOrderChart(@Query('period') period?: string) {
+    return this.reportsService.getOrderChart(period || '30d');
+  }
+
+  @Get('analytics/top-products')
+  getTopProducts(@Query('limit') limit?: string) {
+    return this.reportsService.getTopProducts(limit ? parseInt(limit, 10) : 10);
+  }
+
+  @Get('analytics/top-customers')
+  getTopCustomers(@Query('limit') limit?: string) {
+    return this.reportsService.getTopCustomers(
+      limit ? parseInt(limit, 10) : 10,
+    );
+  }
+
+  @Get('analytics/categories')
+  getCategoryBreakdown() {
+    return this.reportsService.getCategoryBreakdown();
+  }
+
+  @Get('analytics/conversion')
+  getConversionStats() {
+    return this.reportsService.getConversionStats();
+  }
 }
