@@ -14,6 +14,8 @@ import BannerSlider from "../components/BannerSlider";
 import ProductCard from "../components/ProductCard";
 import SearchAutocomplete from "../components/SearchAutocomplete";
 import RecentlyViewed from "../components/RecentlyViewed";
+import FlashSaleBanner from "../components/FlashSaleBanner";
+import FlashSaleSection from "../components/FlashSaleSection";
 
 const ProductListPage = () => {
   const { t } = useTranslation();
@@ -131,6 +133,10 @@ const ProductListPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Banner Slider */}
       <BannerSlider />
+
+      {/* Flash Sale */}
+      <FlashSaleBanner />
+      <FlashSaleSection />
 
       <div className="flex flex-col md:flex-row gap-8">
         {/* Sidebar Filters - Desktop */}
