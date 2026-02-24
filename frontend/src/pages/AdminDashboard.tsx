@@ -13,6 +13,7 @@ import AdminCouponsTab from "../components/AdminCouponsTab";
 import AdminShippingTab from "../components/AdminShippingTab";
 import AdminAnalyticsTab from "../components/AdminAnalyticsTab";
 import AdminFlashSaleTab from "../components/AdminFlashSaleTab";
+import AdminLoyaltyTab from "../components/AdminLoyaltyTab";
 import LowStockAlert from "../components/LowStockAlert";
 import {
   Plus,
@@ -38,6 +39,7 @@ import {
   Image,
   BarChart3,
   Zap,
+  Crown,
 } from "lucide-react";
 
 type TabType =
@@ -49,6 +51,7 @@ type TabType =
   | "coupons"
   | "shipping"
   | "flash-sale"
+  | "loyalty"
   | "analytics";
 
 const statusConfig: Record<
@@ -390,6 +393,11 @@ const AdminDashboard = () => {
               key: "flash-sale",
               label: "Flash Sale",
               icon: <Zap size={18} />,
+            },
+            {
+              key: "loyalty",
+              label: "Loyalty",
+              icon: <Crown size={18} />,
             },
           ].map((tab) => (
             <button
@@ -733,6 +741,13 @@ const AdminDashboard = () => {
 
           {/* Flash Sale Tab */}
           {activeTab === "flash-sale" && <AdminFlashSaleTab />}
+
+          {/* Loyalty Tab */}
+          {activeTab === "loyalty" && (
+            <div className="p-6">
+              <AdminLoyaltyTab />
+            </div>
+          )}
         </div>
       </div>
 

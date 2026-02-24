@@ -31,6 +31,7 @@ const _reportsmodule = require("./reports/reports.module");
 const _addressesmodule = require("./addresses/addresses.module");
 const _shippingmodule = require("./shipping/shipping.module");
 const _flashsalemodule = require("./flash-sale/flash-sale.module");
+const _loyaltymodule = require("./loyalty/loyalty.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -61,7 +62,8 @@ AppModule = _ts_decorate([
             _reportsmodule.ReportsModule,
             _addressesmodule.AddressesModule,
             _shippingmodule.ShippingModule,
-            _flashsalemodule.FlashSaleModule
+            _flashsalemodule.FlashSaleModule,
+            _loyaltymodule.LoyaltyModule
         ],
         controllers: [
             _appcontroller.AppController

@@ -8,6 +8,7 @@ import { CartsService } from '../carts/carts.service';
 import { EmailService } from '../email/email.service';
 import { ShippingService } from '../shipping/shipping.service';
 import { FlashSaleService } from '../flash-sale/flash-sale.service';
+import { LoyaltyService } from '../loyalty/loyalty.service';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class OrdersService {
     private emailService: EmailService,
     private shippingService: ShippingService,
     private flashSaleService: FlashSaleService,
+    private loyaltyService: LoyaltyService,
   ) {}
 
   async createOrder(
@@ -311,6 +313,15 @@ export class OrdersService {
           status,
           statusLabel: statusLabels[status] || status,
         },
+      );
+    }
+
+    // Tich diem loyalty khi DELIVERED
+    if (status === 'DELIVERED' && updatedOrder.user?.id) {
+      void this.loyaltyService.earnPoints(
+        updatedOrder.user.id,
+        id,
+        order.totalAmount,
       );
     }
 
