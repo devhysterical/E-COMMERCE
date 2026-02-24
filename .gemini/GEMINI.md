@@ -42,6 +42,7 @@ Dự án xây dựng nền tảng thương mại điện tử hiện đại, t�
   **Ngôn ngữ**: Luôn luôn sử dụng tiếng Việt trong tất cả phản hồi và tài liệu hướng dẫn liên quan đến dự án này.
   **Tuân thủ**: Tuyệt đối tuân thủ nội dung trong các file hướng dẫn đã ghi.
   **Phong cách**: Không chèn icon hoặc emoji bừa bãi trong văn bản và mã nguồn.
+  **Text**: Các đoạn có chứa text trong mã nguồn nếu text là tiếng Việt thì bắt buộc phải là có dấu và lưu ý đúng chính tả, còn nếu tiếng Anh thì phải đúng ngữ pháp.
 
 - Quy tắc dữ liệu (Database Rules)
   **Tính toàn vẹn**: Sử dụng Foreign Key cho tất cả các mối quan hệ giữa các bảng.

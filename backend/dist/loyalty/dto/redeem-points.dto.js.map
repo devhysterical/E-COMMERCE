@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/loyalty/dto/redeem-points.dto.ts"],"sourcesContent":["import { IsNotEmpty, IsString } from 'class-validator';\r\n\r\nexport class RedeemPointsDto {\r\n  @IsNotEmpty()\r\n  @IsString()\r\n  rewardId: string;\r\n}\r\n"],"names":["RedeemPointsDto"],"mappings":";;;;+BAEaA;;;eAAAA;;;gCAFwB;;;;;;;;;;AAE9B,IAAA,AAAMA,kBAAN,MAAMA;AAIb"}

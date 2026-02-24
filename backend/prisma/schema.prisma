@@ -41,15 +41,17 @@ model User {
   avatarUrl     String?
   authProvider  String    @default("email") // "email" or "google"
   role          Role      @default(USER)
+  totalPoints   Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   deletedAt     DateTime? // Soft Delete
 
-  reviews       Review[]
-  orders        Order[]
-  cart          Cart?
-  wishlist      WishlistItem[]
-  addresses     Address[]
+  reviews           Review[]
+  orders            Order[]
+  cart              Cart?
+  wishlist          WishlistItem[]
+  addresses         Address[]
+  pointTransactions PointTransaction[]
 
   @@map("users")
 }
@@ -315,4 +317,48 @@ model FlashSaleItem {
 
   @@unique([flashSaleId, productId])
   @@map("flash_sale_items")
+}
+
+enum PointTransactionType {
+  EARN
+  REDEEM
+  EXPIRE
+  ADJUST
+}
+
+model LoyaltyTier {
+  id              String    @id @default(uuid())
+  name            String    @unique
+  minPoints       Int
+  pointMultiplier Float     @default(1.0)
+  benefits        String?
+  createdAt       DateTime  @default(now())
+
+  @@map("loyalty_tiers")
+}
+
+model PointTransaction {
+  id            String                @id @default(uuid())
+  userId        String
+  user          User                  @relation(fields: [userId], references: [id])
+  type          PointTransactionType
+  points        Int
+  description   String
+  orderId       String?
+  expiresAt     DateTime?
+  createdAt     DateTime              @default(now())
+
+  @@map("point_transactions")
+}
+
+model PointReward {
+  id              String    @id @default(uuid())
+  name            String
+  pointsCost      Int
+  rewardType      String    // COUPON | FREE_SHIPPING
+  couponValue     Int?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  @@map("point_rewards")
 }

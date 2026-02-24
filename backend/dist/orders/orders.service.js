@@ -14,6 +14,7 @@ const _cartsservice = require("../carts/carts.service");
 const _emailservice = require("../email/email.service");
 const _shippingservice = require("../shipping/shipping.service");
 const _flashsaleservice = require("../flash-sale/flash-sale.service");
+const _loyaltyservice = require("../loyalty/loyalty.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -350,6 +351,10 @@ let OrdersService = class OrdersService {
                 statusLabel: statusLabels[status] || status
             });
         }
+        // Tich diem loyalty khi DELIVERED
+        if (status === 'DELIVERED' && updatedOrder.user?.id) {
+            void this.loyaltyService.earnPoints(updatedOrder.user.id, id, order.totalAmount);
+        }
         return updatedOrder;
     }
     async getStats() {
@@ -402,12 +407,13 @@ let OrdersService = class OrdersService {
             }
         });
     }
-    constructor(prisma, cartsService, emailService, shippingService, flashSaleService){
+    constructor(prisma, cartsService, emailService, shippingService, flashSaleService, loyaltyService){
         this.prisma = prisma;
         this.cartsService = cartsService;
         this.emailService = emailService;
         this.shippingService = shippingService;
         this.flashSaleService = flashSaleService;
+        this.loyaltyService = loyaltyService;
     }
 };
 OrdersService = _ts_decorate([
@@ -418,7 +424,8 @@ OrdersService = _ts_decorate([
         typeof _cartsservice.CartsService === "undefined" ? Object : _cartsservice.CartsService,
         typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService,
         typeof _shippingservice.ShippingService === "undefined" ? Object : _shippingservice.ShippingService,
-        typeof _flashsaleservice.FlashSaleService === "undefined" ? Object : _flashsaleservice.FlashSaleService
+        typeof _flashsaleservice.FlashSaleService === "undefined" ? Object : _flashsaleservice.FlashSaleService,
+        typeof _loyaltyservice.LoyaltyService === "undefined" ? Object : _loyaltyservice.LoyaltyService
     ])
 ], OrdersService);
 

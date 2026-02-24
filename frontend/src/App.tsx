@@ -27,6 +27,7 @@ import ProfilePage from "./pages/ProfilePage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
 import OrderDetailPage from "./pages/OrderDetailPage";
 import WishlistPage from "./pages/WishlistPage";
+import LoyaltyPage from "./pages/LoyaltyPage";
 import AddressesPage from "./pages/AddressesPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
@@ -290,6 +291,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <WishlistPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/loyalty"
+              element={
+                <ProtectedRoute>
+                  <LoyaltyPage />
                 </ProtectedRoute>
               }
             />
