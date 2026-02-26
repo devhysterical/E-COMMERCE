@@ -52,7 +52,9 @@ model User {
   wishlist          WishlistItem[]
   addresses         Address[]
   pointTransactions PointTransaction[]
+  refreshTokens     RefreshToken[]
 
+  @@index([deletedAt])
   @@map("users")
 }
 
@@ -89,6 +91,10 @@ model Product {
   wishlistItems WishlistItem[]
   flashSaleItems FlashSaleItem[]
 
+  @@index([categoryId])
+  @@index([price])
+  @@index([createdAt])
+  @@index([deletedAt])
   @@map("products")
 }
 
@@ -101,9 +107,9 @@ model ProductImage {
   sortOrder     Int       @default(0)
   createdAt     DateTime  @default(now())
 
+  @@index([productId])
   @@map("product_images")
 }
-
 
 model Order {
   id              String        @id @default(uuid())
@@ -126,6 +132,10 @@ model Order {
 
   orderItems      OrderItem[]
 
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([deletedAt])
   @@map("orders")
 }
 
@@ -155,6 +165,7 @@ model Coupon {
   orders          Order[]
   usages          CouponUsage[]
 
+  @@index([expiresAt, isActive])
   @@map("coupons")
 }
 
@@ -170,7 +181,6 @@ model CouponUsage {
   @@map("coupon_usages")
 }
 
-
 model OrderItem {
   id            String    @id @default(uuid())
   orderId       String
@@ -180,6 +190,8 @@ model OrderItem {
   quantity      Int
   price         Int       // Giá tại thời điểm mua (Integer)
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_items")
 }
 
@@ -203,6 +215,7 @@ model CartItem {
   product       Product   @relation(fields: [productId], references: [id])
   quantity      Int
 
+  @@index([cartId])
   @@map("cart_items")
 }
 
@@ -217,6 +230,8 @@ model Review {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  @@index([productId])
+  @@index([userId])
   @@map("reviews")
 }
 
@@ -261,6 +276,7 @@ model Address {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@index([userId])
   @@map("addresses")
 }
 
@@ -301,6 +317,7 @@ model FlashSale {
 
   items         FlashSaleItem[]
 
+  @@index([startTime, endTime])
   @@map("flash_sales")
 }
 
@@ -348,6 +365,7 @@ model PointTransaction {
   expiresAt     DateTime?
   createdAt     DateTime              @default(now())
 
+  @@index([userId])
   @@map("point_transactions")
 }
 
@@ -361,4 +379,18 @@ model PointReward {
   createdAt       DateTime  @default(now())
 
   @@map("point_rewards")
+}
+
+// ===== REFRESH TOKEN =====
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("refresh_tokens")
 }

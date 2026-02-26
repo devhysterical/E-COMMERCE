@@ -17,6 +17,8 @@ const _usersmodule = require("../users/users.module");
 const _jwtstrategy = require("./strategies/jwt.strategy");
 const _supabasemodule = require("../supabase/supabase.module");
 const _otpcacheservice = require("./otp-cache.service");
+const _refreshtokenservice = require("./refresh-token.service");
+const _prismamodule = require("../prisma/prisma.module");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -31,18 +33,20 @@ AuthModule = _ts_decorate([
             _usersmodule.UsersModule,
             _passport.PassportModule,
             _supabasemodule.SupabaseModule,
+            _prismamodule.PrismaModule,
             _jwt.JwtModule.register({
                 global: true,
                 secret: process.env.JWT_SECRET || 'super-secret',
                 signOptions: {
-                    expiresIn: '1d'
+                    expiresIn: '15m'
                 }
             })
         ],
         providers: [
             _authservice.AuthService,
             _jwtstrategy.JwtStrategy,
-            _otpcacheservice.OtpCacheService
+            _otpcacheservice.OtpCacheService,
+            _refreshtokenservice.RefreshTokenService
         ],
         controllers: [
             _authcontroller.AuthController

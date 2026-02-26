@@ -1,6 +1,6 @@
 {
   "env": {
-    "ANTHROPIC_BASE_URL": "http://[IP_ADDRESS]",
+    "ANTHROPIC_BASE_URL": "http://192.168.14.1:1411",
     "API_TIMEOUT_MS": "3000000",
     "CLAUDE_CODE_DISABLE_NONSSENTIAL_TRAFFIC": "1",
     "ANTHROPIC_MODEL": "default_model",

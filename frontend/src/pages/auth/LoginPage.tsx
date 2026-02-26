@@ -26,8 +26,8 @@ const LoginPage = () => {
 
     try {
       const response = await api.post("/auth/login", { email, password });
-      const { user, access_token } = response.data;
-      setAuth(user, access_token);
+      const { user, access_token, refresh_token } = response.data;
+      setAuth(user, access_token, refresh_token);
       navigate("/");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };

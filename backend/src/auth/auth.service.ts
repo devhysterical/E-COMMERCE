@@ -9,6 +9,7 @@ import { UsersService } from '../users/users.service';
 import { SupabaseService } from '../supabase/supabase.service';
 import { EmailService } from '../email/email.service';
 import { OtpCacheService } from './otp-cache.service';
+import { RefreshTokenService } from './refresh-token.service';
 import * as bcrypt from 'bcrypt';
 import {
   LoginDto,
@@ -26,6 +27,7 @@ export class AuthService {
     private supabaseService: SupabaseService,
     private emailService: EmailService,
     private otpCacheService: OtpCacheService,
+    private refreshTokenService: RefreshTokenService,
   ) {}
 
   // Gửi OTP đến email
@@ -98,8 +100,13 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email, role: user.role };
+    const refreshToken = await this.refreshTokenService.createRefreshToken(
+      user.id,
+    );
+
     return {
       access_token: await this.jwtService.signAsync(payload),
+      refresh_token: refreshToken,
       user: {
         id: user.id,
         email: user.email,
@@ -107,6 +114,36 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const tokenData =
+      await this.refreshTokenService.validateRefreshToken(refreshToken);
+    if (!tokenData) {
+      throw new UnauthorizedException(
+        'Refresh token không hợp lệ hoặc đã hết hạn',
+      );
+    }
+
+    const user = await this.usersService.findById(tokenData.userId);
+    if (!user) {
+      throw new UnauthorizedException('Người dùng không tồn tại');
+    }
+
+    const payload = { sub: user.id, email: user.email, role: user.role };
+    const newRefreshToken = await this.refreshTokenService.createRefreshToken(
+      user.id,
+    );
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+      refresh_token: newRefreshToken,
+    };
+  }
+
+  async logout(userId: string) {
+    await this.refreshTokenService.revokeUserTokens(userId);
+    return { message: 'Đăng xuất thành công' };
   }
 
   async forgotPassword(dto: ForgotPasswordDto) {
@@ -157,8 +194,13 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email, role: user.role };
+    const refreshToken = await this.refreshTokenService.createRefreshToken(
+      user.id,
+    );
+
     return {
       access_token: await this.jwtService.signAsync(payload),
+      refresh_token: refreshToken,
       user: {
         id: user.id,
         email: user.email,

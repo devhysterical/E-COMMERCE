@@ -7,19 +7,22 @@ import { UsersModule } from '../users/users.module';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { SupabaseModule } from '../supabase/supabase.module';
 import { OtpCacheService } from './otp-cache.service';
+import { RefreshTokenService } from './refresh-token.service';
+import { PrismaModule } from '../prisma/prisma.module';
 
 @Module({
   imports: [
     UsersModule,
     PassportModule,
     SupabaseModule,
+    PrismaModule,
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET || 'super-secret',
-      signOptions: { expiresIn: '1d' },
+      signOptions: { expiresIn: '15m' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, OtpCacheService],
+  providers: [AuthService, JwtStrategy, OtpCacheService, RefreshTokenService],
   controllers: [AuthController],
 })
 export class AuthModule {}

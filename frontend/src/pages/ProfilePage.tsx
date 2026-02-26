@@ -24,7 +24,7 @@ import { toast } from "react-toastify";
 const ProfilePage = () => {
   const { t } = useTranslation();
   const queryClient = useQueryClient();
-  const { user: authUser, setAuth, token } = useAuthStore();
+  const { user: authUser, setAuth, token, refreshToken } = useAuthStore();
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   // Profile form states
@@ -56,10 +56,11 @@ const ProfilePage = () => {
     mutationFn: UserService.updateProfile,
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
-      if (authUser && token) {
+      if (authUser && token && refreshToken) {
         setAuth(
           { ...authUser, fullName: data.fullName || authUser.fullName },
           token,
+          refreshToken,
         );
       }
       setIsEditing(false);
