@@ -9,6 +9,8 @@ Object.defineProperty(exports, "AppModule", {
     }
 });
 const _common = require("@nestjs/common");
+const _core = require("@nestjs/core");
+const _throttler = require("@nestjs/throttler");
 const _appcontroller = require("./app.controller");
 const _appservice = require("./app.service");
 const _prismamodule = require("./prisma/prisma.module");
@@ -43,6 +45,13 @@ let AppModule = class AppModule {
 AppModule = _ts_decorate([
     (0, _common.Module)({
         imports: [
+            _throttler.ThrottlerModule.forRoot([
+                {
+                    name: 'default',
+                    ttl: 60000,
+                    limit: 60
+                }
+            ]),
             _prismamodule.PrismaModule,
             _supabasemodule.SupabaseModule,
             _emailmodule.EmailModule,
@@ -69,7 +78,11 @@ AppModule = _ts_decorate([
             _appcontroller.AppController
         ],
         providers: [
-            _appservice.AppService
+            _appservice.AppService,
+            {
+                provide: _core.APP_GUARD,
+                useClass: _throttler.ThrottlerGuard
+            }
         ]
     })
 ], AppModule);

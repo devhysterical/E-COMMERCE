@@ -1,4 +1,14 @@
-import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  HttpCode,
+  HttpStatus,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import {
   LoginDto,
@@ -7,8 +17,10 @@ import {
   GoogleAuthDto,
 } from './dto/auth.dto';
 import { SendOtpDto } from './dto/otp.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
+@Throttle({ default: { ttl: 60000, limit: 5 } })
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -27,6 +39,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('refresh')
+  @HttpCode(HttpStatus.OK)
+  refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshTokens(dto.refreshToken);
+  }
+
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard('jwt'))
+  logout(@Request() req: { user: { userId: string } }) {
+    return this.authService.logout(req.user.userId);
   }
 
   @Post('forgot-password')

@@ -14,6 +14,7 @@ const _usersservice = require("../users/users.service");
 const _supabaseservice = require("../supabase/supabase.service");
 const _emailservice = require("../email/email.service");
 const _otpcacheservice = require("./otp-cache.service");
+const _refreshtokenservice = require("./refresh-token.service");
 const _bcrypt = /*#__PURE__*/ _interop_require_wildcard(require("bcrypt"));
 function _getRequireWildcardCache(nodeInterop) {
     if (typeof WeakMap !== "function") return null;
@@ -125,14 +126,42 @@ let AuthService = class AuthService {
             email: user.email,
             role: user.role
         };
+        const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
         return {
             access_token: await this.jwtService.signAsync(payload),
+            refresh_token: refreshToken,
             user: {
                 id: user.id,
                 email: user.email,
                 fullName: user.fullName,
                 role: user.role
             }
+        };
+    }
+    async refreshTokens(refreshToken) {
+        const tokenData = await this.refreshTokenService.validateRefreshToken(refreshToken);
+        if (!tokenData) {
+            throw new _common.UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn');
+        }
+        const user = await this.usersService.findById(tokenData.userId);
+        if (!user) {
+            throw new _common.UnauthorizedException('Người dùng không tồn tại');
+        }
+        const payload = {
+            sub: user.id,
+            email: user.email,
+            role: user.role
+        };
+        const newRefreshToken = await this.refreshTokenService.createRefreshToken(user.id);
+        return {
+            access_token: await this.jwtService.signAsync(payload),
+            refresh_token: newRefreshToken
+        };
+    }
+    async logout(userId) {
+        await this.refreshTokenService.revokeUserTokens(userId);
+        return {
+            message: 'Đăng xuất thành công'
         };
     }
     async forgotPassword(dto) {
@@ -177,8 +206,10 @@ let AuthService = class AuthService {
             email: user.email,
             role: user.role
         };
+        const refreshToken = await this.refreshTokenService.createRefreshToken(user.id);
         return {
             access_token: await this.jwtService.signAsync(payload),
+            refresh_token: refreshToken,
             user: {
                 id: user.id,
                 email: user.email,
@@ -187,12 +218,13 @@ let AuthService = class AuthService {
             }
         };
     }
-    constructor(usersService, jwtService, supabaseService, emailService, otpCacheService){
+    constructor(usersService, jwtService, supabaseService, emailService, otpCacheService, refreshTokenService){
         this.usersService = usersService;
         this.jwtService = jwtService;
         this.supabaseService = supabaseService;
         this.emailService = emailService;
         this.otpCacheService = otpCacheService;
+        this.refreshTokenService = refreshTokenService;
     }
 };
 AuthService = _ts_decorate([
@@ -203,7 +235,8 @@ AuthService = _ts_decorate([
         typeof _jwt.JwtService === "undefined" ? Object : _jwt.JwtService,
         typeof _supabaseservice.SupabaseService === "undefined" ? Object : _supabaseservice.SupabaseService,
         typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService,
-        typeof _otpcacheservice.OtpCacheService === "undefined" ? Object : _otpcacheservice.OtpCacheService
+        typeof _otpcacheservice.OtpCacheService === "undefined" ? Object : _otpcacheservice.OtpCacheService,
+        typeof _refreshtokenservice.RefreshTokenService === "undefined" ? Object : _refreshtokenservice.RefreshTokenService
     ])
 ], AuthService);
 

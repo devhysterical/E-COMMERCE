@@ -31,8 +31,8 @@ const AuthCallbackPage = () => {
           accessToken: session.access_token,
         });
 
-        const { user, access_token } = response.data;
-        setAuth(user, access_token);
+        const { user, access_token, refresh_token } = response.data;
+        setAuth(user, access_token, refresh_token);
         navigate("/");
       } catch (err: unknown) {
         const error = err as { message?: string };
