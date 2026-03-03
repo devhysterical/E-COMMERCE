@@ -29,6 +29,8 @@ import OrderDetailPage from "./pages/OrderDetailPage";
 import WishlistPage from "./pages/WishlistPage";
 import LoyaltyPage from "./pages/LoyaltyPage";
 import AddressesPage from "./pages/AddressesPage";
+import FAQPage from "./pages/FAQPage";
+import ContactPage from "./pages/ContactPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
 import { WishlistService } from "./services/api.service";
@@ -40,6 +42,7 @@ import {
   Package,
   ChevronDown,
   Heart,
+  HelpCircle,
 } from "lucide-react";
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useIdleTimeout } from "./hooks/useIdleTimeout";
@@ -106,6 +109,14 @@ const Navbar = () => {
               className="text-3xl font-black text-indigo-600 tracking-tighter italic hover:opacity-80 transition-opacity">
               L-TECH SOLUTIONS.
             </Link>
+            <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-slate-600 dark:text-slate-300">
+              <Link
+                to="/faq"
+                className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5">
+                <HelpCircle size={16} />
+                FAQ
+              </Link>
+            </div>
           </div>
           <div className="flex items-center gap-8">
             <Link
@@ -262,6 +273,8 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
             <Route path="/auth/callback" element={<AuthCallbackPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route
               path="/"
               element={

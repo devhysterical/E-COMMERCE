@@ -14,6 +14,7 @@ import AdminShippingTab from "../components/AdminShippingTab";
 import AdminAnalyticsTab from "../components/AdminAnalyticsTab";
 import AdminFlashSaleTab from "../components/AdminFlashSaleTab";
 import AdminLoyaltyTab from "../components/AdminLoyaltyTab";
+import AdminContactTab from "../components/AdminContactTab";
 import LowStockAlert from "../components/LowStockAlert";
 import {
   Plus,
@@ -40,6 +41,7 @@ import {
   BarChart3,
   Zap,
   Crown,
+  MessageSquare,
 } from "lucide-react";
 
 type TabType =
@@ -52,7 +54,8 @@ type TabType =
   | "shipping"
   | "flash-sale"
   | "loyalty"
-  | "analytics";
+  | "analytics"
+  | "contact";
 
 const statusConfig: Record<
   string,
@@ -398,6 +401,11 @@ const AdminDashboard = () => {
               key: "loyalty",
               label: "Loyalty",
               icon: <Crown size={18} />,
+            },
+            {
+              key: "contact",
+              label: "Hỗ trợ",
+              icon: <MessageSquare size={18} />,
             },
           ].map((tab) => (
             <button
@@ -748,6 +756,9 @@ const AdminDashboard = () => {
               <AdminLoyaltyTab />
             </div>
           )}
+
+          {/* Contact Tab */}
+          {activeTab === "contact" && <AdminContactTab />}
         </div>
       </div>
 

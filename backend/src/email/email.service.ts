@@ -221,4 +221,45 @@ export class EmailService {
       console.error(`[EMAIL] Failed to send status update to ${email}:`, error);
     }
   }
+
+  async sendContactNotificationEmail(ticket: {
+    id: string;
+    name: string;
+    email: string;
+    subject: string;
+    message: string;
+  }): Promise<void> {
+    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    if (!adminEmail) return;
+
+    const mailOptions = {
+      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      to: adminEmail,
+      subject: `[Hỗ trợ] ${ticket.subject}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #4F46E5; text-align: center;">Yêu cầu hỗ trợ mới</h2>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 10px; margin: 20px 0;">
+            <p style="margin: 0;"><strong>Từ:</strong> ${ticket.name} (${ticket.email})</p>
+            <p style="margin: 10px 0 0;"><strong>Chủ đề:</strong> ${ticket.subject}</p>
+            <p style="margin: 10px 0 0;"><strong>Mã ticket:</strong> #${ticket.id.slice(0, 8).toUpperCase()}</p>
+          </div>
+          <div style="padding: 15px; border-left: 4px solid #4F46E5; background: #fafafa; border-radius: 0 10px 10px 0; margin: 20px 0;">
+            <p style="margin: 0; white-space: pre-wrap;">${ticket.message}</p>
+          </div>
+          <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
+          <p style="color: #999; font-size: 12px; text-align: center;">
+            © 2026 E-Commerce. All rights reserved.
+          </p>
+        </div>
+      `,
+    };
+
+    try {
+      await this.transporter.sendMail(mailOptions);
+      console.log(`[EMAIL] Contact notification sent to admin`);
+    } catch (error) {
+      console.error(`[EMAIL] Failed to send contact notification:`, error);
+    }
+  }
 }
