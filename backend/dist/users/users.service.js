@@ -172,6 +172,36 @@ let UsersService = class UsersService {
         });
         return updatedUser;
     }
+    async deleteUser(userId) {
+        const user = await this.findById(userId);
+        if (!user) {
+            throw new _common.NotFoundException('Người dùng không tồn tại');
+        }
+        if (user.role === 'ADMIN') {
+            throw new _common.NotFoundException('Không thể xoá tài khoản có vai trò Admin. Hãy hạ vai trò về User trước.');
+        }
+        await this.prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                deletedAt: new Date()
+            }
+        });
+        return {
+            message: 'Đã xoá tài khoản thành công'
+        };
+    }
+    async restoreUser(userId) {
+        return this.prisma.user.update({
+            where: {
+                id: userId
+            },
+            data: {
+                deletedAt: null
+            }
+        });
+    }
     constructor(prisma){
         this.prisma = prisma;
     }

@@ -266,7 +266,7 @@ export default function AdminAnalyticsTab() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold text-slate-800 flex items-center gap-2">
               <ShoppingCart size={18} className="text-emerald-500" />
-              Don hang
+              Đơn hàng
             </h3>
             <PeriodSelector value={orderPeriod} onChange={setOrderPeriod} />
           </div>

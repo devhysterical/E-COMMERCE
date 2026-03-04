@@ -49,6 +49,9 @@ let AdminController = class AdminController {
     updateUserRole(id, dto) {
         return this.usersService.updateRole(id, dto.role);
     }
+    deleteUser(id) {
+        return this.usersService.deleteUser(id);
+    }
     constructor(usersService){
         this.usersService = usersService;
     }
@@ -70,6 +73,15 @@ _ts_decorate([
     ]),
     _ts_metadata("design:returntype", void 0)
 ], AdminController.prototype, "updateUserRole", null);
+_ts_decorate([
+    (0, _common.Delete)('users/:id'),
+    _ts_param(0, (0, _common.Param)('id')),
+    _ts_metadata("design:type", Function),
+    _ts_metadata("design:paramtypes", [
+        String
+    ]),
+    _ts_metadata("design:returntype", void 0)
+], AdminController.prototype, "deleteUser", null);
 AdminController = _ts_decorate([
     (0, _common.Controller)('admin'),
     (0, _common.UseGuards)(_jwtauthguard.JwtAuthGuard, _rolesguard.RolesGuard),

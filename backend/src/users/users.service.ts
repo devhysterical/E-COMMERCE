@@ -128,4 +128,31 @@ export class UsersService {
 
     return updatedUser;
   }
+
+  async deleteUser(userId: string) {
+    const user = await this.findById(userId);
+    if (!user) {
+      throw new NotFoundException('Người dùng không tồn tại');
+    }
+
+    if (user.role === 'ADMIN') {
+      throw new NotFoundException(
+        'Không thể xoá tài khoản có vai trò Admin. Hãy hạ vai trò về User trước.',
+      );
+    }
+
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: new Date() },
+    });
+
+    return { message: 'Đã xoá tài khoản thành công' };
+  }
+
+  async restoreUser(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: { deletedAt: null },
+    });
+  }
 }
