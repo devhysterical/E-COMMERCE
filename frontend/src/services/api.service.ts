@@ -309,6 +309,10 @@ export const AdminService = {
     const response = await api.patch(`/admin/users/${id}/role`, { role });
     return response.data;
   },
+  deleteUser: async (id: string): Promise<{ message: string }> => {
+    const response = await api.delete(`/admin/users/${id}`);
+    return response.data;
+  },
 };
 
 export const UploadService = {

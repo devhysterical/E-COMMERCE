@@ -77,6 +77,9 @@ let AuthService = class AuthService {
         // Kiểm tra email đã tồn tại chưa
         const userExists = await this.usersService.findOne(dto.email);
         if (userExists) {
+            if (userExists.deletedAt) {
+                throw new _common.ConflictException('Tài khoản này đã bị vô hiệu hoá. Vui lòng liên hệ hỗ trợ.');
+            }
             // Kiểm tra nếu user đã đăng ký qua Google
             if (userExists.authProvider === 'google') {
                 throw new _common.ConflictException('Email này đã được sử dụng để đăng nhập với Google. Vui lòng sử dụng tính năng "Đăng nhập với Google" thay thế.');
@@ -100,6 +103,9 @@ let AuthService = class AuthService {
         }
         const userExists = await this.usersService.findOne(dto.email);
         if (userExists) {
+            if (userExists.deletedAt) {
+                throw new _common.ConflictException('Tài khoản này đã bị vô hiệu hoá. Vui lòng liên hệ hỗ trợ.');
+            }
             throw new _common.ConflictException('Email đã tồn tại');
         }
         const hashedPassword = await _bcrypt.hash(dto.password, 10);
@@ -114,7 +120,7 @@ let AuthService = class AuthService {
     }
     async login(dto) {
         const user = await this.usersService.findOne(dto.email);
-        if (!user) {
+        if (!user || user.deletedAt) {
             throw new _common.UnauthorizedException('Thông tin đăng nhập không chính xác');
         }
         const isPasswordValid = await _bcrypt.compare(dto.password, user.password);
@@ -144,7 +150,7 @@ let AuthService = class AuthService {
             throw new _common.UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn');
         }
         const user = await this.usersService.findById(tokenData.userId);
-        if (!user) {
+        if (!user || user.deletedAt) {
             throw new _common.UnauthorizedException('Người dùng không tồn tại');
         }
         const payload = {
@@ -187,18 +193,34 @@ let AuthService = class AuthService {
         let user = await this.usersService.findOne(googleUser.email);
         if (!user) {
             // Tạo user mới nếu chưa tồn tại
-            const randomPassword = await _bcrypt.hash(Math.random().toString(36), 10);
-            user = await this.usersService.create({
-                email: googleUser.email,
-                password: randomPassword,
-                fullName: googleUser.fullName || undefined,
-                authProvider: 'google'
-            });
-            // Cập nhật avatar nếu có
-            if (googleUser.avatarUrl) {
-                await this.usersService.updateProfile(user.id, {
-                    avatarUrl: googleUser.avatarUrl
+            try {
+                const randomPassword = await _bcrypt.hash(Math.random().toString(36), 10);
+                user = await this.usersService.create({
+                    email: googleUser.email,
+                    password: randomPassword,
+                    fullName: googleUser.fullName || undefined,
+                    authProvider: 'google'
                 });
+                // Cập nhật avatar nếu có
+                if (googleUser.avatarUrl) {
+                    await this.usersService.updateProfile(user.id, {
+                        avatarUrl: googleUser.avatarUrl
+                    });
+                }
+            } catch (error) {
+                // P2002: Unique constraint — email đã tồn tại (race condition hoặc soft-deleted)
+                if (error && typeof error === 'object' && 'code' in error && error.code === 'P2002') {
+                    user = await this.usersService.findOne(googleUser.email);
+                    if (!user) {
+                        throw new _common.UnauthorizedException('Không thể xác thực tài khoản. Vui lòng thử lại.');
+                    }
+                    // Restore nếu bị soft-delete
+                    if (user.deletedAt) {
+                        await this.usersService.restoreUser(user.id);
+                    }
+                } else {
+                    throw error;
+                }
             }
         }
         const payload = {
