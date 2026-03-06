@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { CartService } from "../services/cart.service";
@@ -63,8 +63,38 @@ const CartPage = () => {
   const updateMutation = useMutation({
     mutationFn: ({ id, quantity }: { id: string; quantity: number }) =>
       CartService.update(id, quantity),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    onMutate: async ({ id, quantity }) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+
+      // Snapshot previous value
+      const previousCart = queryClient.getQueryData(["cart"]);
+
+      // Optimistic update — phản hồi ngay lập tức
+      queryClient.setQueryData(
+        ["cart"],
+        (old: { cartItems: CartItem[] } | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            cartItems: old.cartItems.map((item: CartItem) =>
+              item.id === id ? { ...item, quantity } : item,
+            ),
+          };
+        },
+      );
+
+      return { previousCart };
+    },
+    onError: (_err, _vars, context) => {
+      // Rollback on error
+      if (context?.previousCart) {
+        queryClient.setQueryData(["cart"], context.previousCart);
+      }
+      toast.error("Cập nhật số lượng thất bại");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["cart"] });
       // Re-validate coupon with new total
       if (couponResult && cart) {
         handleValidateCoupon(couponResult.code);
@@ -72,11 +102,66 @@ const CartPage = () => {
     },
   });
 
+  // Debounce timer cho keyboard input
+  const quantityTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>(
+    {},
+  );
+
+  const handleQuantityChange = (itemId: string, rawValue: string) => {
+    const parsed = parseInt(rawValue, 10);
+    if (isNaN(parsed) || parsed < 0) return;
+    const newQuantity = Math.max(1, parsed);
+
+    // Optimistic update ngay lập tức
+    queryClient.setQueryData(
+      ["cart"],
+      (old: { cartItems: CartItem[] } | undefined) => {
+        if (!old) return old;
+        return {
+          ...old,
+          cartItems: old.cartItems.map((item: CartItem) =>
+            item.id === itemId ? { ...item, quantity: newQuantity } : item,
+          ),
+        };
+      },
+    );
+
+    // Debounce API call 500ms
+    if (quantityTimers.current[itemId]) {
+      clearTimeout(quantityTimers.current[itemId]);
+    }
+    quantityTimers.current[itemId] = setTimeout(() => {
+      updateMutation.mutate({ id: itemId, quantity: newQuantity });
+    }, 500);
+  };
+
   const removeMutation = useMutation({
     mutationFn: (id: string) => CartService.remove(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["cart"] });
-      // Re-validate coupon with new total
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ["cart"] });
+      const previousCart = queryClient.getQueryData(["cart"]);
+
+      queryClient.setQueryData(
+        ["cart"],
+        (old: { cartItems: CartItem[] } | undefined) => {
+          if (!old) return old;
+          return {
+            ...old,
+            cartItems: old.cartItems.filter((item: CartItem) => item.id !== id),
+          };
+        },
+      );
+
+      return { previousCart };
+    },
+    onError: (_err, _vars, context) => {
+      if (context?.previousCart) {
+        queryClient.setQueryData(["cart"], context.previousCart);
+      }
+      toast.error("Xoá sản phẩm thất bại");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: ["cart"] });
       if (couponResult && cart) {
         const newTotal =
           cart.cartItems.reduce(
@@ -204,20 +289,33 @@ const CartPage = () => {
                     {item.product.price.toLocaleString("vi-VN")} đ
                   </p>
                 </div>
-                <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-700 p-2 rounded-xl">
+                <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-xl">
                   <button
                     onClick={() =>
                       updateMutation.mutate({
                         id: item.id,
-                        quantity: item.quantity - 1,
+                        quantity: Math.max(1, item.quantity - 1),
                       })
                     }
-                    className="p-1 hover:text-indigo-600 transition-colors">
-                    <Minus size={20} />
+                    disabled={item.quantity <= 1}
+                    className="p-1.5 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-600 rounded-lg transition-all disabled:opacity-30 disabled:cursor-not-allowed">
+                    <Minus size={18} />
                   </button>
-                  <span className="font-bold w-4 text-center">
-                    {item.quantity}
-                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      handleQuantityChange(item.id, e.target.value)
+                    }
+                    onBlur={(e) => {
+                      const val = parseInt(e.target.value, 10);
+                      if (isNaN(val) || val < 1) {
+                        handleQuantityChange(item.id, "1");
+                      }
+                    }}
+                    className="w-10 text-center font-bold text-sm bg-white dark:bg-slate-600 border border-slate-200 dark:border-slate-500 rounded-lg py-1 outline-none focus:ring-2 focus:ring-indigo-400 transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button
                     onClick={() =>
                       updateMutation.mutate({
@@ -225,8 +323,8 @@ const CartPage = () => {
                         quantity: item.quantity + 1,
                       })
                     }
-                    className="p-1 hover:text-indigo-600 transition-colors">
-                    <Plus size={20} />
+                    className="p-1.5 hover:text-indigo-600 hover:bg-white dark:hover:bg-slate-600 rounded-lg transition-all">
+                    <Plus size={18} />
                   </button>
                 </div>
                 <button

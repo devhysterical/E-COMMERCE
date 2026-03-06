@@ -5,6 +5,7 @@ import { WishlistService, type Product } from "../services/api.service";
 import { CartService } from "../services/cart.service";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../store/useAuthStore";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ProductCardProps {
   product: Product;
@@ -52,17 +53,23 @@ const ProductCard = ({ product }: ProductCardProps) => {
     }
   };
 
-  const handleAddToCart = async (e: React.MouseEvent) => {
+  const queryClient = useQueryClient();
+
+  const addToCartMutation = useMutation({
+    mutationFn: () => CartService.add(product.id, 1),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success("Đã thêm vào giỏ hàng");
+    },
+    onError: () => {
+      toast.error("Không thể thêm vào giỏ hàng");
+    },
+  });
+
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    try {
-      await CartService.add(product.id, 1);
-      toast.success("Đã thêm vào giỏ hàng");
-    } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Không thể thêm vào giỏ hàng");
-    }
+    addToCartMutation.mutate();
   };
 
   return (
