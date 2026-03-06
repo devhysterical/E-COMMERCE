@@ -10,6 +10,7 @@ Object.defineProperty(exports, "ReviewsService", {
 });
 const _common = require("@nestjs/common");
 const _prismaservice = require("../prisma/prisma.service");
+const _notificationsservice = require("../notifications/notifications.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -31,7 +32,7 @@ let ReviewsService = class ReviewsService {
         if (!product) {
             throw new _common.NotFoundException('Sản phẩm không tồn tại');
         }
-        return this.prisma.review.create({
+        const review = await this.prisma.review.create({
             data: {
                 rating: dto.rating,
                 comment: dto.comment,
@@ -48,6 +49,17 @@ let ReviewsService = class ReviewsService {
                 }
             }
         });
+        // Gửi notification cho admin khi có review mới
+        void this.notificationsService.createForAdmins({
+            type: 'NEW_REVIEW',
+            title: `Đánh giá mới cho "${product.name}"`,
+            message: `${review.user.fullName || review.user.email} đã đánh giá ${dto.rating} sao`,
+            metadata: {
+                productId: dto.productId,
+                reviewId: review.id
+            }
+        });
+        return review;
     }
     async findByProduct(productId) {
         return this.prisma.review.findMany({
@@ -139,15 +151,17 @@ let ReviewsService = class ReviewsService {
             totalReviews: stats._count.rating
         };
     }
-    constructor(prisma){
+    constructor(prisma, notificationsService){
         this.prisma = prisma;
+        this.notificationsService = notificationsService;
     }
 };
 ReviewsService = _ts_decorate([
     (0, _common.Injectable)(),
     _ts_metadata("design:type", Function),
     _ts_metadata("design:paramtypes", [
-        typeof _prismaservice.PrismaService === "undefined" ? Object : _prismaservice.PrismaService
+        typeof _prismaservice.PrismaService === "undefined" ? Object : _prismaservice.PrismaService,
+        typeof _notificationsservice.NotificationsService === "undefined" ? Object : _notificationsservice.NotificationsService
     ])
 ], ReviewsService);
 

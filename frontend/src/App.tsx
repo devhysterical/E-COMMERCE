@@ -31,6 +31,7 @@ import LoyaltyPage from "./pages/LoyaltyPage";
 import AddressesPage from "./pages/AddressesPage";
 import FAQPage from "./pages/FAQPage";
 import ContactPage from "./pages/ContactPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { CartService } from "./services/cart.service";
 import { WishlistService } from "./services/api.service";
@@ -50,6 +51,7 @@ import SessionTimeoutModal from "./components/SessionTimeoutModal";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import ThemeToggle from "./components/ThemeToggle";
 import { LanguageSwitcherCompact } from "./components/LanguageSwitcher";
+import NotificationBell from "./components/NotificationBell";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +121,7 @@ const Navbar = () => {
             </div>
           </div>
           <div className="flex items-center gap-8">
+            {isAuthenticated && <NotificationBell />}
             <Link
               to="/wishlist"
               className="relative p-2 text-slate-600 hover:text-red-500 transition-colors"
@@ -352,6 +355,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <OrderDetailPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/notifications"
+              element={
+                <ProtectedRoute>
+                  <NotificationsPage />
                 </ProtectedRoute>
               }
             />

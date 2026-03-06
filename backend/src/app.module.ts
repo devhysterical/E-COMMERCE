@@ -25,6 +25,7 @@ import { ShippingModule } from './shipping/shipping.module';
 import { FlashSaleModule } from './flash-sale/flash-sale.module';
 import { LoyaltyModule } from './loyalty/loyalty.module';
 import { ContactModule } from './contact/contact.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ContactModule } from './contact/contact.module';
     FlashSaleModule,
     LoyaltyModule,
     ContactModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

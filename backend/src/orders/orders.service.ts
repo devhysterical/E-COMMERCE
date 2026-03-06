@@ -9,6 +9,7 @@ import { EmailService } from '../email/email.service';
 import { ShippingService } from '../shipping/shipping.service';
 import { FlashSaleService } from '../flash-sale/flash-sale.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
@@ -20,6 +21,7 @@ export class OrdersService {
     private shippingService: ShippingService,
     private flashSaleService: FlashSaleService,
     private loyaltyService: LoyaltyService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async createOrder(
@@ -314,6 +316,15 @@ export class OrdersService {
           statusLabel: statusLabels[status] || status,
         },
       );
+
+      // Gửi notification in-app
+      void this.notificationsService.create({
+        userId: updatedOrder.user.id,
+        type: 'ORDER_STATUS',
+        title: `Đơn hàng #${id.slice(0, 8)} — ${statusLabels[status] || status}`,
+        message: `Đơn hàng của bạn đã được cập nhật trạng thái: ${statusLabels[status] || status}`,
+        metadata: { orderId: id, status },
+      });
     }
 
     // Tich diem loyalty khi DELIVERED

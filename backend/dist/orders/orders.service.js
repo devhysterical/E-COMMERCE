@@ -15,6 +15,7 @@ const _emailservice = require("../email/email.service");
 const _shippingservice = require("../shipping/shipping.service");
 const _flashsaleservice = require("../flash-sale/flash-sale.service");
 const _loyaltyservice = require("../loyalty/loyalty.service");
+const _notificationsservice = require("../notifications/notifications.service");
 function _ts_decorate(decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -350,6 +351,17 @@ let OrdersService = class OrdersService {
                 status,
                 statusLabel: statusLabels[status] || status
             });
+            // Gửi notification in-app
+            void this.notificationsService.create({
+                userId: updatedOrder.user.id,
+                type: 'ORDER_STATUS',
+                title: `Đơn hàng #${id.slice(0, 8)} — ${statusLabels[status] || status}`,
+                message: `Đơn hàng của bạn đã được cập nhật trạng thái: ${statusLabels[status] || status}`,
+                metadata: {
+                    orderId: id,
+                    status
+                }
+            });
         }
         // Tich diem loyalty khi DELIVERED
         if (status === 'DELIVERED' && updatedOrder.user?.id) {
@@ -407,13 +419,14 @@ let OrdersService = class OrdersService {
             }
         });
     }
-    constructor(prisma, cartsService, emailService, shippingService, flashSaleService, loyaltyService){
+    constructor(prisma, cartsService, emailService, shippingService, flashSaleService, loyaltyService, notificationsService){
         this.prisma = prisma;
         this.cartsService = cartsService;
         this.emailService = emailService;
         this.shippingService = shippingService;
         this.flashSaleService = flashSaleService;
         this.loyaltyService = loyaltyService;
+        this.notificationsService = notificationsService;
     }
 };
 OrdersService = _ts_decorate([
@@ -425,7 +438,8 @@ OrdersService = _ts_decorate([
         typeof _emailservice.EmailService === "undefined" ? Object : _emailservice.EmailService,
         typeof _shippingservice.ShippingService === "undefined" ? Object : _shippingservice.ShippingService,
         typeof _flashsaleservice.FlashSaleService === "undefined" ? Object : _flashsaleservice.FlashSaleService,
-        typeof _loyaltyservice.LoyaltyService === "undefined" ? Object : _loyaltyservice.LoyaltyService
+        typeof _loyaltyservice.LoyaltyService === "undefined" ? Object : _loyaltyservice.LoyaltyService,
+        typeof _notificationsservice.NotificationsService === "undefined" ? Object : _notificationsservice.NotificationsService
     ])
 ], OrdersService);
 

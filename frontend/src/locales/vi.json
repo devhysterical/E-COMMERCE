@@ -102,12 +102,12 @@
     "processing": "Đang xử lý...",
     "processingMomo": "Đang chuyển đến MoMo...",
     "payWithMomo": "Thanh toán với MoMo",
-    "confirmOrder": "Xac nhan dat hang",
-    "shippingFee": "Phi van chuyen",
-    "shippingZone": "Vung van chuyen",
-    "shippingCost": "Phi ship",
-    "freeShipping": "Mien phi",
-    "estimatedDelivery": "Thoi gian giao hang"
+    "confirmOrder": "Xác nhận đặt hàng",
+    "shippingFee": "Phí vận chuyển",
+    "shippingZone": "Vùng vận chuyển",
+    "shippingCost": "Phí ship",
+    "freeShipping": "Miễn phí",
+    "estimatedDelivery": "Thời gian giao hàng"
   },
   "order": {
     "title": "Đơn hàng của bạn",

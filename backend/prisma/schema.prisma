@@ -30,6 +30,13 @@ enum PaymentStatus {
   FAILED
 }
 
+enum NotificationType {
+  ORDER_STATUS
+  NEW_REVIEW
+  SYSTEM
+  PROMOTION
+}
+
 model User {
   id            String    @id @default(uuid())
   email         String    @unique
@@ -53,6 +60,7 @@ model User {
   addresses         Address[]
   pointTransactions PointTransaction[]
   refreshTokens     RefreshToken[]
+  notifications     Notification[]
 
   @@index([deletedAt])
   @@map("users")
@@ -418,4 +426,22 @@ model ContactTicket {
   @@index([status])
   @@index([createdAt])
   @@map("contact_tickets")
+}
+
+// ===== NOTIFICATIONS =====
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  title     String
+  message   String
+  isRead    Boolean          @default(false)
+  metadata  Json?
+  createdAt DateTime         @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
 }
