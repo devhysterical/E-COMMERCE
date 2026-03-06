@@ -5,10 +5,14 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
+import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
 export class ReviewsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notificationsService: NotificationsService,
+  ) {}
 
   async create(userId: string, dto: CreateReviewDto) {
     // Kiểm tra sản phẩm tồn tại
@@ -20,7 +24,7 @@ export class ReviewsService {
       throw new NotFoundException('Sản phẩm không tồn tại');
     }
 
-    return this.prisma.review.create({
+    const review = await this.prisma.review.create({
       data: {
         rating: dto.rating,
         comment: dto.comment,
@@ -33,6 +37,16 @@ export class ReviewsService {
         },
       },
     });
+
+    // Gửi notification cho admin khi có review mới
+    void this.notificationsService.createForAdmins({
+      type: 'NEW_REVIEW',
+      title: `Đánh giá mới cho "${product.name}"`,
+      message: `${review.user.fullName || review.user.email} đã đánh giá ${dto.rating} sao`,
+      metadata: { productId: dto.productId, reviewId: review.id },
+    });
+
+    return review;
   }
 
   async findByProduct(productId: string) {

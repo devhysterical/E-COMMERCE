@@ -7,6 +7,7 @@ import { EmailModule } from '../email/email.module';
 import { ShippingModule } from '../shipping/shipping.module';
 import { FlashSaleModule } from '../flash-sale/flash-sale.module';
 import { LoyaltyModule } from '../loyalty/loyalty.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { LoyaltyModule } from '../loyalty/loyalty.module';
     ShippingModule,
     FlashSaleModule,
     LoyaltyModule,
+    NotificationsModule,
   ],
   controllers: [OrdersController],
   providers: [OrdersService, InvoiceService],

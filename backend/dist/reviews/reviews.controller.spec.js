@@ -4,12 +4,27 @@ Object.defineProperty(exports, "__esModule", {
 });
 const _testing = require("@nestjs/testing");
 const _reviewscontroller = require("./reviews.controller");
+const _reviewsservice = require("./reviews.service");
+const mockReviewsService = {
+    create: jest.fn(),
+    findByProduct: jest.fn(),
+    getProductStats: jest.fn(),
+    findOne: jest.fn(),
+    update: jest.fn(),
+    remove: jest.fn()
+};
 describe('ReviewsController', ()=>{
     let controller;
     beforeEach(async ()=>{
         const module = await _testing.Test.createTestingModule({
             controllers: [
                 _reviewscontroller.ReviewsController
+            ],
+            providers: [
+                {
+                    provide: _reviewsservice.ReviewsService,
+                    useValue: mockReviewsService
+                }
             ]
         }).compile();
         controller = module.get(_reviewscontroller.ReviewsController);

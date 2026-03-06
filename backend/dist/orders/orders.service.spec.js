@@ -4,18 +4,370 @@ Object.defineProperty(exports, "__esModule", {
 });
 const _testing = require("@nestjs/testing");
 const _ordersservice = require("./orders.service");
+const _prismaservice = require("../prisma/prisma.service");
+const _cartsservice = require("../carts/carts.service");
+const _emailservice = require("../email/email.service");
+const _shippingservice = require("../shipping/shipping.service");
+const _flashsaleservice = require("../flash-sale/flash-sale.service");
+const _loyaltyservice = require("../loyalty/loyalty.service");
+const _common = require("@nestjs/common");
+const _client = require("@prisma/client");
+const mockPrisma = {
+    order: {
+        findMany: jest.fn(),
+        findFirst: jest.fn(),
+        findUnique: jest.fn(),
+        create: jest.fn(),
+        update: jest.fn(),
+        count: jest.fn(),
+        aggregate: jest.fn(),
+        groupBy: jest.fn()
+    },
+    coupon: {
+        findUnique: jest.fn()
+    },
+    couponUsage: {
+        findUnique: jest.fn(),
+        create: jest.fn()
+    },
+    $transaction: jest.fn()
+};
+const mockCartsService = {
+    getCart: jest.fn()
+};
+const mockEmailService = {
+    sendOrderConfirmationEmail: jest.fn(),
+    sendOrderStatusUpdateEmail: jest.fn()
+};
+const mockShippingService = {
+    calculateFee: jest.fn()
+};
+const mockFlashSaleService = {
+    checkFlashSalePrice: jest.fn(),
+    incrementSoldQty: jest.fn()
+};
+const mockLoyaltyService = {
+    earnPoints: jest.fn()
+};
 describe('OrdersService', ()=>{
     let service;
     beforeEach(async ()=>{
         const module = await _testing.Test.createTestingModule({
             providers: [
-                _ordersservice.OrdersService
+                _ordersservice.OrdersService,
+                {
+                    provide: _prismaservice.PrismaService,
+                    useValue: mockPrisma
+                },
+                {
+                    provide: _cartsservice.CartsService,
+                    useValue: mockCartsService
+                },
+                {
+                    provide: _emailservice.EmailService,
+                    useValue: mockEmailService
+                },
+                {
+                    provide: _shippingservice.ShippingService,
+                    useValue: mockShippingService
+                },
+                {
+                    provide: _flashsaleservice.FlashSaleService,
+                    useValue: mockFlashSaleService
+                },
+                {
+                    provide: _loyaltyservice.LoyaltyService,
+                    useValue: mockLoyaltyService
+                }
             ]
         }).compile();
         service = module.get(_ordersservice.OrdersService);
+        jest.clearAllMocks();
     });
-    it('should be defined', ()=>{
-        expect(service).toBeDefined();
+    const mockOrder = {
+        id: 'order-1',
+        userId: 'user-1',
+        totalAmount: 300000,
+        discountAmount: 0,
+        shippingFee: 0,
+        status: 'PENDING',
+        address: '123 Nguyễn Huệ',
+        phone: '0901234567',
+        deletedAt: null,
+        paymentMethod: 'COD',
+        paymentStatus: 'PENDING',
+        orderItems: [
+            {
+                id: 'oi-1',
+                orderId: 'order-1',
+                productId: 'prod-1',
+                quantity: 2,
+                price: 150000,
+                product: {
+                    id: 'prod-1',
+                    name: 'Áo thun',
+                    stock: 50
+                }
+            }
+        ],
+        user: {
+            id: 'user-1',
+            email: 'test@example.com',
+            fullName: 'Test'
+        }
+    };
+    const mockCart = {
+        id: 'cart-1',
+        userId: 'user-1',
+        cartItems: [
+            {
+                id: 'ci-1',
+                cartId: 'cart-1',
+                productId: 'prod-1',
+                quantity: 2,
+                product: {
+                    id: 'prod-1',
+                    name: 'Áo thun',
+                    price: 150000,
+                    stock: 50
+                }
+            }
+        ]
+    };
+    // ==================== CREATE ORDER ====================
+    describe('createOrder', ()=>{
+        it('should throw if cart is empty', async ()=>{
+            mockCartsService.getCart.mockResolvedValue({
+                id: 'cart-1',
+                cartItems: []
+            });
+            await expect(service.createOrder('user-1', '123 Đường ABC', '0901234567')).rejects.toThrow(_common.BadRequestException);
+        });
+        it('should create order with COD payment', async ()=>{
+            mockCartsService.getCart.mockResolvedValue(mockCart);
+            mockFlashSaleService.checkFlashSalePrice.mockResolvedValue(null);
+            const createdOrder = {
+                ...mockOrder
+            };
+            mockPrisma.$transaction.mockImplementation(async (fn)=>{
+                return await fn({
+                    order: {
+                        create: jest.fn().mockResolvedValue(createdOrder)
+                    },
+                    orderItem: {
+                        create: jest.fn()
+                    },
+                    product: {
+                        update: jest.fn()
+                    },
+                    cartItem: {
+                        deleteMany: jest.fn()
+                    },
+                    user: {
+                        findUnique: jest.fn().mockResolvedValue({
+                            id: 'user-1',
+                            email: 'test@example.com'
+                        })
+                    },
+                    couponUsage: {
+                        create: jest.fn()
+                    },
+                    coupon: {
+                        update: jest.fn()
+                    }
+                });
+            });
+            const result = await service.createOrder('user-1', '123 Nguyễn Huệ', '0901234567', 'COD');
+            expect(result.id).toBe('order-1');
+        });
+        it('should apply shipping fee when province provided', async ()=>{
+            mockCartsService.getCart.mockResolvedValue(mockCart);
+            mockFlashSaleService.checkFlashSalePrice.mockResolvedValue(null);
+            mockShippingService.calculateFee.mockResolvedValue({
+                fee: 30000
+            });
+            mockPrisma.$transaction.mockImplementation(async (fn)=>{
+                return await fn({
+                    order: {
+                        create: jest.fn().mockResolvedValue({
+                            ...mockOrder,
+                            shippingFee: 30000,
+                            totalAmount: 330000
+                        })
+                    },
+                    orderItem: {
+                        create: jest.fn()
+                    },
+                    product: {
+                        update: jest.fn()
+                    },
+                    cartItem: {
+                        deleteMany: jest.fn()
+                    },
+                    user: {
+                        findUnique: jest.fn().mockResolvedValue(null)
+                    },
+                    couponUsage: {
+                        create: jest.fn()
+                    },
+                    coupon: {
+                        update: jest.fn()
+                    }
+                });
+            });
+            const result = await service.createOrder('user-1', '123 ABC', '0901234567', 'COD', undefined, 'Hà Nội');
+            expect(mockShippingService.calculateFee).toHaveBeenCalledWith('Hà Nội', 300000);
+            expect(result.shippingFee).toBe(30000);
+        });
+    });
+    // ==================== FIND ALL ====================
+    describe('findAll', ()=>{
+        it('should return user orders', async ()=>{
+            mockPrisma.order.findMany.mockResolvedValue([
+                mockOrder
+            ]);
+            const result = await service.findAll('user-1');
+            expect(result).toHaveLength(1);
+            expect(mockPrisma.order.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: {
+                    userId: 'user-1',
+                    deletedAt: null
+                }
+            }));
+        });
+    });
+    // ==================== FIND ONE ====================
+    describe('findOne', ()=>{
+        it('should return a specific order', async ()=>{
+            mockPrisma.order.findFirst.mockResolvedValue(mockOrder);
+            const result = await service.findOne('order-1', 'user-1');
+            expect(result).toEqual(mockOrder);
+        });
+        it('should return null if not found', async ()=>{
+            mockPrisma.order.findFirst.mockResolvedValue(null);
+            const result = await service.findOne('nonexistent', 'user-1');
+            expect(result).toBeNull();
+        });
+    });
+    // ==================== FIND ALL ADMIN ====================
+    describe('findAllAdmin', ()=>{
+        it('should return all orders for admin', async ()=>{
+            mockPrisma.order.findMany.mockResolvedValue([
+                mockOrder
+            ]);
+            const result = await service.findAllAdmin();
+            expect(result).toHaveLength(1);
+            expect(mockPrisma.order.findMany).toHaveBeenCalledWith(expect.objectContaining({
+                where: {
+                    deletedAt: null
+                }
+            }));
+        });
+    });
+    // ==================== UPDATE STATUS ====================
+    describe('updateStatus', ()=>{
+        it('should throw if order not found', async ()=>{
+            mockPrisma.order.findUnique.mockResolvedValue(null);
+            await expect(service.updateStatus('nonexistent', _client.OrderStatus.DELIVERED)).rejects.toThrow(_common.NotFoundException);
+        });
+        it('should update status normally (non-cancelled)', async ()=>{
+            mockPrisma.order.findUnique.mockResolvedValue(mockOrder);
+            mockPrisma.order.update.mockResolvedValue({
+                ...mockOrder,
+                status: 'SHIPPED',
+                user: {
+                    id: 'user-1',
+                    email: 'test@example.com',
+                    fullName: 'Test'
+                }
+            });
+            const result = await service.updateStatus('order-1', _client.OrderStatus.SHIPPED);
+            expect(result.status).toBe('SHIPPED');
+        });
+        it('should restore stock when cancelled', async ()=>{
+            mockPrisma.order.findUnique.mockResolvedValue(mockOrder);
+            const cancelledOrder = {
+                ...mockOrder,
+                status: 'CANCELLED'
+            };
+            mockPrisma.$transaction.mockImplementation(async (fn)=>{
+                return await fn({
+                    product: {
+                        update: jest.fn()
+                    },
+                    order: {
+                        update: jest.fn().mockResolvedValue(cancelledOrder)
+                    }
+                });
+            });
+            const result = await service.updateStatus('order-1', _client.OrderStatus.CANCELLED);
+            expect(result.status).toBe('CANCELLED');
+            expect(mockPrisma.$transaction).toHaveBeenCalled();
+        });
+    });
+    // ==================== GET STATS ====================
+    describe('getStats', ()=>{
+        it('should return order statistics', async ()=>{
+            mockPrisma.order.count.mockResolvedValue(50);
+            mockPrisma.order.aggregate.mockResolvedValue({
+                _sum: {
+                    totalAmount: 5000000
+                }
+            });
+            mockPrisma.order.groupBy.mockResolvedValue([
+                {
+                    status: 'PENDING',
+                    _count: {
+                        status: 10
+                    }
+                },
+                {
+                    status: 'DELIVERED',
+                    _count: {
+                        status: 30
+                    }
+                }
+            ]);
+            const result = await service.getStats();
+            expect(result.totalOrders).toBe(50);
+            expect(result.totalRevenue).toBe(5000000);
+            expect(result.ordersByStatus).toHaveProperty('PENDING', 10);
+            expect(result.ordersByStatus).toHaveProperty('DELIVERED', 30);
+        });
+        it('should handle zero revenue', async ()=>{
+            mockPrisma.order.count.mockResolvedValue(0);
+            mockPrisma.order.aggregate.mockResolvedValue({
+                _sum: {
+                    totalAmount: null
+                }
+            });
+            mockPrisma.order.groupBy.mockResolvedValue([]);
+            const result = await service.getStats();
+            expect(result.totalOrders).toBe(0);
+            expect(result.totalRevenue).toBe(0);
+        });
+    });
+    // ==================== UPDATE PAYMENT STATUS ====================
+    describe('updatePaymentStatus', ()=>{
+        it('should update payment status', async ()=>{
+            const updated = {
+                ...mockOrder,
+                paymentStatus: _client.PaymentStatus.COMPLETED,
+                momoTransId: 'MOMO123'
+            };
+            mockPrisma.order.update.mockResolvedValue(updated);
+            const result = await service.updatePaymentStatus('order-1', _client.PaymentStatus.COMPLETED, 'MOMO123');
+            expect(result.paymentStatus).toBe('COMPLETED');
+            expect(mockPrisma.order.update).toHaveBeenCalledWith({
+                where: {
+                    id: 'order-1'
+                },
+                data: {
+                    paymentStatus: _client.PaymentStatus.COMPLETED,
+                    momoTransId: 'MOMO123'
+                }
+            });
+        });
     });
 });
 
