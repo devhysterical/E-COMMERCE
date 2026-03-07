@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { X } from "lucide-react";
 import type { Address, CreateAddressData } from "../services/api.service";
@@ -12,6 +12,17 @@ interface AddressFormProps {
 
 const LABEL_OPTIONS = ["Home", "Office", "Other"];
 
+const getInitialFormData = (address?: Address): CreateAddressData => ({
+  label: address?.label ?? "Home",
+  fullName: address?.fullName ?? "",
+  phone: address?.phone ?? "",
+  province: address?.province ?? "",
+  district: address?.district ?? "",
+  ward: address?.ward ?? "",
+  street: address?.street ?? "",
+  isDefault: address?.isDefault ?? false,
+});
+
 export default function AddressForm({
   address,
   onSubmit,
@@ -19,31 +30,9 @@ export default function AddressForm({
   isLoading,
 }: AddressFormProps) {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<CreateAddressData>({
-    label: "Home",
-    fullName: "",
-    phone: "",
-    province: "",
-    district: "",
-    ward: "",
-    street: "",
-    isDefault: false,
-  });
-
-  useEffect(() => {
-    if (address) {
-      setFormData({
-        label: address.label,
-        fullName: address.fullName,
-        phone: address.phone,
-        province: address.province,
-        district: address.district,
-        ward: address.ward || "",
-        street: address.street,
-        isDefault: address.isDefault,
-      });
-    }
-  }, [address]);
+  const [formData, setFormData] = useState<CreateAddressData>(() =>
+    getInitialFormData(address),
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
