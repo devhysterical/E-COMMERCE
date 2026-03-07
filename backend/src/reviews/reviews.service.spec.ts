@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsService } from './reviews.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotificationsService } from '../notifications/notifications.service';
 
 const mockPrisma = {
   review: {
@@ -16,6 +17,11 @@ const mockPrisma = {
   },
 };
 
+const mockNotificationsService = {
+  create: jest.fn(),
+  createForAdmins: jest.fn(),
+};
+
 describe('ReviewsService', () => {
   let service: ReviewsService;
 
@@ -24,6 +30,7 @@ describe('ReviewsService', () => {
       providers: [
         ReviewsService,
         { provide: PrismaService, useValue: mockPrisma },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 

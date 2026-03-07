@@ -6,6 +6,7 @@ import { EmailService } from '../email/email.service';
 import { ShippingService } from '../shipping/shipping.service';
 import { FlashSaleService } from '../flash-sale/flash-sale.service';
 import { LoyaltyService } from '../loyalty/loyalty.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { OrderStatus, PaymentStatus } from '@prisma/client';
 
@@ -50,6 +51,11 @@ const mockLoyaltyService = {
   earnPoints: jest.fn(),
 };
 
+const mockNotificationsService = {
+  create: jest.fn(),
+  createForAdmins: jest.fn(),
+};
+
 describe('OrdersService', () => {
   let service: OrdersService;
 
@@ -63,6 +69,7 @@ describe('OrdersService', () => {
         { provide: ShippingService, useValue: mockShippingService },
         { provide: FlashSaleService, useValue: mockFlashSaleService },
         { provide: LoyaltyService, useValue: mockLoyaltyService },
+        { provide: NotificationsService, useValue: mockNotificationsService },
       ],
     }).compile();
 
