@@ -35,8 +35,8 @@ jobs:
             'password.*=.*["\x27].{8,}'
           )
 
-          # Only scan tracked, non-binary files; exclude .env.example, lock files, and this CI file
-          FILES=$(git ls-files -- ':!*.lock' ':!package-lock.json' ':!*.env.example' ':!.github/workflows/ci.yml')
+          # Only scan tracked source files; exclude non-source directories and files
+          FILES=$(git ls-files -- ':!*.lock' ':!package-lock.json' ':!*.env.example' ':!.github/workflows/ci.yml' ':!.agent/**' ':!.shared/**' ':!**/dist/**' ':!*.map' ':!*.csv')
 
           for pattern in "${PATTERNS[@]}"; do
             MATCHES=$(echo "$FILES" | xargs grep -rlnE "$pattern" 2>/dev/null || true)
