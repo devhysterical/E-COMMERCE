@@ -8,10 +8,62 @@ on:
 
 jobs:
   # ============================================
+  # Secret Scanning — chặn secrets bị commit
+  # ============================================
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Scan for hardcoded secrets
+        run: |
+          echo "🔍 Scanning tracked files for hardcoded secrets..."
+          FOUND=0
+
+          # Patterns: JWT tokens, private keys, common password/secret assignments
+          PATTERNS=(
+            'eyJhbGciOi'
+            'PRIVATE KEY'
+            'GOCSPX-'
+            'sk_live_'
+            'sk_test_'
+            'AKIA[0-9A-Z]{16}'
+            'smtp_pass'
+            'password.*=.*["\x27].{8,}'
+          )
+
+          # Only scan tracked, non-binary files; exclude .env.example, lock files, and this CI file
+          FILES=$(git ls-files -- ':!*.lock' ':!package-lock.json' ':!*.env.example' ':!.github/workflows/ci.yml')
+
+          for pattern in "${PATTERNS[@]}"; do
+            MATCHES=$(echo "$FILES" | xargs grep -rlnE "$pattern" 2>/dev/null || true)
+            if [ -n "$MATCHES" ]; then
+              echo "🔴 BLOCKED — Pattern '$pattern' found in:"
+              echo "$MATCHES" | while read -r file; do
+                echo "   → $file"
+              done
+              FOUND=1
+            fi
+          done
+
+          if [ "$FOUND" -eq 1 ]; then
+            echo ""
+            echo "❌ Secret scan FAILED. Remove hardcoded secrets before pushing."
+            echo "   Use environment variables or GitHub Secrets instead."
+            exit 1
+          fi
+
+          echo "✅ No hardcoded secrets detected."
+
+  # ============================================
   # Backend CI
   # ============================================
   backend:
     name: Backend CI
+    needs: secret-scan
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -53,6 +105,7 @@ jobs:
   # ============================================
   frontend:
     name: Frontend CI
+    needs: secret-scan
     runs-on: ubuntu-latest
     defaults:
       run:
