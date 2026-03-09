@@ -4,6 +4,7 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { UsersService } from '../users/users.service';
@@ -49,6 +50,15 @@ const mockRefreshTokenService = {
   revokeUserTokens: jest.fn(),
 };
 
+const mockConfigService = {
+  get: jest.fn((key: string, defaultValue?: string) => {
+    const config: Record<string, string> = {
+      FRONTEND_URL: 'http://localhost:5173',
+    };
+    return config[key] ?? defaultValue;
+  }),
+};
+
 describe('AuthService', () => {
   let service: AuthService;
 
@@ -62,6 +72,7 @@ describe('AuthService', () => {
         { provide: EmailService, useValue: mockEmailService },
         { provide: OtpCacheService, useValue: mockOtpCacheService },
         { provide: RefreshTokenService, useValue: mockRefreshTokenService },
+        { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
