@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
   BadRequestException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { SupabaseService } from '../supabase/supabase.service';
@@ -28,6 +29,7 @@ export class AuthService {
     private emailService: EmailService,
     private otpCacheService: OtpCacheService,
     private refreshTokenService: RefreshTokenService,
+    private configService: ConfigService,
   ) {}
 
   // Gửi OTP đến email
@@ -158,7 +160,10 @@ export class AuthService {
 
   async forgotPassword(dto: ForgotPasswordDto) {
     // Không tiết lộ user có tồn tại hay không (bảo mật)
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:5173',
+    );
     const redirectUrl = `${frontendUrl}/reset-password`;
 
     try {

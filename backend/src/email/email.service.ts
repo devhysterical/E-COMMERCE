@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
   private transporter: nodemailer.Transporter;
+  private readonly smtpUser: string;
 
-  constructor() {
-    // Cấu hình SMTP transporter
+  constructor(private readonly configService: ConfigService) {
+    this.smtpUser = this.configService.get<string>('SMTP_USER', '');
+
     this.transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || 'smtp.gmail.com',
-      port: parseInt(process.env.SMTP_PORT || '587'),
+      host: this.configService.get<string>('SMTP_HOST', 'smtp.gmail.com'),
+      port: this.configService.get<number>('SMTP_PORT', 587),
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: this.smtpUser,
+        pass: this.configService.get<string>('SMTP_PASS', ''),
       },
     });
   }
 
   async sendOtpEmail(email: string, otp: string): Promise<void> {
     const mailOptions = {
-      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      from: `"E-Commerce" <${this.smtpUser}>`,
       to: email,
       subject: 'Mã xác thực đăng ký tài khoản',
       html: `
@@ -55,7 +58,7 @@ export class EmailService {
     resetLink: string,
   ): Promise<void> {
     const mailOptions = {
-      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      from: `"E-Commerce" <${this.smtpUser}>`,
       to: email,
       subject: 'Đặt lại mật khẩu',
       html: `
@@ -116,7 +119,7 @@ export class EmailService {
     const finalAmount = orderData.totalAmount - orderData.discountAmount;
 
     const mailOptions = {
-      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      from: `"E-Commerce" <${this.smtpUser}>`,
       to: email,
       subject: `Xác nhận đơn hàng #${orderData.orderId.slice(0, 8).toUpperCase()}`,
       html: `
@@ -188,7 +191,7 @@ export class EmailService {
     const color = statusColors[orderData.status] || '#4F46E5';
 
     const mailOptions = {
-      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      from: `"E-Commerce" <${this.smtpUser}>`,
       to: email,
       subject: `Cập nhật đơn hàng #${orderData.orderId.slice(0, 8).toUpperCase()}`,
       html: `
@@ -229,11 +232,12 @@ export class EmailService {
     subject: string;
     message: string;
   }): Promise<void> {
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;
+    const adminEmail =
+      this.configService.get<string>('ADMIN_EMAIL') || this.smtpUser;
     if (!adminEmail) return;
 
     const mailOptions = {
-      from: `"E-Commerce" <${process.env.SMTP_USER}>`,
+      from: `"E-Commerce" <${this.smtpUser}>`,
       to: adminEmail,
       subject: `[Hỗ trợ] ${ticket.subject}`,
       html: `

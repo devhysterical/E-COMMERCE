@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 
 interface MoMoPaymentRequest {
@@ -29,12 +30,14 @@ export class PaymentService {
   private readonly secretKey: string;
   private readonly apiEndpoint: string;
 
-  constructor() {
-    this.partnerCode = process.env.MOMO_PARTNER_CODE || '';
-    this.accessKey = process.env.MOMO_ACCESS_KEY || '';
-    this.secretKey = process.env.MOMO_SECRET_KEY || '';
-    this.apiEndpoint =
-      process.env.MOMO_API_ENDPOINT || 'https://test-payment.momo.vn';
+  constructor(private readonly configService: ConfigService) {
+    this.partnerCode = this.configService.get<string>('MOMO_PARTNER_CODE', '');
+    this.accessKey = this.configService.get<string>('MOMO_ACCESS_KEY', '');
+    this.secretKey = this.configService.get<string>('MOMO_SECRET_KEY', '');
+    this.apiEndpoint = this.configService.get<string>(
+      'MOMO_API_ENDPOINT',
+      'https://test-payment.momo.vn',
+    );
   }
 
   async createMoMoPayment(

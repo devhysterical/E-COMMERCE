@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { PaymentService } from './payment.service';
 import { OrdersService } from '../orders/orders.service';
@@ -22,6 +23,7 @@ export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,
     private readonly ordersService: OrdersService,
+    private readonly configService: ConfigService,
   ) {}
 
   @Post('momo/create')
@@ -39,8 +41,14 @@ export class PaymentController {
       return { success: false, message: 'Đơn hàng không tồn tại' };
     }
 
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:5173',
+    );
+    const backendUrl = this.configService.get<string>(
+      'BACKEND_URL',
+      'http://localhost:4000',
+    );
 
     const result = await this.paymentService.createMoMoPayment({
       orderId: dto.orderId,
@@ -99,7 +107,10 @@ export class PaymentController {
     @Query('resultCode') resultCode: string,
     @Res() res: Response,
   ) {
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = this.configService.get<string>(
+      'FRONTEND_URL',
+      'http://localhost:5173',
+    );
 
     if (resultCode === '0') {
       return res.redirect(`${frontendUrl}/orders?payment=success`);
