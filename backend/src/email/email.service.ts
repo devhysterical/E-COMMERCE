@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as nodemailer from 'nodemailer';
 
 @Injectable()
 export class EmailService {
+  private readonly logger = new Logger(EmailService.name);
   private transporter: nodemailer.Transporter;
   private readonly smtpUser: string;
 
@@ -46,9 +47,9 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`[EMAIL] OTP sent successfully to ${email}`);
+      this.logger.log(`OTP sent successfully to ${email}`);
     } catch (error) {
-      console.error(`[EMAIL] Failed to send OTP to ${email}:`, error);
+      this.logger.error(`Failed to send OTP to ${email}`, error);
       throw error;
     }
   }
@@ -83,12 +84,9 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`[EMAIL] Password reset email sent to ${email}`);
+      this.logger.log(`Password reset email sent to ${email}`);
     } catch (error) {
-      console.error(
-        `[EMAIL] Failed to send password reset to ${email}:`,
-        error,
-      );
+      this.logger.error(`Failed to send password reset to ${email}`, error);
       throw error;
     }
   }
@@ -162,12 +160,9 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`[EMAIL] Order confirmation sent to ${email}`);
+      this.logger.log(`Order confirmation sent to ${email}`);
     } catch (error) {
-      console.error(
-        `[EMAIL] Failed to send order confirmation to ${email}:`,
-        error,
-      );
+      this.logger.error(`Failed to send order confirmation to ${email}`, error);
       // Don't throw - order was already created, just log the error
     }
   }
@@ -219,9 +214,9 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`[EMAIL] Order status update sent to ${email}`);
+      this.logger.log(`Order status update sent to ${email}`);
     } catch (error) {
-      console.error(`[EMAIL] Failed to send status update to ${email}:`, error);
+      this.logger.error(`Failed to send status update to ${email}`, error);
     }
   }
 
@@ -261,9 +256,9 @@ export class EmailService {
 
     try {
       await this.transporter.sendMail(mailOptions);
-      console.log(`[EMAIL] Contact notification sent to admin`);
+      this.logger.log(`Contact notification sent to admin`);
     } catch (error) {
-      console.error(`[EMAIL] Failed to send contact notification:`, error);
+      this.logger.error(`Failed to send contact notification`, error);
     }
   }
 }

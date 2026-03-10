@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class SupabaseService {
+  private readonly logger = new Logger(SupabaseService.name);
   private supabase: ReturnType<typeof createClient>;
 
   constructor(private readonly configService: ConfigService) {
@@ -94,14 +95,11 @@ export class SupabaseService {
   }
 
   // Gửi email OTP sử dụng Supabase Edge Function hoặc custom SMTP
-  // Tạm thời sử dụng console.log để demo, thực tế cần setup email template
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async sendOtpEmail(email: string, otp: string): Promise<void> {
-    // Supabase không có built-in OTP email, nên ta sẽ tự gửi
-    // Option 1: Sử dụng Supabase Edge Function
-    // Option 2: Sử dụng nodemailer với SMTP
-    // Hiện tại log ra console để test, sau đó tích hợp thực tế
+    // TODO: Tích hợp gửi email thực tế qua Edge Function hoặc nodemailer
 
-    console.log(`[OTP] Sending OTP ${otp} to ${email}`);
+    this.logger.log(`OTP sent to ${email}`);
 
     // TODO: Tích hợp gửi email thực tế
     // Ví dụ với nodemailer:

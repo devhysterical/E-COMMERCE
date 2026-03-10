@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { CreateContactDto } from './dto/create-contact.dto';
@@ -6,6 +6,7 @@ import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Injectable()
 export class ContactService {
+  private readonly logger = new Logger(ContactService.name);
   constructor(
     private prisma: PrismaService,
     private emailService: EmailService,
@@ -20,7 +21,7 @@ export class ContactService {
     try {
       await this.emailService.sendContactNotificationEmail(ticket);
     } catch (error) {
-      console.error('[CONTACT] Gửi email thông báo thất bại:', error);
+      this.logger.error('Gửi email thông báo thất bại', error);
     }
 
     return {
