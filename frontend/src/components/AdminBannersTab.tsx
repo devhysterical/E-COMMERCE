@@ -14,11 +14,14 @@ import {
   EyeOff,
   Image,
 } from "lucide-react";
+import Pagination from "./Pagination";
 
 const AdminBannersTab = () => {
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: banners = [], isLoading } = useQuery({
     queryKey: ["admin-banners"],
@@ -132,74 +135,79 @@ const AdminBannersTab = () => {
           </button>
         </div>
       ) : (
-        <div className="grid gap-4">
-          {banners.map((banner) => (
-            <div
-              key={banner.id}
-              className={`flex items-center gap-4 p-4 bg-white rounded-xl border ${
-                banner.isActive
-                  ? "border-slate-200"
-                  : "border-slate-100 opacity-60"
-              }`}>
-              {/* Image Preview */}
-              <div className="w-32 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
-                <img
-                  src={banner.imageUrl}
-                  alt={banner.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-slate-900 truncate">
-                    {banner.title}
-                  </h3>
-                  {!banner.isActive && (
-                    <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
-                      Ẩn
-                    </span>
-                  )}
+        <>
+          <div className="grid gap-4">
+            {banners.slice((page - 1) * limit, page * limit).map((banner) => (
+              <div
+                key={banner.id}
+                className={`flex items-center gap-4 p-4 bg-white rounded-xl border ${
+                  banner.isActive
+                    ? "border-slate-200"
+                    : "border-slate-100 opacity-60"
+                }`}>
+                <div className="w-32 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
+                  <img
+                    src={banner.imageUrl}
+                    alt={banner.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-                {banner.description && (
-                  <p className="text-sm text-slate-500 truncate">
-                    {banner.description}
-                  </p>
-                )}
-                <p className="text-xs text-slate-400 mt-1">
-                  Thứ tự: {banner.sortOrder}
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handleToggleActive(banner)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                  title={banner.isActive ? "Ẩn banner" : "Hiện banner"}>
-                  {banner.isActive ? (
-                    <Eye size={18} className="text-green-600" />
-                  ) : (
-                    <EyeOff size={18} className="text-slate-400" />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-slate-900 truncate">
+                      {banner.title}
+                    </h3>
+                    {!banner.isActive && (
+                      <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-500 rounded">
+                        Ẩn
+                      </span>
+                    )}
+                  </div>
+                  {banner.description && (
+                    <p className="text-sm text-slate-500 truncate">
+                      {banner.description}
+                    </p>
                   )}
-                </button>
-                <button
-                  onClick={() => handleEdit(banner)}
-                  className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
-                  title="Chỉnh sửa">
-                  <Edit size={18} className="text-indigo-600" />
-                </button>
-                <button
-                  onClick={() => handleDelete(banner.id)}
-                  className="p-2 hover:bg-red-50 rounded-lg transition-colors"
-                  title="Xóa">
-                  <Trash2 size={18} className="text-red-500" />
-                </button>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Thứ tự: {banner.sortOrder}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => handleToggleActive(banner)}
+                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                    title={banner.isActive ? "Ẩn banner" : "Hiện banner"}>
+                    {banner.isActive ? (
+                      <Eye size={18} className="text-green-600" />
+                    ) : (
+                      <EyeOff size={18} className="text-slate-400" />
+                    )}
+                  </button>
+                  <button
+                    onClick={() => handleEdit(banner)}
+                    className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                    title="Chỉnh sửa">
+                    <Edit size={18} className="text-indigo-600" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(banner.id)}
+                    className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                    title="Xóa">
+                    <Trash2 size={18} className="text-red-500" />
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(banners.length / limit)}
+            totalItems={banners.length}
+            label="banner"
+            onPageChange={setPage}
+          />
+        </>
       )}
 
       {/* Modal */}

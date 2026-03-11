@@ -13,6 +13,7 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import Pagination from "./Pagination";
 
 interface ZoneFormData {
   name: string;
@@ -105,6 +106,8 @@ export default function AdminShippingTab() {
   const [selectedZoneForProvinces, setSelectedZoneForProvinces] =
     useState<ShippingZone | null>(null);
   const [selectedProvinces, setSelectedProvinces] = useState<string[]>([]);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: zones = [], isLoading } = useQuery({
     queryKey: ["admin-shipping-zones"],
@@ -400,7 +403,7 @@ export default function AdminShippingTab() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {zones.map((zone) => (
+              {zones.slice((page - 1) * limit, page * limit).map((zone) => (
                 <tr
                   key={zone.id}
                   className="hover:bg-slate-50/50 transition-colors">
@@ -458,6 +461,14 @@ export default function AdminShippingTab() {
               ))}
             </tbody>
           </table>
+
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(zones.length / limit)}
+            totalItems={zones.length}
+            label="vùng vận chuyển"
+            onPageChange={setPage}
+          />
         </div>
       )}
 

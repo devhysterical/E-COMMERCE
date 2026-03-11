@@ -6,6 +6,7 @@ import {
   Param,
   UseGuards,
   Patch,
+  Query,
   Res,
 } from '@nestjs/common';
 import type { Response } from 'express';
@@ -48,8 +49,16 @@ export class OrdersController {
   }
 
   @Get()
-  findAll(@GetUser('userId') userId: string) {
-    return this.ordersService.findAll(userId);
+  findAll(
+    @GetUser('userId') userId: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.ordersService.findAll(
+      userId,
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 10,
+    );
   }
 
   @Get(':id')
@@ -70,8 +79,11 @@ export class OrdersController {
   @Get('admin/all')
   @UseGuards(RolesGuard)
   @Roles('ADMIN')
-  findAllAdmin() {
-    return this.ordersService.findAllAdmin();
+  findAllAdmin(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return this.ordersService.findAllAdmin(
+      page ? parseInt(page, 10) : 1,
+      limit ? parseInt(limit, 10) : 20,
+    );
   }
 
   @Get('admin/stats')

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { AdminService } from "../services/api.service";
 import type { Order } from "../services/api.service";
 import {
@@ -14,6 +14,8 @@ import {
   Loader,
   MapPin,
   Phone,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const statusConfig: Record<
@@ -50,11 +52,17 @@ const statusConfig: Record<
 const AdminOrdersTab = () => {
   const queryClient = useQueryClient();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
-  const { data: orders = [] } = useQuery({
-    queryKey: ["admin-orders"],
-    queryFn: AdminService.getAllOrders,
+  const { data: paginatedData } = useQuery({
+    queryKey: ["admin-orders", page],
+    queryFn: () => AdminService.getAllOrders(page, limit),
+    placeholderData: keepPreviousData,
   });
+
+  const orders = paginatedData?.data ?? [];
+  const meta = paginatedData?.meta;
 
   const updateOrderStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
@@ -142,6 +150,34 @@ const AdminOrdersTab = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Pagination */}
+      {meta && meta.totalPages > 1 && (
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
+          <span className="text-sm text-slate-500">
+            Tổng {meta.total} đơn hàng
+          </span>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              <ChevronLeft size={16} />
+              Trước
+            </button>
+            <span className="text-sm text-slate-500">
+              {page} / {meta.totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+              disabled={page === meta.totalPages}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              Sau
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Order Detail Modal */}
       {selectedOrder && (

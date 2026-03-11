@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { OrderService } from "../services/api.service";
@@ -6,6 +7,7 @@ import type { Order } from "../services/api.service";
 import {
   Package,
   ChevronRight,
+  ChevronLeft,
   Clock,
   Truck,
   CheckCircle,
@@ -15,10 +17,17 @@ import {
 
 const OrderHistoryPage = () => {
   const { t } = useTranslation();
-  const { data: orders = [], isLoading } = useQuery({
-    queryKey: ["myOrders"],
-    queryFn: OrderService.getMyOrders,
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["myOrders", page],
+    queryFn: () => OrderService.getMyOrders(page, limit),
+    placeholderData: keepPreviousData,
   });
+
+  const orders = data?.data ?? [];
+  const meta = data?.meta;
 
   const statusConfig: Record<
     string,
@@ -93,89 +102,114 @@ const OrderHistoryPage = () => {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
-          {orders.map((order: Order) => {
-            const status = statusConfig[order.status] || statusConfig.PENDING;
-            return (
-              <Link
-                to={`/orders/${order.id}`}
-                key={order.id}
-                className="block bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-6 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-slate-400 dark:text-slate-500">
-                        {t("order.orderDetails")}:
-                      </span>
-                      <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
-                        #{order.id.slice(0, 8)}
-                      </span>
-                    </div>
-                    <p className="text-xl font-bold text-slate-900 dark:text-white">
-                      {order.totalAmount.toLocaleString("vi-VN")} đ
-                    </p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
-                      {new Date(order.createdAt).toLocaleDateString("vi-VN", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${status.color}`}>
-                      {status.icon}
-                      {status.label}
-                    </span>
-                    <ChevronRight className="text-slate-300 dark:text-slate-600" />
-                  </div>
-                </div>
-
-                {/* Order Items Preview */}
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
-                  <div className="flex items-center gap-4 overflow-x-auto pb-2">
-                    {order.orderItems.slice(0, 4).map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex-shrink-0 flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3">
-                        <div className="w-12 h-12 bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden">
-                          {item.product.imageUrl ? (
-                            <img
-                              src={item.product.imageUrl}
-                              alt={item.product.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                              N/A
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-slate-700 dark:text-slate-300 line-clamp-1">
-                            {item.product.name}
-                          </p>
-                          <p className="text-xs text-slate-400 dark:text-slate-500">
-                            x{item.quantity}
-                          </p>
-                        </div>
+        <>
+          <div className="space-y-4">
+            {orders.map((order: Order) => {
+              const status = statusConfig[order.status] || statusConfig.PENDING;
+              return (
+                <Link
+                  to={`/orders/${order.id}`}
+                  key={order.id}
+                  className="block bg-white dark:bg-slate-800 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 p-6 hover:shadow-xl hover:border-indigo-200 dark:hover:border-indigo-800 transition-all cursor-pointer">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-slate-400 dark:text-slate-500">
+                          {t("order.orderDetails")}:
+                        </span>
+                        <span className="font-mono text-sm text-slate-600 dark:text-slate-300">
+                          #{order.id.slice(0, 8)}
+                        </span>
                       </div>
-                    ))}
-                    {order.orderItems.length > 4 && (
-                      <span className="text-sm text-slate-400 dark:text-slate-500">
-                        +{order.orderItems.length - 4} {t("common.moreItems")}
+                      <p className="text-xl font-bold text-slate-900 dark:text-white">
+                        {order.totalAmount.toLocaleString("vi-VN")} đ
+                      </p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {new Date(order.createdAt).toLocaleDateString("vi-VN", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-4">
+                      <span
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold ${status.color}`}>
+                        {status.icon}
+                        {status.label}
                       </span>
-                    )}
+                      <ChevronRight className="text-slate-300 dark:text-slate-600" />
+                    </div>
                   </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+
+                  {/* Order Items Preview */}
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-700">
+                    <div className="flex items-center gap-4 overflow-x-auto pb-2">
+                      {order.orderItems.slice(0, 4).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex-shrink-0 flex items-center gap-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl p-3">
+                          <div className="w-12 h-12 bg-slate-200 dark:bg-slate-600 rounded-lg overflow-hidden">
+                            {item.product.imageUrl ? (
+                              <img
+                                src={item.product.imageUrl}
+                                alt={item.product.name}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                                N/A
+                              </div>
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-slate-700 dark:text-slate-300 line-clamp-1">
+                              {item.product.name}
+                            </p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500">
+                              x{item.quantity}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      {order.orderItems.length > 4 && (
+                        <span className="text-sm text-slate-400 dark:text-slate-500">
+                          +{order.orderItems.length - 4} {t("common.moreItems")}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Pagination */}
+          {meta && meta.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-3 mt-8">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                <ChevronLeft size={16} />
+                {t("common.previous", "Trước")}
+              </button>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {page} / {meta.totalPages}
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
+                disabled={page === meta.totalPages}
+                className="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                {t("common.next", "Sau")}
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

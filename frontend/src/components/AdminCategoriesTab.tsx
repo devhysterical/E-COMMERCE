@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { CategoryService } from "../services/api.service";
 import { Plus, Edit, Trash2, X, Save } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
+import Pagination from "./Pagination";
 
 const AdminCategoriesTab = () => {
   const queryClient = useQueryClient();
@@ -13,6 +14,8 @@ const AdminCategoriesTab = () => {
     description?: string;
   } | null>(null);
   const [deleteCategoryId, setDeleteCategoryId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: categories = [] } = useQuery({
     queryKey: ["admin-categories"],
@@ -92,7 +95,7 @@ const AdminCategoriesTab = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {categories.map(
+          {categories.slice((page - 1) * limit, page * limit).map(
             (category: {
               id: string;
               name: string;
@@ -134,6 +137,14 @@ const AdminCategoriesTab = () => {
           )}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        totalPages={Math.ceil(categories.length / limit)}
+        totalItems={categories.length}
+        label="danh mục"
+        onPageChange={setPage}
+      />
 
       {/* Category Modal */}
       {showCategoryModal && (

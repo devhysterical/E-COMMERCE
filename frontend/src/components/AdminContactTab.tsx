@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, X, Clock, Loader, CheckCircle, XCircle } from "lucide-react";
 import api from "../api/axios";
 import { toast } from "react-toastify";
+import Pagination from "./Pagination";
 
 interface ContactTicket {
   id: string;
@@ -49,6 +50,8 @@ const AdminContactTab = () => {
   );
   const [adminNote, setAdminNote] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: ticketsData } = useQuery({
     queryKey: ["admin-tickets", filterStatus],
@@ -134,7 +137,7 @@ const AdminContactTab = () => {
               </td>
             </tr>
           ) : (
-            tickets.map((ticket) => (
+            tickets.slice((page - 1) * limit, page * limit).map((ticket) => (
               <tr
                 key={ticket.id}
                 className="hover:bg-slate-50/50 transition-colors">
@@ -174,6 +177,14 @@ const AdminContactTab = () => {
           )}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        totalPages={Math.ceil(tickets.length / limit)}
+        totalItems={tickets.length}
+        label="yêu cầu"
+        onPageChange={setPage}
+      />
 
       {/* Detail Modal */}
       {selectedTicket && (

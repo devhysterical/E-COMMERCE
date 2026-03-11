@@ -9,12 +9,15 @@ import { toast } from "react-toastify";
 import type { Product } from "../services/api.service";
 import { Plus, Edit, Trash2, X, Save, Upload, Loader } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
+import Pagination from "./Pagination";
 
 const AdminProductsTab = () => {
   const queryClient = useQueryClient();
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deleteProductId, setDeleteProductId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: productsData } = useQuery({
     queryKey: ["admin-products"],
@@ -109,7 +112,7 @@ const AdminProductsTab = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {products.map((product: Product) => (
+          {products.slice((page - 1) * limit, page * limit).map((product: Product) => (
             <tr
               key={product.id}
               className="hover:bg-slate-50/50 transition-colors">
@@ -163,6 +166,14 @@ const AdminProductsTab = () => {
           ))}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        totalPages={Math.ceil(products.length / limit)}
+        totalItems={products.length}
+        label="sản phẩm"
+        onPageChange={setPage}
+      />
 
       {/* Product Modal */}
       {showProductModal && (

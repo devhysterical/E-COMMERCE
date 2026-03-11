@@ -264,8 +264,8 @@ export const UserService = {
 };
 
 export const OrderService = {
-  getMyOrders: async (): Promise<Order[]> => {
-    const response = await api.get("/orders");
+  getMyOrders: async (page = 1, limit = 10): Promise<PaginatedResponse<Order>> => {
+    const response = await api.get("/orders", { params: { page, limit } });
     return response.data;
   },
   getOne: async (id: string): Promise<Order> => {
@@ -293,8 +293,8 @@ export const AdminService = {
     const response = await api.get("/orders/admin/stats");
     return response.data;
   },
-  getAllOrders: async (): Promise<Order[]> => {
-    const response = await api.get("/orders/admin/all");
+  getAllOrders: async (page = 1, limit = 20): Promise<PaginatedResponse<Order>> => {
+    const response = await api.get("/orders/admin/all", { params: { page, limit } });
     return response.data;
   },
   updateOrderStatus: async (id: string, status: string): Promise<Order> => {

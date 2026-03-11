@@ -19,11 +19,14 @@ import {
   ToggleRight,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import Pagination from "./Pagination";
 
 const AdminCouponsTab = () => {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const [formData, setFormData] = useState<CreateCouponDto>({
     code: "",
@@ -393,94 +396,104 @@ const AdminCouponsTab = () => {
           <p className="text-slate-500">Chưa có mã giảm giá nào</p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {coupons.map((coupon) => (
-            <div
-              key={coupon.id}
-              className="bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-md transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-mono font-bold text-lg">
-                      {coupon.code}
-                    </span>
-                    {(() => {
-                      const statusInfo = getCouponStatus(coupon);
-                      const Icon =
-                        statusInfo.status === "active"
-                          ? ToggleRight
-                          : ToggleLeft;
-                      return (
-                        <span
-                          className={`flex items-center gap-1 text-sm ${statusInfo.color}`}>
-                          <Icon size={16} /> {statusInfo.label}
-                        </span>
-                      );
-                    })()}
-                  </div>
-
-                  {coupon.description && (
-                    <p className="text-slate-500 text-sm">
-                      {coupon.description}
-                    </p>
-                  )}
-
-                  <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-                    <div className="flex items-center gap-1">
-                      {coupon.discountType === "PERCENTAGE" ? (
-                        <Percent size={16} className="text-indigo-600" />
-                      ) : (
-                        <DollarSign size={16} className="text-indigo-600" />
-                      )}
-                      <span className="font-semibold">
-                        {formatDiscount(coupon)}
+        <>
+          <div className="space-y-4">
+            {coupons.slice((page - 1) * limit, page * limit).map((coupon) => (
+              <div
+                key={coupon.id}
+                className="bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between">
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-mono font-bold text-lg">
+                        {coupon.code}
                       </span>
+                      {(() => {
+                        const statusInfo = getCouponStatus(coupon);
+                        const Icon =
+                          statusInfo.status === "active"
+                            ? ToggleRight
+                            : ToggleLeft;
+                        return (
+                          <span
+                            className={`flex items-center gap-1 text-sm ${statusInfo.color}`}>
+                            <Icon size={16} /> {statusInfo.label}
+                          </span>
+                        );
+                      })()}
                     </div>
 
-                    <div className="flex items-center gap-1">
-                      <Calendar size={16} className="text-slate-400" />
-                      Hết hạn: {formatDate(coupon.expiresAt)}
-                    </div>
+                    {coupon.description && (
+                      <p className="text-slate-500 text-sm">
+                        {coupon.description}
+                      </p>
+                    )}
 
-                    <div>
-                      Đã dùng:{" "}
-                      <span className="font-semibold">
-                        {coupon.usedCount}
-                        {coupon.maxUses ? `/${coupon.maxUses}` : ""}
-                      </span>
-                    </div>
-
-                    {coupon.minOrderAmount > 0 && (
-                      <div>
-                        Đơn tối thiểu:{" "}
+                    <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                      <div className="flex items-center gap-1">
+                        {coupon.discountType === "PERCENTAGE" ? (
+                          <Percent size={16} className="text-indigo-600" />
+                        ) : (
+                          <DollarSign size={16} className="text-indigo-600" />
+                        )}
                         <span className="font-semibold">
-                          {coupon.minOrderAmount.toLocaleString("vi-VN")}đ
+                          {formatDiscount(coupon)}
                         </span>
                       </div>
-                    )}
+
+                      <div className="flex items-center gap-1">
+                        <Calendar size={16} className="text-slate-400" />
+                        Hết hạn: {formatDate(coupon.expiresAt)}
+                      </div>
+
+                      <div>
+                        Đã dùng:{" "}
+                        <span className="font-semibold">
+                          {coupon.usedCount}
+                          {coupon.maxUses ? `/${coupon.maxUses}` : ""}
+                        </span>
+                      </div>
+
+                      {coupon.minOrderAmount > 0 && (
+                        <div>
+                          Đơn tối thiểu:{" "}
+                          <span className="font-semibold">
+                            {coupon.minOrderAmount.toLocaleString("vi-VN")}đ
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(coupon)}
+                      className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                      <Pencil size={18} />
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm("Xóa mã giảm giá này?")) {
+                          deleteMutation.mutate(coupon.id);
+                        }
+                      }}
+                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <Trash2 size={18} />
+                    </button>
                   </div>
                 </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(coupon)}
-                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-                    <Pencil size={18} />
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (confirm("Xóa mã giảm giá này?")) {
-                        deleteMutation.mutate(coupon.id);
-                      }
-                    }}
-                    className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+
+          <Pagination
+            page={page}
+            totalPages={Math.ceil(coupons.length / limit)}
+            totalItems={coupons.length}
+            label="mã giảm giá"
+            onPageChange={setPage}
+          />
+        </>
       )}
     </div>
   );

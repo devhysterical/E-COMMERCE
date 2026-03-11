@@ -202,16 +202,28 @@ export class OrdersService {
     });
   }
 
-  async findAll(userId: string) {
-    return this.prisma.order.findMany({
-      where: { userId, deletedAt: null },
-      include: {
-        orderItems: {
-          include: { product: true },
+  async findAll(userId: string, page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { userId, deletedAt: null },
+        include: {
+          orderItems: {
+            include: { product: true },
+          },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where: { userId, deletedAt: null } }),
+    ]);
+
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async findOne(id: string, userId: string) {
@@ -226,21 +238,33 @@ export class OrdersService {
   }
 
   // Admin APIs
-  async findAllAdmin() {
-    return this.prisma.order.findMany({
-      where: { deletedAt: null },
-      include: {
-        user: {
-          select: { id: true, email: true, fullName: true },
-        },
-        orderItems: {
-          include: {
-            product: { select: { id: true, name: true, imageUrl: true } },
+  async findAllAdmin(page = 1, limit = 20) {
+    const skip = (page - 1) * limit;
+
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where: { deletedAt: null },
+        include: {
+          user: {
+            select: { id: true, email: true, fullName: true },
+          },
+          orderItems: {
+            include: {
+              product: { select: { id: true, name: true, imageUrl: true } },
+            },
           },
         },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.order.count({ where: { deletedAt: null } }),
+    ]);
+
+    return {
+      data,
+      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    };
   }
 
   async updateStatus(id: string, status: OrderStatus) {

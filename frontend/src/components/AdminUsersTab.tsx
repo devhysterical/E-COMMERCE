@@ -5,10 +5,13 @@ import type { UserProfile } from "../services/api.service";
 import { Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmModal from "./ConfirmModal";
+import Pagination from "./Pagination";
 
 const AdminUsersTab = () => {
   const queryClient = useQueryClient();
   const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   const { data: users = [] } = useQuery({
     queryKey: ["admin-users"],
@@ -71,7 +74,7 @@ const AdminUsersTab = () => {
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-50">
-          {users.map((user: UserProfile) => (
+          {users.slice((page - 1) * limit, page * limit).map((user: UserProfile) => (
             <tr
               key={user.id}
               className="hover:bg-slate-50/50 transition-colors">
@@ -129,6 +132,14 @@ const AdminUsersTab = () => {
           ))}
         </tbody>
       </table>
+
+      <Pagination
+        page={page}
+        totalPages={Math.ceil(users.length / limit)}
+        totalItems={users.length}
+        label="người dùng"
+        onPageChange={setPage}
+      />
 
       <ConfirmModal
         isOpen={!!deleteTarget}

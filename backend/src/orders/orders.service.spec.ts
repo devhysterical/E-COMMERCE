@@ -203,15 +203,45 @@ describe('OrdersService', () => {
 
   // ==================== FIND ALL ====================
   describe('findAll', () => {
-    it('should return user orders', async () => {
+    it('should return paginated user orders', async () => {
       mockPrisma.order.findMany.mockResolvedValue([mockOrder]);
+      mockPrisma.order.count.mockResolvedValue(1);
 
       const result = await service.findAll('user-1');
 
-      expect(result).toHaveLength(1);
+      expect(result.data).toHaveLength(1);
+      expect(result.meta).toEqual({
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      });
       expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { userId: 'user-1', deletedAt: null },
+          skip: 0,
+          take: 10,
+        }),
+      );
+    });
+
+    it('should respect page and limit params', async () => {
+      mockPrisma.order.findMany.mockResolvedValue([]);
+      mockPrisma.order.count.mockResolvedValue(25);
+
+      const result = await service.findAll('user-1', 3, 5);
+
+      expect(result.data).toHaveLength(0);
+      expect(result.meta).toEqual({
+        total: 25,
+        page: 3,
+        limit: 5,
+        totalPages: 5,
+      });
+      expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: 10,
+          take: 5,
         }),
       );
     });
@@ -238,15 +268,44 @@ describe('OrdersService', () => {
 
   // ==================== FIND ALL ADMIN ====================
   describe('findAllAdmin', () => {
-    it('should return all orders for admin', async () => {
+    it('should return paginated orders for admin', async () => {
       mockPrisma.order.findMany.mockResolvedValue([mockOrder]);
+      mockPrisma.order.count.mockResolvedValue(1);
 
       const result = await service.findAllAdmin();
 
-      expect(result).toHaveLength(1);
+      expect(result.data).toHaveLength(1);
+      expect(result.meta).toEqual({
+        total: 1,
+        page: 1,
+        limit: 20,
+        totalPages: 1,
+      });
       expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: { deletedAt: null },
+          skip: 0,
+          take: 20,
+        }),
+      );
+    });
+
+    it('should respect page and limit params', async () => {
+      mockPrisma.order.findMany.mockResolvedValue([]);
+      mockPrisma.order.count.mockResolvedValue(50);
+
+      const result = await service.findAllAdmin(2, 15);
+
+      expect(result.meta).toEqual({
+        total: 50,
+        page: 2,
+        limit: 15,
+        totalPages: 4,
+      });
+      expect(mockPrisma.order.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          skip: 15,
+          take: 15,
         }),
       );
     });

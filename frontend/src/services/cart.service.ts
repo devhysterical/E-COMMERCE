@@ -30,8 +30,8 @@ export const OrderService = {
     const response = await api.post("/orders", data);
     return response.data;
   },
-  getAll: async () => {
-    const response = await api.get("/orders");
+  getAll: async (page = 1, limit = 10) => {
+    const response = await api.get("/orders", { params: { page, limit } });
     return response.data;
   },
 };
