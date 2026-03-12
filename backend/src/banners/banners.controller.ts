@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { BannersService } from './banners.service';
 import { CreateBannerDto, UpdateBannerDto } from './dto/banner.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -16,6 +17,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('banners')
+@ApiTags('Banners')
+@ApiBearerAuth()
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 

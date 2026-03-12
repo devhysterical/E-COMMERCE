@@ -7,6 +7,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
@@ -20,6 +21,7 @@ import { SendOtpDto } from './dto/otp.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
+@ApiTags('Auth')
 @Throttle({ default: { ttl: 60000, limit: 5 } })
 export class AuthController {
   constructor(private authService: AuthService) {}

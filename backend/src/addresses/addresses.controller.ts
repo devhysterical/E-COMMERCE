@@ -8,12 +8,15 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AddressesService } from './addresses.service';
 import { CreateAddressDto, UpdateAddressDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 
 @Controller('addresses')
+@ApiTags('Addresses')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class AddressesController {
   constructor(private readonly addressesService: AddressesService) {}

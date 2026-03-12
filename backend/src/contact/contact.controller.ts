@@ -10,6 +10,7 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -20,6 +21,8 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateTicketDto } from './dto/update-ticket.dto';
 
 @Controller('contact')
+@ApiTags('Contact')
+@ApiBearerAuth()
 export class ContactController {
   constructor(private contactService: ContactService) {}
 

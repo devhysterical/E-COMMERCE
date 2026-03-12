@@ -12,6 +12,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UsersService } from '../users/users.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 class UpdateRoleDto {
   @IsNotEmpty({ message: 'Role không được để trống' })
@@ -20,6 +21,8 @@ class UpdateRoleDto {
 }
 
 @Controller('admin')
+@ApiTags('Admin')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('ADMIN')
 export class AdminController {

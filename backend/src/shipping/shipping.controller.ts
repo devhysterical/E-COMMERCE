@@ -9,6 +9,7 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ShippingService } from './shipping.service';
 import {
   CreateShippingZoneDto,
@@ -20,6 +21,8 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('shipping')
+@ApiTags('Shipping')
+@ApiBearerAuth()
 export class ShippingController {
   constructor(private readonly shippingService: ShippingService) {}
 

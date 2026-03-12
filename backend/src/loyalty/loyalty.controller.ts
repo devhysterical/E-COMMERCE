@@ -9,6 +9,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoyaltyService } from './loyalty.service';
 import { RedeemPointsDto } from './dto/redeem-points.dto';
 import { AdjustPointsDto } from './dto/adjust-points.dto';
@@ -21,6 +22,8 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 
 @Controller('loyalty')
+@ApiTags('Loyalty')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class LoyaltyController {
   constructor(private readonly loyaltyService: LoyaltyService) {}

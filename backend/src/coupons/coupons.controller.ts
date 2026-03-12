@@ -19,8 +19,11 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('coupons')
+@ApiTags('Coupons')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class CouponsController {
   constructor(private couponsService: CouponsService) {}

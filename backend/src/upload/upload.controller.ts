@@ -6,6 +6,7 @@ import {
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -31,6 +32,8 @@ interface UploadedFileType {
 }
 
 @Controller('upload')
+@ApiTags('Upload')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UploadController {
   constructor(private readonly supabaseService: SupabaseService) {}

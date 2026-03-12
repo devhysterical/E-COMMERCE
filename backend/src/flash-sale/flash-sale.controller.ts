@@ -8,6 +8,7 @@ import {
   Param,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { FlashSaleService } from './flash-sale.service';
 import { CreateFlashSaleDto } from './dto/create-flash-sale.dto';
 import { UpdateFlashSaleDto } from './dto/update-flash-sale.dto';
@@ -18,6 +19,8 @@ import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
 @Controller('flash-sales')
+@ApiTags('Flash Sale')
+@ApiBearerAuth()
 export class FlashSaleController {
   constructor(private readonly flashSaleService: FlashSaleService) {}
 

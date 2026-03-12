@@ -9,11 +9,14 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto, UpdateReviewDto } from './dto/review.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('reviews')
+@ApiTags('Reviews')
+@ApiBearerAuth()
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}
 

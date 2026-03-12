@@ -11,8 +11,11 @@ import {
 import { CartsService } from './carts.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('carts')
+@ApiTags('Carts')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class CartsController {
   constructor(private readonly cartsService: CartsService) {}

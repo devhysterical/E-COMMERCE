@@ -17,8 +17,11 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { OrderStatus, PaymentMethod } from '@prisma/client';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('orders')
+@ApiTags('Orders')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class OrdersController {
   constructor(

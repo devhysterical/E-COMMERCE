@@ -44,6 +44,12 @@ export class UsersService {
       throw new NotFoundException('Người dùng không tồn tại');
     }
 
+    if (!dto || Object.keys(dto).length === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { password, ...result } = user;
+      return result;
+    }
+
     const updatedUser = await this.prisma.user.update({
       where: { id: userId },
       data: {

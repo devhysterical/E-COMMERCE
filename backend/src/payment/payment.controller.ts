@@ -8,6 +8,7 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import type { Response } from 'express';
 import { PaymentService } from './payment.service';
@@ -19,6 +20,8 @@ interface CreateMoMoPaymentDto {
 }
 
 @Controller('payment')
+@ApiTags('Payment')
+@ApiBearerAuth()
 export class PaymentController {
   constructor(
     private readonly paymentService: PaymentService,

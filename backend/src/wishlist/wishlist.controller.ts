@@ -7,10 +7,13 @@ import {
   UseGuards,
   Request,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { WishlistService } from './wishlist.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('wishlist')
+@ApiTags('Wishlist')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class WishlistController {
   constructor(private wishlistService: WishlistService) {}
