@@ -138,7 +138,12 @@ describe('OrdersService', () => {
         return await fn({
           order: { create: jest.fn().mockResolvedValue(createdOrder) },
           orderItem: { create: jest.fn() },
-          product: { update: jest.fn() },
+          product: {
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ stock: 50, name: 'Áo thun' }),
+            update: jest.fn(),
+          },
           cartItem: { deleteMany: jest.fn() },
           user: {
             findUnique: jest.fn().mockResolvedValue({
@@ -176,7 +181,12 @@ describe('OrdersService', () => {
             }),
           },
           orderItem: { create: jest.fn() },
-          product: { update: jest.fn() },
+          product: {
+            findUnique: jest
+              .fn()
+              .mockResolvedValue({ stock: 50, name: 'Áo thun' }),
+            update: jest.fn(),
+          },
           cartItem: { deleteMany: jest.fn() },
           user: { findUnique: jest.fn().mockResolvedValue(null) },
           couponUsage: { create: jest.fn() },

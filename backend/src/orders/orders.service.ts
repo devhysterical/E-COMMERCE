@@ -125,9 +125,15 @@ export class OrdersService {
 
       // 2. Tạo OrderItems và Cập nhật Stock
       for (const item of cart.cartItems) {
-        if (item.product.stock < item.quantity) {
+        // Re-check stock bên trong transaction để tránh race condition
+        const freshProduct = await tx.product.findUnique({
+          where: { id: item.productId },
+          select: { stock: true, name: true },
+        });
+
+        if (!freshProduct || freshProduct.stock < item.quantity) {
           throw new BadRequestException(
-            `Sản phẩm ${item.product.name} không đủ tồn kho`,
+            `Sản phẩm ${freshProduct?.name ?? item.product.name} không đủ tồn kho`,
           );
         }
 
@@ -141,9 +147,10 @@ export class OrdersService {
           },
         });
 
+        // Atomic decrement — tránh read-then-write race condition
         await tx.product.update({
           where: { id: item.productId },
-          data: { stock: item.product.stock - item.quantity },
+          data: { stock: { decrement: item.quantity } },
         });
       }
 
