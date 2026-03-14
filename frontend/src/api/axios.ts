@@ -8,16 +8,12 @@ const api = axios.create({
   },
 });
 
-// Request interceptor: gắn JWT token vào header
+// Request interceptor: gắn JWT token vào header (đọc từ Zustand store, không phải localStorage)
 api.interceptors.request.use(
   (config) => {
-    const authStorage = localStorage.getItem("auth-storage");
-    if (authStorage) {
-      const { state } = JSON.parse(authStorage);
-      const token = state?.token;
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+    const token = useAuthStore.getState().token;
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   },
@@ -69,10 +65,7 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const authStorage = localStorage.getItem("auth-storage");
-      const refreshToken = authStorage
-        ? JSON.parse(authStorage).state?.refreshToken
-        : null;
+      const refreshToken = useAuthStore.getState().refreshToken;
 
       if (!refreshToken) {
         // Không có refresh token -> logout
@@ -89,7 +82,7 @@ api.interceptors.response.use(
 
         const { access_token, refresh_token } = response.data;
 
-        // Cập nhật tokens trong store
+        // Cập nhật tokens trong store (memory-only)
         useAuthStore.getState().setTokens(access_token, refresh_token);
 
         // Retry tất cả requests đang chờ
