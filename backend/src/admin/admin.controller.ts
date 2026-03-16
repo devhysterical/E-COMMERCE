@@ -7,18 +7,12 @@ import {
   Body,
   UseGuards,
 } from '@nestjs/common';
-import { IsIn, IsNotEmpty } from 'class-validator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { UsersService } from '../users/users.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-
-class UpdateRoleDto {
-  @IsNotEmpty({ message: 'Role không được để trống' })
-  @IsIn(['USER', 'ADMIN'], { message: 'Role phải là USER hoặc ADMIN' })
-  role: 'USER' | 'ADMIN';
-}
+import { UpdateRoleDto } from './dto/admin.dto';
 
 @Controller('admin')
 @ApiTags('Admin')

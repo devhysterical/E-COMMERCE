@@ -119,7 +119,7 @@ export class OrdersService {
           address,
           phone,
           paymentMethod,
-          paymentStatus: paymentMethod === 'COD' ? 'PENDING' : 'PENDING',
+          paymentStatus: 'PENDING',
         },
       });
 
