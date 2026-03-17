@@ -6,7 +6,9 @@
     "orders": "Đơn hàng",
     "profile": "Hồ sơ",
     "login": "Đăng nhập",
+    "loginSubtitle": "Chào mừng trở lại! Đăng nhập để tiếp tục mua sắm.",
     "register": "Đăng ký",
+    "registerSubtitle": "Chào mừng bạn đến với cửa hàng của chúng tôi! Đăng ký để bắt đầu mua sắm.",
     "logout": "Đăng xuất",
     "search": "Tìm kiếm",
     "loading": "Đang tải...",
@@ -145,7 +147,6 @@
     "confirmPassword": "Xác nhận mật khẩu",
     "forgotPassword": "Quên mật khẩu?",
     "rememberMe": "Ghi nhớ đăng nhập",
-    "loginWith": "Hoặc đăng nhập với",
     "noAccount": "Chưa có tài khoản?",
     "hasAccount": "Đã có tài khoản?",
     "registerHere": "Đăng ký ngay"
