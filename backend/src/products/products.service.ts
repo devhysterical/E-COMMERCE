@@ -73,6 +73,7 @@ export class ProductsService {
       select: {
         id: true,
         name: true,
+        shortName: true,
         price: true,
         imageUrl: true,
       },

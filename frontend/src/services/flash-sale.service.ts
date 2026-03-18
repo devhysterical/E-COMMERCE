@@ -11,6 +11,7 @@ export interface FlashSaleItem {
   product: {
     id?: string;
     name: string;
+    shortName?: string | null;
     price: number;
     imageUrl: string | null;
     stock?: number;

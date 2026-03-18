@@ -55,7 +55,7 @@ export default function FlashSaleSection() {
 
               <div className="p-3">
                 <p className="text-sm font-medium text-slate-800 truncate">
-                  {item.product.name}
+                  {item.product.shortName || item.product.name}
                 </p>
 
                 <div className="flex items-baseline gap-2 mt-1">

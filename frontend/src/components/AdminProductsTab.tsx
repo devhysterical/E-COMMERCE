@@ -5,6 +5,7 @@ import {
   CategoryService,
   UploadService,
 } from "../services/api.service";
+import type { SpecificationItem } from "../services/product.service";
 import { toast } from "react-toastify";
 import type { Product } from "../services/api.service";
 import { Plus, Edit, Trash2, X, Save, Upload, Loader } from "lucide-react";
@@ -35,6 +36,10 @@ const AdminProductsTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setShowProductModal(false);
+      toast.success("Thêm sản phẩm thành công!");
+    },
+    onError: () => {
+      toast.error("Thêm sản phẩm thất bại. Vui lòng thử lại.");
     },
   });
 
@@ -46,17 +51,22 @@ const AdminProductsTab = () => {
       id: string;
       data: Partial<{
         name: string;
-        description: string;
+        shortName: string;
         price: number;
         stock: number;
         imageUrl: string;
         categoryId: string;
+        specifications: SpecificationItem[];
       }>;
     }) => ProductService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setShowProductModal(false);
       setEditingProduct(null);
+      toast.success("Cập nhật sản phẩm thành công!");
+    },
+    onError: () => {
+      toast.error("Cập nhật sản phẩm thất bại. Vui lòng thử lại.");
     },
   });
 
@@ -64,6 +74,10 @@ const AdminProductsTab = () => {
     mutationFn: ProductService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("Xóa sản phẩm thành công!");
+    },
+    onError: () => {
+      toast.error("Xóa sản phẩm thất bại. Vui lòng thử lại.");
     },
   });
 
@@ -188,7 +202,7 @@ const AdminProductsTab = () => {
             if (editingProduct) {
               updateProductMutation.mutate({
                 id: editingProduct.id,
-                data: { ...data, description: data.description || undefined },
+                data,
               });
             } else {
               createProductMutation.mutate(
@@ -229,11 +243,12 @@ interface ProductModalProps {
   onClose: () => void;
   onSubmit: (data: {
     name: string;
-    description: string;
+    shortName: string;
     price: number;
     stock: number;
     imageUrl: string;
     categoryId: string;
+    specifications: SpecificationItem[];
   }) => void;
   isPending: boolean;
 }
@@ -247,12 +262,33 @@ const ProductModal = ({
 }: ProductModalProps) => {
   const [formData, setFormData] = useState({
     name: product?.name || "",
-    description: product?.description || "",
+    shortName: product?.shortName || "",
     price: product?.price || 0,
     stock: product?.stock || 0,
     imageUrl: product?.imageUrl || "",
     categoryId: product?.categoryId || categories[0]?.id || "",
   });
+  const [specifications, setSpecifications] = useState<SpecificationItem[]>(
+    (product?.specifications as SpecificationItem[]) || [],
+  );
+
+  const addSpecRow = () => {
+    setSpecifications([...specifications, { label: "", value: "" }]);
+  };
+
+  const removeSpecRow = (index: number) => {
+    setSpecifications(specifications.filter((_, i) => i !== index));
+  };
+
+  const updateSpecRow = (
+    index: number,
+    field: "label" | "value",
+    value: string,
+  ) => {
+    const updated = [...specifications];
+    updated[index] = { ...updated[index], [field]: value };
+    setSpecifications(updated);
+  };
   const [isUploading, setIsUploading] = useState(false);
 
   const handleFileUpload = async (file: File) => {
@@ -270,7 +306,13 @@ const ProductModal = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    const filteredSpecs = specifications.filter(
+      (s) => s.label.trim() || s.value.trim(),
+    );
+    onSubmit({
+      ...formData,
+      specifications: filteredSpecs,
+    });
   };
 
   return (
@@ -290,7 +332,25 @@ const ProductModal = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 mb-2">
-              Tên sản phẩm
+              Tên hiển thị (trang chủ)
+            </label>
+            <input
+              type="text"
+              value={formData.shortName}
+              onChange={(e) =>
+                setFormData({ ...formData, shortName: e.target.value })
+              }
+              placeholder="VD: Lenovo ThinkPad X1 Carbon Gen 13 2025 Aura Edition"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+            />
+            <p className="text-xs text-slate-400 mt-1">
+              Tên ngắn gọn hiển thị trên trang chủ. Nếu để trống sẽ dùng tên đầy đủ.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">
+              Tên đầy đủ sản phẩm
             </label>
             <input
               type="text"
@@ -298,23 +358,13 @@ const ProductModal = ({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
+              placeholder="VD: Lenovo ThinkPad X1 Carbon Gen 13 2025 Aura Edition Core Ultra 7 258V RAM 32GB SSD 1TB 14INCH 2.8K OLED"
               className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
               required
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
-              Mô tả
-            </label>
-            <textarea
-              value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y min-h-24"
-              rows={3}
-            />
+            <p className="text-xs text-slate-400 mt-1">
+              Tên đầy đủ hiển thị trên trang chi tiết sản phẩm.
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -428,6 +478,62 @@ const ProductModal = ({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Specifications Table Builder */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-bold text-slate-700">
+                Thông số nổi bật
+              </label>
+              <button
+                type="button"
+                onClick={addSpecRow}
+                className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+                <Plus size={14} /> Thêm thông số
+              </button>
+            </div>
+
+            {specifications.length > 0 ? (
+              <div className="space-y-3">
+                {specifications.map((spec, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-2 items-start bg-slate-50 p-3 rounded-xl border border-slate-100">
+                    <div className="flex-1 space-y-2">
+                      <input
+                        type="text"
+                        value={spec.label}
+                        onChange={(e) =>
+                          updateSpecRow(index, "label", e.target.value)
+                        }
+                        placeholder="Tiêu đề (VD: CPU, RAM, SSD...)"
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+                      />
+                      <textarea
+                        value={spec.value}
+                        onChange={(e) =>
+                          updateSpecRow(index, "value", e.target.value)
+                        }
+                        placeholder="Giá trị (VD: Intel Core Ultra 7 258V) — có thể xuống dòng"
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm resize-y min-h-[40px]"
+                        rows={1}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeSpecRow(index)}
+                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all mt-1">
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400 italic">
+                Chưa có thông số nào. Nhấn "Thêm thông số" để bắt đầu.
+              </p>
+            )}
           </div>
 
           <button

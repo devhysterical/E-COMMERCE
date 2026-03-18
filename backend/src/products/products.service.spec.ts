@@ -40,7 +40,6 @@ describe('ProductsService', () => {
   const mockProduct = {
     id: 'prod-1',
     name: 'Áo thun',
-    description: 'Áo thun cotton',
     price: 150000,
     stock: 50,
     imageUrl: null,

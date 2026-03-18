@@ -19,13 +19,19 @@ export interface ProductImage {
   createdAt: string;
 }
 
+export interface SpecificationItem {
+  label: string;
+  value: string;
+}
+
 export interface Product {
   id: string;
   name: string;
-  description: string | null;
+  shortName: string | null;
   price: number;
   stock: number;
   imageUrl: string | null;
+  specifications: SpecificationItem[] | null;
   categoryId: string;
   category: {
     id: string;
@@ -53,7 +59,13 @@ export const ProductService = {
     query: string,
     limit: number = 5,
   ): Promise<
-    { id: string; name: string; price: number; imageUrl: string | null }[]
+    {
+      id: string;
+      name: string;
+      shortName: string | null;
+      price: number;
+      imageUrl: string | null;
+    }[]
   > => {
     const response = await api.get("/products/search/suggest", {
       params: { q: query, limit },
@@ -97,11 +109,12 @@ export const ProductService = {
   },
   create: async (data: {
     name: string;
-    description?: string;
+    shortName?: string;
     price: number;
     stock: number;
     imageUrl?: string;
     categoryId: string;
+    specifications?: SpecificationItem[];
   }) => {
     const response = await api.post("/products", data);
     return response.data;
@@ -110,11 +123,12 @@ export const ProductService = {
     id: string,
     data: Partial<{
       name: string;
-      description: string;
+      shortName: string;
       price: number;
       stock: number;
       imageUrl: string;
       categoryId: string;
+      specifications: SpecificationItem[];
     }>,
   ) => {
     const response = await api.patch(`/products/${id}`, data);

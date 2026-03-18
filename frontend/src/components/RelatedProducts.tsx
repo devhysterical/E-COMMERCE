@@ -63,7 +63,7 @@ const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
             </div>
             <div className="p-3">
               <h4 className="font-semibold text-slate-900 text-sm line-clamp-2 group-hover:text-indigo-600 transition-colors">
-                {product.name}
+                {product.shortName || product.name}
               </h4>
               <p className="text-indigo-600 font-bold mt-1 text-sm">
                 {product.price.toLocaleString("vi-VN")}đ

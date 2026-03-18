@@ -223,9 +223,50 @@ const ProductDetailPage = () => {
             </div>
           </div>
 
-          <p className="text-lg text-slate-600 dark:text-slate-300 leading-relaxed whitespace-pre-line">
-            {product.description || t("product.noDescription")}
-          </p>
+
+
+          {/* Specifications Table */}
+          {product.specifications &&
+            Array.isArray(product.specifications) &&
+            product.specifications.length > 0 && (
+              <div className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+                <div className="bg-slate-100 dark:bg-slate-800 px-5 py-3 border-b border-slate-200 dark:border-slate-700">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                    Thông số nổi bật
+                  </h3>
+                </div>
+                <table className="w-full">
+                  <tbody>
+                    {(
+                      product.specifications as {
+                        label: string;
+                        value: string;
+                      }[]
+                    ).map(
+                      (
+                        spec: { label: string; value: string },
+                        index: number,
+                      ) => (
+                        <tr
+                          key={index}
+                          className={
+                            index % 2 === 0
+                              ? "bg-white dark:bg-slate-900/30"
+                              : "bg-slate-50 dark:bg-slate-800/50"
+                          }>
+                          <td className="px-5 py-3 text-sm font-semibold text-slate-700 dark:text-slate-300 w-1/3 align-top border-r border-slate-100 dark:border-slate-700">
+                            {spec.label}
+                          </td>
+                          <td className="px-5 py-3 text-sm text-slate-600 dark:text-slate-400 whitespace-pre-line">
+                            {spec.value}
+                          </td>
+                        </tr>
+                      ),
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            )}
 
           <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl space-y-4 border border-slate-100 dark:border-slate-700">
             <div className="flex items-center justify-between text-sm">

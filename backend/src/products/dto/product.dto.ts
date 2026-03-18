@@ -1,4 +1,11 @@
-import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class CreateProductDto {
   @IsString()
@@ -7,7 +14,7 @@ export class CreateProductDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  shortName?: string;
 
   @IsInt({ message: 'Giá phải là số nguyên' })
   @Min(0, { message: 'Giá không được nhỏ hơn 0' })
@@ -24,6 +31,10 @@ export class CreateProductDto {
   @IsString()
   @IsNotEmpty({ message: 'CategoryId không được để trống' })
   categoryId: string;
+
+  @IsArray()
+  @IsOptional()
+  specifications?: { label: string; value: string }[];
 }
 
 export class UpdateProductDto {
@@ -33,7 +44,7 @@ export class UpdateProductDto {
 
   @IsString()
   @IsOptional()
-  description?: string;
+  shortName?: string;
 
   @IsInt()
   @IsOptional()
@@ -52,4 +63,8 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   categoryId?: string;
+
+  @IsArray()
+  @IsOptional()
+  specifications?: { label: string; value: string }[];
 }

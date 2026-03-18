@@ -80,13 +80,14 @@ model Category {
 }
 
 model Product {
-  id            String    @id @default(uuid())
-  name          String
-  description   String?
-  price         Int       // Định dạng tiền tệ: Số nguyên (Integer)
-  stock         Int       @default(0)
-  imageUrl      String?   // Ảnh chính (backward compatible)
-  categoryId    String
+  id              String    @id @default(uuid())
+  name            String
+  shortName       String?   // Tên ngắn hiển thị trang chủ
+  price           Int       // Định dạng tiền tệ: Số nguyên (Integer)
+  stock           Int       @default(0)
+  imageUrl        String?   // Ảnh chính (backward compatible)
+  specifications  Json?     // Thông số kỹ thuật: [{ label: string, value: string }]
+  categoryId      String
   category      Category  @relation(fields: [categoryId], references: [id])
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
