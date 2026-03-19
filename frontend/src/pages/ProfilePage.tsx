@@ -49,7 +49,7 @@ const ProfilePage = () => {
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: UserService.getProfile,
-    staleTime: 0,
+    staleTime: 10_000,
   });
 
   const updateProfileMutation = useMutation({
