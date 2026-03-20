@@ -4,12 +4,16 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Security headers
   app.use(helmet());
+
+  // Cookie parser — để đọc httpOnly cookies chứa JWT
+  app.use(cookieParser());
 
   // Tăng body limit để hỗ trợ upload hình ảnh base64
   app.use(json({ limit: '10mb' }));

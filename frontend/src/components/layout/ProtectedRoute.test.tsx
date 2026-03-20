@@ -65,8 +65,6 @@ describe("ProtectedRoute", () => {
         fullName: "Test User",
         role: "USER",
       },
-      "token",
-      "refresh",
     );
 
     renderWithRouter(
@@ -87,8 +85,6 @@ describe("ProtectedRoute", () => {
         fullName: "Test User",
         role: "USER",
       },
-      "token",
-      "refresh",
     );
 
     render(
@@ -121,8 +117,6 @@ describe("ProtectedRoute", () => {
         fullName: "Admin User",
         role: "ADMIN",
       },
-      "token",
-      "refresh",
     );
 
     render(

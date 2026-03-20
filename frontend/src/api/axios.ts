@@ -6,21 +6,8 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Gửi httpOnly cookies tự động
 });
-
-// Request interceptor: gắn JWT token vào header (đọc từ Zustand store, không phải localStorage)
-api.interceptors.request.use(
-  (config) => {
-    const token = useAuthStore.getState().token;
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
 
 // Response interceptor: auto refresh token khi 401
 let isRefreshing = false;
@@ -29,12 +16,12 @@ let failedQueue: Array<{
   reject: (reason: unknown) => void;
 }> = [];
 
-const processQueue = (error: unknown, token: string | null = null) => {
+const processQueue = (error: unknown) => {
   failedQueue.forEach((promise) => {
     if (error) {
       promise.reject(error);
     } else {
-      promise.resolve(token);
+      promise.resolve(undefined);
     }
   });
   failedQueue = [];
@@ -56,8 +43,8 @@ api.interceptors.response.use(
         // Nếu đang refresh, queue request lại và đợi
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
-        }).then((token) => {
-          originalRequest.headers.Authorization = `Bearer ${token}`;
+        }).then(() => {
+          // Cookie đã được server cập nhật, retry trực tiếp
           return api(originalRequest);
         });
       }
@@ -65,35 +52,22 @@ api.interceptors.response.use(
       originalRequest._retry = true;
       isRefreshing = true;
 
-      const refreshToken = useAuthStore.getState().refreshToken;
-
-      if (!refreshToken) {
-        // Không có refresh token -> logout
-        useAuthStore.getState().logout();
-        window.location.href = "/login";
-        return Promise.reject(error);
-      }
-
       try {
-        const response = await axios.post(
+        // Server đọc refresh_token từ cookie, set cookie mới
+        await axios.post(
           `${import.meta.env.VITE_API_BASE_URL || "http://localhost:4000"}/auth/refresh`,
-          { refreshToken },
+          {},
+          { withCredentials: true },
         );
 
-        const { access_token, refresh_token } = response.data;
-
-        // Cập nhật tokens trong store (memory-only)
-        useAuthStore.getState().setTokens(access_token, refresh_token);
-
         // Retry tất cả requests đang chờ
-        processQueue(null, access_token);
+        processQueue(null);
 
-        // Retry request gốc
-        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        // Retry request gốc (cookie mới đã được set bởi server)
         return api(originalRequest);
       } catch (refreshError) {
         // Refresh thất bại -> logout
-        processQueue(refreshError, null);
+        processQueue(refreshError);
         useAuthStore.getState().logout();
         window.location.href = "/login";
         return Promise.reject(refreshError);
