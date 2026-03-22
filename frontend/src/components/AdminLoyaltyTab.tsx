@@ -238,7 +238,7 @@ const AdminLoyaltyTab = () => {
             className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
               activeSection === tab.key
                 ? "bg-orange-500 text-white shadow-lg shadow-orange-500/25"
-                : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-200"
+                : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800"
             }`}>
             {tab.icon}
             {tab.label}
@@ -250,7 +250,7 @@ const AdminLoyaltyTab = () => {
       {activeSection === "tiers" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-800">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
               Hạng thành viên
             </h3>
             <button
@@ -262,38 +262,40 @@ const AdminLoyaltyTab = () => {
 
           {/* Tier Form */}
           {showTierForm && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-slate-700">
+                <h4 className="font-medium text-slate-700 dark:text-slate-200">
                   {editTierId ? "Sửa hạng" : "Tạo hạng mới"}
                 </h4>
-                <button onClick={resetTierForm}>
+                <button onClick={resetTierForm} className="dark:text-slate-400">
                   <X size={18} className="text-slate-400" />
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-500">Tên hạng</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
+                    Tên hạng
+                  </label>
                   <input
                     value={tierName}
                     onChange={(e) => setTierName(e.target.value)}
                     placeholder="Bronze, Silver, Gold..."
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
                     Điểm tối thiểu
                   </label>
                   <input
                     type="number"
                     value={tierMinPoints}
                     onChange={(e) => setTierMinPoints(Number(e.target.value))}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
                     Hệ số nhân điểm
                   </label>
                   <input
@@ -301,16 +303,18 @@ const AdminLoyaltyTab = () => {
                     step="0.1"
                     value={tierMultiplier}
                     onChange={(e) => setTierMultiplier(Number(e.target.value))}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Quyền lợi</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
+                    Quyền lợi
+                  </label>
                   <input
                     value={tierBenefits}
                     onChange={(e) => setTierBenefits(e.target.value)}
                     placeholder="Mô tả quyền lợi..."
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
               </div>
@@ -319,7 +323,7 @@ const AdminLoyaltyTab = () => {
                 disabled={
                   !tierName || createTier.isPending || updateTier.isPending
                 }
-                className="bg-orange-500 text-white px-6 py-2.5 rounded-xl text-sm hover:bg-orange-600 disabled:opacity-50">
+                className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
                 {editTierId ? "Cập nhật" : "Tạo mới"}
               </button>
             </div>
@@ -330,34 +334,36 @@ const AdminLoyaltyTab = () => {
             {tiers.map((tier: LoyaltyTier) => (
               <div
                 key={tier.id}
-                className="relative bg-white rounded-2xl border border-slate-200 overflow-hidden">
+                className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
                 <div
                   className={`h-2 bg-gradient-to-r ${tierColors[tier.name] ?? "from-slate-400 to-slate-600"}`}
                 />
                 <div className="p-5 space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="font-bold text-lg text-slate-800">
+                    <h4 className="text-lg font-bold text-slate-800 dark:text-slate-100">
                       {tier.name}
                     </h4>
-                    <span className="text-xs bg-orange-100 text-orange-600 px-2 py-1 rounded-full font-medium">
+                    <span className="rounded-full bg-orange-100 px-2 py-1 text-xs font-medium text-orange-600 dark:bg-orange-500/15 dark:text-orange-200">
                       x{tier.pointMultiplier}
                     </span>
                   </div>
-                  <p className="text-sm text-slate-500">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
                     Từ {formatVND(tier.minPoints)} điểm
                   </p>
                   {tier.benefits && (
-                    <p className="text-xs text-slate-400">{tier.benefits}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      {tier.benefits}
+                    </p>
                   )}
                   <div className="flex gap-2 pt-2">
                     <button
                       onClick={() => handleEditTier(tier)}
-                      className="flex-1 flex items-center justify-center gap-1 text-sm text-slate-600 border border-slate-200 rounded-lg py-1.5 hover:bg-slate-50">
+                      className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                       <Edit2 size={14} /> Sửa
                     </button>
                     <button
                       onClick={() => deleteTier.mutate(tier.id)}
-                      className="flex items-center justify-center text-red-500 border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50">
+                      className="flex items-center justify-center rounded-lg border border-red-200 px-3 py-1.5 text-red-500 hover:bg-red-50 dark:border-red-500/30 dark:text-red-300 dark:hover:bg-red-500/10">
                       <Trash2 size={14} />
                     </button>
                   </div>
@@ -372,7 +378,7 @@ const AdminLoyaltyTab = () => {
       {activeSection === "rewards" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-800">
+            <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
               Phan thuong
             </h3>
             <button
@@ -384,49 +390,57 @@ const AdminLoyaltyTab = () => {
 
           {/* Reward Form */}
           {showRewardForm && (
-            <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+            <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center justify-between">
-                <h4 className="font-medium text-slate-700">
+                <h4 className="font-medium text-slate-700 dark:text-slate-200">
                   {editRewardId ? "Sửa phần thưởng" : "Tạo phần thưởng mới"}
                 </h4>
-                <button onClick={resetRewardForm}>
+                <button
+                  onClick={resetRewardForm}
+                  className="dark:text-slate-400">
                   <X size={18} className="text-slate-400" />
                 </button>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-xs text-slate-500">Tên</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
+                    Tên
+                  </label>
                   <input
                     value={rewardName}
                     onChange={(e) => setRewardName(e.target.value)}
                     placeholder="Giảm 50k, Free Ship..."
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Điểm cần đổi</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
+                    Điểm cần đổi
+                  </label>
                   <input
                     type="number"
                     value={rewardPointsCost}
                     onChange={(e) =>
                       setRewardPointsCost(Number(e.target.value))
                     }
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-slate-500">Loại</label>
+                  <label className="text-xs text-slate-500 dark:text-slate-400">
+                    Loại
+                  </label>
                   <select
                     value={rewardType}
                     onChange={(e) => setRewardType(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1 bg-white">
+                    className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
                     <option value="COUPON">Coupon giảm giá</option>
                     <option value="FREE_SHIPPING">Miễn phí vận chuyển</option>
                   </select>
                 </div>
                 {rewardType === "COUPON" && (
                   <div>
-                    <label className="text-xs text-slate-500">
+                    <label className="text-xs text-slate-500 dark:text-slate-400">
                       Giá trị coupon (VND)
                     </label>
                     <input
@@ -435,7 +449,7 @@ const AdminLoyaltyTab = () => {
                       onChange={(e) =>
                         setRewardCouponValue(Number(e.target.value))
                       }
-                      className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm mt-1"
+                      className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                     />
                   </div>
                 )}
@@ -448,47 +462,49 @@ const AdminLoyaltyTab = () => {
                   createReward.isPending ||
                   updateReward.isPending
                 }
-                className="bg-orange-500 text-white px-6 py-2.5 rounded-xl text-sm hover:bg-orange-600 disabled:opacity-50">
+                className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
                 {editRewardId ? "Cập nhật" : "Tạo mới"}
               </button>
             </div>
           )}
 
           {/* Rewards List */}
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/80">
                 <tr>
-                  <th className="text-left px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
                     Phần thưởng
                   </th>
-                  <th className="text-left px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
                     Loại
                   </th>
-                  <th className="text-right px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
                     Điểm cần
                   </th>
-                  <th className="text-right px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
                     Giá trị
                   </th>
-                  <th className="text-center px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-center font-medium text-slate-600 dark:text-slate-300">
                     Trạng thái
                   </th>
-                  <th className="text-right px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
                     Thao tác
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {rewards.map((reward: PointReward) => (
-                  <tr key={reward.id} className="hover:bg-slate-50/50">
-                    <td className="px-6 py-4 font-medium text-slate-800">
+                  <tr
+                    key={reward.id}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/60">
+                    <td className="px-6 py-4 font-medium text-slate-800 dark:text-slate-100">
                       <div className="flex items-center gap-2">
                         <Gift size={16} className="text-orange-500" />
                         {reward.name}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-slate-600">
+                    <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                       {reward.rewardType === "COUPON"
                         ? "Coupon giảm giá"
                         : "Miễn phí ship"}
@@ -496,7 +512,7 @@ const AdminLoyaltyTab = () => {
                     <td className="px-6 py-4 text-right font-medium text-orange-600">
                       {formatVND(reward.pointsCost)}
                     </td>
-                    <td className="px-6 py-4 text-right text-slate-600">
+                    <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-300">
                       {reward.couponValue
                         ? `${formatVND(reward.couponValue)}đ`
                         : "-"}
@@ -505,8 +521,8 @@ const AdminLoyaltyTab = () => {
                       <span
                         className={`text-xs px-2.5 py-1 rounded-full font-medium ${
                           reward.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
+                            ? "bg-green-100 text-green-700 dark:bg-emerald-500/15 dark:text-emerald-200"
+                            : "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200"
                         }`}>
                         {reward.isActive ? "Hoạt động" : "Ngừng"}
                       </span>
@@ -515,12 +531,12 @@ const AdminLoyaltyTab = () => {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => handleEditReward(reward)}
-                          className="text-slate-500 hover:text-orange-500">
+                          className="text-slate-500 hover:text-orange-500 dark:text-slate-400 dark:hover:text-orange-300">
                           <Edit2 size={14} />
                         </button>
                         <button
                           onClick={() => deleteReward.mutate(reward.id)}
-                          className="text-slate-500 hover:text-red-500">
+                          className="text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-300">
                           <Trash2 size={14} />
                         </button>
                       </div>
@@ -536,18 +552,20 @@ const AdminLoyaltyTab = () => {
       {/* Users Section */}
       {activeSection === "users" && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-slate-800">
+          <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
             Người dùng có điểm
           </h3>
 
           {/* Adjust Points Form */}
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
-            <h4 className="font-medium text-slate-700">Điều chỉnh điểm</h4>
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
+            <h4 className="font-medium text-slate-700 dark:text-slate-200">
+              Điều chỉnh điểm
+            </h4>
             <div className="grid grid-cols-3 gap-4">
               <select
                 value={adjustUserId}
                 onChange={(e) => setAdjustUserId(e.target.value)}
-                className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm bg-white">
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
                 <option value="">Chọn người dùng</option>
                 {users.map((u: LoyaltyUser) => (
                   <option key={u.id} value={u.id}>
@@ -560,13 +578,13 @@ const AdminLoyaltyTab = () => {
                 value={adjustPoints}
                 onChange={(e) => setAdjustPoints(Number(e.target.value))}
                 placeholder="Số điểm (+/-)"
-                className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
               <input
                 value={adjustDesc}
                 onChange={(e) => setAdjustDesc(e.target.value)}
                 placeholder="Lý do..."
-                className="border border-slate-200 rounded-xl px-4 py-2.5 text-sm"
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
             </div>
             <button
@@ -583,31 +601,31 @@ const AdminLoyaltyTab = () => {
                 !adjustDesc ||
                 adjustPointsMut.isPending
               }
-              className="bg-orange-500 text-white px-6 py-2.5 rounded-xl text-sm hover:bg-orange-600 disabled:opacity-50">
+              className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
               Điều chỉnh
             </button>
           </div>
 
           {/* Users Table */}
-          <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+          <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/80">
                 <tr>
-                  <th className="text-left px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
                     Người dùng
                   </th>
-                  <th className="text-left px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
                     Email
                   </th>
-                  <th className="text-right px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
                     Tổng điểm
                   </th>
-                  <th className="text-center px-6 py-3 font-medium text-slate-600">
+                  <th className="px-6 py-3 text-center font-medium text-slate-600 dark:text-slate-300">
                     Hạng
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {users.map((user: LoyaltyUser) => {
                   const userTier =
                     [...tiers]
@@ -619,14 +637,18 @@ const AdminLoyaltyTab = () => {
                         (t: LoyaltyTier) => user.totalPoints >= t.minPoints,
                       ) ?? null;
                   return (
-                    <tr key={user.id} className="hover:bg-slate-50/50">
-                      <td className="px-6 py-4 font-medium text-slate-800">
+                    <tr
+                      key={user.id}
+                      className="hover:bg-slate-50/50 dark:hover:bg-slate-800/60">
+                      <td className="px-6 py-4 font-medium text-slate-800 dark:text-slate-100">
                         <div className="flex items-center gap-2">
                           <Star size={16} className="text-yellow-500" />
                           {user.fullName ?? "Chưa cập nhật"}
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-slate-600">{user.email}</td>
+                      <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
+                        {user.email}
+                      </td>
                       <td className="px-6 py-4 text-right font-bold text-orange-600">
                         {formatVND(user.totalPoints)}
                       </td>

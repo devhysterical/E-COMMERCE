@@ -70,16 +70,16 @@ const AdminDashboard = () => {
     <div className="max-w-7xl mx-auto px-4 py-12">
       {/* Header */}
       <div className="flex justify-between items-center mb-10">
-        <h1 className="text-3xl font-black text-slate-900 italic uppercase tracking-tighter">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white italic uppercase tracking-tighter">
           Hệ thống quản trị
         </h1>
         <div className="flex items-center gap-3">
           {/* Export Dropdown */}
           <div className="relative group">
-            <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100">
+            <button className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-100 dark:shadow-none">
               <Download size={18} /> Xuất báo cáo
             </button>
-            <div className="absolute right-0 top-full mt-2 bg-white rounded-xl border border-slate-100 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-48">
+            <div className="absolute right-0 top-full mt-2 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-700 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 min-w-48">
               <button
                 onClick={async () => {
                   try {
@@ -91,7 +91,7 @@ const AdminDashboard = () => {
                     toast.error("Không thể tải báo cáo");
                   }
                 }}
-                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 rounded-t-xl text-slate-700 font-medium w-full text-left">
+                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-t-xl text-slate-700 dark:text-slate-200 font-medium w-full text-left">
                 <ShoppingBag size={16} className="text-blue-500" />
                 Xuất đơn hàng
               </button>
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
                     toast.error("Không thể tải báo cáo");
                   }
                 }}
-                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 rounded-b-xl text-slate-700 font-medium w-full text-left">
+                className="flex items-center gap-2 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-b-xl text-slate-700 dark:text-slate-200 font-medium w-full text-left">
                 <Package size={16} className="text-indigo-500" />
                 Xuất tồn kho
               </button>
@@ -117,47 +117,47 @@ const AdminDashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-4 text-slate-500 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 mb-2">
             <DollarSign size={20} className="text-green-500" />
             <span className="text-sm font-bold uppercase tracking-wider">
               Doanh thu
             </span>
           </div>
-          <p className="text-3xl font-black text-slate-900">
+          <p className="text-3xl font-black text-slate-900 dark:text-white">
             {(stats?.totalRevenue || 0).toLocaleString("vi-VN")} đ
           </p>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-4 text-slate-500 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 mb-2">
             <ShoppingBag size={20} className="text-blue-500" />
             <span className="text-sm font-bold uppercase tracking-wider">
               Đơn hàng
             </span>
           </div>
-          <p className="text-3xl font-black text-slate-900">
+          <p className="text-3xl font-black text-slate-900 dark:text-white">
             {stats?.totalOrders || 0}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-4 text-slate-500 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 mb-2">
             <Package size={20} className="text-indigo-500" />
             <span className="text-sm font-bold uppercase tracking-wider">
               Sản phẩm
             </span>
           </div>
-          <p className="text-3xl font-black text-slate-900">
+          <p className="text-3xl font-black text-slate-900 dark:text-white">
             {products.length}
           </p>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm">
-          <div className="flex items-center gap-4 text-slate-500 mb-2">
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm">
+          <div className="flex items-center gap-4 text-slate-500 dark:text-slate-400 mb-2">
             <LayoutGrid size={20} className="text-purple-500" />
             <span className="text-sm font-bold uppercase tracking-wider">
               Danh mục
             </span>
           </div>
-          <p className="text-3xl font-black text-slate-900">
+          <p className="text-3xl font-black text-slate-900 dark:text-white">
             {categories.length}
           </p>
         </div>
@@ -226,8 +226,8 @@ const AdminDashboard = () => {
               className={`flex items-center gap-2.5 px-4 py-3 rounded-xl font-bold text-sm transition-all text-left ${
                 activeTab === tab.key
                   ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-slate-600 hover:bg-slate-50 border border-slate-100"
-              }`}>
+                  : "bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-100 dark:border-slate-700"
+               }`}>
               {tab.icon}
               {tab.label}
             </button>
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Content */}
-        <div className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden min-w-0">
+        <div className="flex-1 bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden min-w-0">
           {activeTab === "products" && <AdminProductsTab />}
           {activeTab === "orders" && <AdminOrdersTab />}
           {activeTab === "categories" && <AdminCategoriesTab />}

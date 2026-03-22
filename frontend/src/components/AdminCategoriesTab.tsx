@@ -67,18 +67,18 @@ const AdminCategoriesTab = () => {
 
   return (
     <>
-      <div className="p-4 border-b border-slate-100 flex justify-end">
+      <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-end">
         <button
           onClick={() => {
             setEditingCategory(null);
             setShowCategoryModal(true);
           }}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none">
           <Plus size={20} /> Thêm danh mục
         </button>
       </div>
       <table className="w-full text-left border-collapse">
-        <thead className="bg-slate-50 border-b border-slate-100">
+        <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
               Tên danh mục
@@ -94,7 +94,7 @@ const AdminCategoriesTab = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-50">
+        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
           {categories.slice((page - 1) * limit, page * limit).map(
             (category: {
               id: string;
@@ -104,17 +104,17 @@ const AdminCategoriesTab = () => {
             }) => (
               <tr
                 key={category.id}
-                className="hover:bg-slate-50/50 transition-colors">
+                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
                 <td className="px-6 py-4">
-                  <span className="font-bold text-slate-900">
+                  <span className="font-bold text-slate-900 dark:text-white">
                     {category.name}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-500">
+                <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                   {category.description || "Chưa có mô tả"}
                 </td>
                 <td className="px-6 py-4">
-                  <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm font-semibold">
+                  <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-full text-sm font-semibold">
                     {category._count?.products || 0} sản phẩm
                   </span>
                 </td>
@@ -122,12 +122,12 @@ const AdminCategoriesTab = () => {
                   <div className="flex justify-end gap-2">
                     <button
                       onClick={() => handleEditCategory(category)}
-                      className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
                       <Edit size={18} />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category.id)}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -215,21 +215,21 @@ const CategoryModal = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md">
-        <div className="flex items-center justify-between p-6 border-b border-slate-100">
-          <h2 className="text-xl font-bold text-slate-900">
-            {category ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
-          </h2>
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-md border border-slate-100 dark:border-slate-700">
+          <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              {category ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
+            </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
             <X size={20} />
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
               Tên danh mục
             </label>
             <input
@@ -238,14 +238,14 @@ const CategoryModal = ({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
               placeholder="Nhập tên danh mục..."
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-bold text-slate-700 mb-2">
+            <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
               Mô tả
             </label>
             <textarea
@@ -253,7 +253,7 @@ const CategoryModal = ({
               onChange={(e) =>
                 setFormData({ ...formData, description: e.target.value })
               }
-              className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none h-24"
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-none h-24"
               placeholder="Nhập mô tả danh mục..."
             />
           </div>
@@ -261,7 +261,7 @@ const CategoryModal = ({
           <button
             type="submit"
             disabled={isPending}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400">
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400 dark:disabled:bg-indigo-900/50">
             <Save size={20} />
             {isPending
               ? "Đang lưu..."

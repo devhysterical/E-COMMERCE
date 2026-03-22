@@ -144,6 +144,15 @@ const ProfilePage = () => {
     }
   };
 
+  const fieldLabelClass =
+    "flex items-center gap-2 text-sm font-bold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400";
+  const inputClass =
+    "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500";
+  const readOnlyInputClass =
+    "w-full rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-slate-500 dark:border-slate-800 dark:bg-slate-950/70 dark:text-slate-400";
+  const detailRowClass =
+    "flex items-center justify-between border-b border-slate-100 py-3 dark:border-slate-800";
+
   if (isLoading) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-12 animate-pulse">
@@ -158,7 +167,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
+    <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-8">
         {t("common.profile")}
       </h1>
@@ -175,12 +184,12 @@ const ProfilePage = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-100 dark:shadow-slate-900/50 border border-slate-100 dark:border-slate-700 overflow-hidden">
+      <div className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-xl shadow-slate-200/70 dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/70">
         {/* Profile Header */}
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-8 text-center">
+        <div className="bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-600 p-8 text-center">
           {/* Avatar with upload */}
           <div className="relative inline-block">
-            <div className="w-24 h-24 rounded-full mx-auto overflow-hidden shadow-xl border-4 border-white/30">
+            <div className="mx-auto h-24 w-24 overflow-hidden rounded-full border-4 border-white/20 shadow-[0_18px_45px_rgba(15,23,42,0.35)]">
               {profile?.avatarUrl ? (
                 <img
                   src={profile.avatarUrl}
@@ -188,14 +197,14 @@ const ProfilePage = () => {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full bg-white flex items-center justify-center text-indigo-600 text-4xl font-bold">
+                <div className="flex h-full w-full items-center justify-center bg-white text-4xl font-bold text-indigo-600">
                   {profile?.fullName?.charAt(0) ||
                     profile?.email.charAt(0).toUpperCase()}
                 </div>
               )}
             </div>
             {/* Upload button */}
-            <label className="absolute bottom-0 right-0 w-8 h-8 bg-white rounded-full shadow-lg flex items-center justify-center cursor-pointer hover:bg-slate-50 transition-colors border-2 border-indigo-500">
+            <label className="absolute bottom-0 right-0 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full border-2 border-indigo-500 bg-white shadow-lg transition-colors hover:bg-slate-50">
               {isUploadingAvatar ? (
                 <Loader2 size={16} className="text-indigo-600 animate-spin" />
               ) : (
@@ -213,20 +222,20 @@ const ProfilePage = () => {
           <h2 className="mt-4 text-2xl font-bold text-white">
             {profile?.fullName || "Chưa cập nhật tên"}
           </h2>
-          <p className="text-indigo-100">{profile?.email}</p>
-          <span className="inline-block mt-2 px-3 py-1 bg-white/20 rounded-full text-white text-sm font-medium">
+          <p className="text-sm text-indigo-100/90">{profile?.email}</p>
+          <span className="mt-3 inline-flex rounded-full border border-white/15 bg-slate-950/20 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
             {profile?.role === "ADMIN" ? "Quản trị viên" : "Khách hàng"}
           </span>
         </div>
 
         {/* Profile Content */}
-        <div className="p-8 space-y-6">
+        <div className="space-y-6 bg-gradient-to-b from-white via-slate-50/50 to-white p-8 dark:from-slate-900 dark:via-slate-950/80 dark:to-slate-900">
           {isEditing ? (
             /* Edit Mode - Form */
             <div className="space-y-5">
               {/* Full Name */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <label className={fieldLabelClass}>
                   <User size={16} /> Họ và tên
                 </label>
                 <input
@@ -235,27 +244,27 @@ const ProfilePage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, fullName: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  className={inputClass}
                   placeholder="Nhập họ và tên"
                 />
               </div>
 
               {/* Email (read-only) */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <label className={fieldLabelClass}>
                   <Mail size={16} /> Email
                 </label>
                 <input
                   type="email"
                   value={profile?.email || ""}
                   disabled
-                  className="w-full px-4 py-3 rounded-xl border border-slate-100 bg-slate-50 text-slate-500"
+                  className={readOnlyInputClass}
                 />
               </div>
 
               {/* Phone */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <label className={fieldLabelClass}>
                   <Phone size={16} /> Số điện thoại
                 </label>
                 <input
@@ -264,14 +273,14 @@ const ProfilePage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  className={inputClass}
                   placeholder="Nhập số điện thoại"
                 />
               </div>
 
               {/* Date of Birth */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <label className={fieldLabelClass}>
                   <Calendar size={16} /> Ngày sinh
                 </label>
                 <input
@@ -280,13 +289,13 @@ const ProfilePage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, dateOfBirth: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                  className={inputClass}
                 />
               </div>
 
               {/* Address */}
               <div className="space-y-2">
-                <label className="text-sm font-bold text-slate-500 uppercase tracking-wider flex items-center gap-2">
+                <label className={fieldLabelClass}>
                   <MapPin size={16} /> Địa chỉ
                 </label>
                 <textarea
@@ -294,7 +303,7 @@ const ProfilePage = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, address: e.target.value })
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y min-h-[80px]"
+                  className={`${inputClass} min-h-[88px] resize-y`}
                   placeholder="Nhập địa chỉ nhận hàng mặc định"
                   rows={2}
                 />
@@ -304,13 +313,13 @@ const ProfilePage = () => {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 px-6 py-3 border border-slate-200 text-slate-600 rounded-xl font-semibold hover:bg-slate-50 transition-colors">
+                  className="flex-1 rounded-xl border border-slate-200 px-6 py-3 font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                   Hủy
                 </button>
                 <button
                   onClick={handleSaveProfile}
                   disabled={updateProfileMutation.isPending}
-                  className="flex-1 px-6 py-3 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+                  className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-indigo-700">
                   <Save size={18} />
                   {updateProfileMutation.isPending
                     ? "Đang lưu..."
@@ -322,12 +331,14 @@ const ProfilePage = () => {
             /* View Mode */
             <div className="space-y-5">
               {/* Full Name */}
-              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <div className={detailRowClass}>
                 <div className="flex items-center gap-3">
-                  <User size={18} className="text-slate-400" />
+                  <User size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
-                    <p className="text-sm text-slate-500">Họ và tên</p>
-                    <p className="text-slate-900 font-medium">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Họ và tên
+                    </p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.fullName || "Chưa cập nhật"}
                     </p>
                   </div>
@@ -335,12 +346,14 @@ const ProfilePage = () => {
               </div>
 
               {/* Email */}
-              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <div className={detailRowClass}>
                 <div className="flex items-center gap-3">
-                  <Mail size={18} className="text-slate-400" />
+                  <Mail size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
-                    <p className="text-sm text-slate-500">Email</p>
-                    <p className="text-slate-900 font-medium">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Email
+                    </p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.email}
                     </p>
                   </div>
@@ -348,12 +361,14 @@ const ProfilePage = () => {
               </div>
 
               {/* Phone */}
-              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <div className={detailRowClass}>
                 <div className="flex items-center gap-3">
-                  <Phone size={18} className="text-slate-400" />
+                  <Phone size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
-                    <p className="text-sm text-slate-500">Số điện thoại</p>
-                    <p className="text-slate-900 font-medium">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Số điện thoại
+                    </p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.phone || "Chưa cập nhật"}
                     </p>
                   </div>
@@ -361,12 +376,17 @@ const ProfilePage = () => {
               </div>
 
               {/* Date of Birth */}
-              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <div className={detailRowClass}>
                 <div className="flex items-center gap-3">
-                  <Calendar size={18} className="text-slate-400" />
+                  <Calendar
+                    size={18}
+                    className="text-slate-400 dark:text-slate-500"
+                  />
                   <div>
-                    <p className="text-sm text-slate-500">Ngày sinh</p>
-                    <p className="text-slate-900 font-medium">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Ngày sinh
+                    </p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.dateOfBirth
                         ? new Date(profile.dateOfBirth).toLocaleDateString(
                             "vi-VN",
@@ -378,12 +398,17 @@ const ProfilePage = () => {
               </div>
 
               {/* Address */}
-              <div className="flex items-center justify-between py-3 border-b border-slate-100">
+              <div className={detailRowClass}>
                 <div className="flex items-center gap-3">
-                  <MapPin size={18} className="text-slate-400" />
+                  <MapPin
+                    size={18}
+                    className="text-slate-400 dark:text-slate-500"
+                  />
                   <div>
-                    <p className="text-sm text-slate-500">Địa chỉ</p>
-                    <p className="text-slate-900 font-medium">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Địa chỉ
+                    </p>
+                    <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.address || "Chưa cập nhật"}
                     </p>
                   </div>
@@ -393,40 +418,42 @@ const ProfilePage = () => {
               {/* Edit Button */}
               <button
                 onClick={handleEditProfile}
-                className="w-full mt-4 px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-xl font-semibold hover:bg-indigo-50 transition-colors">
+                className="mt-4 w-full rounded-xl border border-indigo-200 bg-indigo-50/70 px-6 py-3 font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200 dark:hover:bg-indigo-500/15">
                 Chỉnh sửa thông tin
               </button>
             </div>
           )}
 
           {/* Divider */}
-          <hr className="border-slate-100" />
+          <hr className="border-slate-100 dark:border-slate-800" />
 
           {/* Link to Addresses */}
           <Link
             to="/addresses"
-            className="flex items-center justify-between py-3 px-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors group">
+            className="group flex items-center justify-between rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-4 transition-colors hover:bg-slate-100 dark:border-slate-800 dark:bg-slate-950/70 dark:hover:bg-slate-800/80">
             <div className="flex items-center gap-3">
               <MapPin size={20} className="text-indigo-600" />
               <div>
-                <p className="font-medium text-slate-900">Địa chỉ giao hàng</p>
-                <p className="text-sm text-slate-500">
+                <p className="font-medium text-slate-900 dark:text-slate-100">
+                  Địa chỉ giao hàng
+                </p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   Quản lý địa chỉ nhận hàng
                 </p>
               </div>
             </div>
             <ChevronDown
               size={18}
-              className="text-slate-400 -rotate-90 group-hover:translate-x-1 transition-transform"
+              className="-rotate-90 text-slate-400 transition-transform group-hover:translate-x-1 dark:text-slate-500"
             />
           </Link>
 
           {/* Divider */}
-          <hr className="border-slate-100" />
+          <hr className="border-slate-100 dark:border-slate-800" />
           <div className="space-y-4">
             <button
               onClick={() => setShowPasswordForm(!showPasswordForm)}
-              className="flex items-center gap-2 text-slate-700 font-semibold hover:text-indigo-600 transition-colors">
+              className="flex items-center gap-2 font-semibold text-slate-700 transition-colors hover:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-300">
               <Lock size={18} />
               Đổi mật khẩu
             </button>
@@ -434,20 +461,20 @@ const ProfilePage = () => {
             {showPasswordForm && (
               <form
                 onSubmit={handleChangePassword}
-                className="space-y-4 p-6 bg-slate-50 rounded-2xl">
+                className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/80 p-6 dark:border-slate-800 dark:bg-slate-950/70">
                 <div className="relative">
                   <input
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Mật khẩu hiện tại"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none pr-12"
+                    className={`${inputClass} pr-12`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
                     {showCurrentPassword ? (
                       <EyeOff size={20} />
                     ) : (
@@ -462,13 +489,13 @@ const ProfilePage = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Mật khẩu mới"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none pr-12"
+                    className={`${inputClass} pr-12`}
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
                     {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
                 </div>
@@ -479,12 +506,12 @@ const ProfilePage = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Xác nhận mật khẩu mới"
-                    className={`w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none ${
+                    className={`w-full rounded-xl border px-4 py-3 text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 ${
                       confirmPassword && confirmPassword !== newPassword
-                        ? "border-red-300"
+                        ? "border-red-300 dark:border-red-500/60"
                         : confirmPassword && confirmPassword === newPassword
-                          ? "border-green-300"
-                          : "border-slate-200"
+                          ? "border-green-300 dark:border-emerald-500/60"
+                          : "border-slate-200 dark:border-slate-700"
                     }`}
                     required
                   />
@@ -502,7 +529,7 @@ const ProfilePage = () => {
                     changePasswordMutation.isPending ||
                     newPassword !== confirmPassword
                   }
-                  className="w-full bg-slate-900 text-white py-3 rounded-xl font-semibold hover:bg-slate-800 transition-colors disabled:bg-slate-300">
+                  className="w-full rounded-xl bg-slate-900 py-3 font-semibold text-white transition-colors hover:bg-slate-800 disabled:bg-slate-300 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:disabled:bg-slate-700 dark:disabled:text-slate-400">
                   {changePasswordMutation.isPending
                     ? "Đang xử lý..."
                     : "Đổi mật khẩu"}

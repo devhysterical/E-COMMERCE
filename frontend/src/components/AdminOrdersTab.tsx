@@ -24,27 +24,27 @@ const statusConfig: Record<
 > = {
   PENDING: {
     label: "Chờ xử lý",
-    color: "bg-yellow-100 text-yellow-700",
+    color: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
     icon: <Clock size={14} />,
   },
   PROCESSING: {
     label: "Đang xử lý",
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
     icon: <Loader size={14} />,
   },
   SHIPPED: {
     label: "Đang giao",
-    color: "bg-indigo-100 text-indigo-700",
+    color: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300",
     icon: <Truck size={14} />,
   },
   DELIVERED: {
     label: "Đã giao",
-    color: "bg-green-100 text-green-700",
+    color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
     icon: <CheckCircle size={14} />,
   },
   CANCELLED: {
     label: "Đã hủy",
-    color: "bg-red-100 text-red-700",
+    color: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
     icon: <XCircle size={14} />,
   },
 };
@@ -76,7 +76,7 @@ const AdminOrdersTab = () => {
   return (
     <>
       <table className="w-full text-left border-collapse">
-        <thead className="bg-slate-50 border-b border-slate-100">
+        <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
               Mã đơn
@@ -98,23 +98,25 @@ const AdminOrdersTab = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-50">
+        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
           {orders.map((order: Order) => (
             <tr
               key={order.id}
-              className="hover:bg-slate-50/50 transition-colors">
-              <td className="px-6 py-4 font-mono text-sm text-slate-600">
+              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+              <td className="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">
                 #{order.id.slice(0, 8)}
               </td>
               <td className="px-6 py-4">
                 <div>
-                  <p className="font-bold text-slate-900">
+                  <p className="font-bold text-slate-900 dark:text-white">
                     {order.user?.fullName || "N/A"}
                   </p>
-                  <p className="text-sm text-slate-400">{order.user?.email}</p>
+                  <p className="text-sm text-slate-400 dark:text-slate-500">
+                    {order.user?.email}
+                  </p>
                 </div>
               </td>
-              <td className="px-6 py-4 font-bold text-slate-700">
+              <td className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">
                 {order.totalAmount.toLocaleString("vi-VN")} đ
               </td>
               <td className="px-6 py-4">
@@ -128,7 +130,7 @@ const AdminOrdersTab = () => {
                   }
                   className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
                     statusConfig[order.status]?.color || "bg-slate-100"
-                  }`}>
+                  } dark:bg-slate-800`}>
                   <option value="PENDING">Chờ xử lý</option>
                   <option value="PROCESSING">Đang xử lý</option>
                   <option value="SHIPPED">Đang giao</option>
@@ -136,13 +138,13 @@ const AdminOrdersTab = () => {
                   <option value="CANCELLED">Đã hủy</option>
                 </select>
               </td>
-              <td className="px-6 py-4 text-sm text-slate-500">
+              <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                 {new Date(order.createdAt).toLocaleDateString("vi-VN")}
               </td>
               <td className="px-6 py-4 text-right">
                 <button
                   onClick={() => setSelectedOrder(order)}
-                  className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                  className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
                   <Eye size={18} />
                 </button>
               </td>
@@ -153,25 +155,25 @@ const AdminOrdersTab = () => {
 
       {/* Pagination */}
       {meta && meta.totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100">
-          <span className="text-sm text-slate-500">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-700">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             Tổng {meta.total} đơn hàng
           </span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
               <ChevronLeft size={16} />
               Trước
             </button>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
               {page} / {meta.totalPages}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
               disabled={page === meta.totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 text-sm font-semibold text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
               Sau
               <ChevronRight size={16} />
             </button>
@@ -182,51 +184,51 @@ const AdminOrdersTab = () => {
       {/* Order Detail Modal */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b border-slate-100">
-              <h2 className="text-xl font-bold text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden border border-slate-100 dark:border-slate-700">
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                 Chi tiết đơn hàng #{selectedOrder.id.slice(0, 8)}
               </h2>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="p-2 hover:bg-slate-100 rounded-full transition-colors">
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
                 <X size={20} />
               </button>
             </div>
 
             <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)] space-y-6">
               {/* Customer Info */}
-              <div className="bg-slate-50 rounded-2xl p-4 space-y-3">
-                <h3 className="font-bold text-slate-700 flex items-center gap-2">
+              <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 space-y-3">
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                   <Users size={18} className="text-indigo-600" />
                   Thông tin khách hàng
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-slate-400">Họ tên:</span>
-                    <p className="font-semibold text-slate-800">
+                    <span className="text-slate-400 dark:text-slate-500">Họ tên:</span>
+                    <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.user?.fullName || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <span className="text-slate-400">Email:</span>
-                    <p className="font-semibold text-slate-800">
+                    <span className="text-slate-400 dark:text-slate-500">Email:</span>
+                    <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.user?.email}
                     </p>
                   </div>
                   <div>
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
                       <Phone size={14} /> Điện thoại:
                     </span>
-                    <p className="font-semibold text-slate-800">
+                    <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.phone || "N/A"}
                     </p>
                   </div>
                   <div>
-                    <span className="text-slate-400 flex items-center gap-1">
+                    <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
                       <MapPin size={14} /> Địa chỉ:
                     </span>
-                    <p className="font-semibold text-slate-800">
+                    <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.address || "N/A"}
                     </p>
                   </div>
@@ -234,9 +236,9 @@ const AdminOrdersTab = () => {
               </div>
 
               {/* Order Status */}
-              <div className="flex items-center justify-between bg-slate-50 rounded-2xl p-4">
+              <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 rounded-2xl p-4">
                 <div>
-                  <span className="text-sm text-slate-400">Trạng thái</span>
+                  <span className="text-sm text-slate-400 dark:text-slate-500">Trạng thái</span>
                   <p
                     className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold mt-1 ${
                       statusConfig[selectedOrder.status]?.color
@@ -246,8 +248,8 @@ const AdminOrdersTab = () => {
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-slate-400">Ngày đặt</span>
-                  <p className="font-semibold text-slate-800">
+                  <span className="text-sm text-slate-400 dark:text-slate-500">Ngày đặt</span>
+                  <p className="font-semibold text-slate-800 dark:text-white">
                     {new Date(selectedOrder.createdAt).toLocaleString("vi-VN")}
                   </p>
                 </div>
@@ -255,7 +257,7 @@ const AdminOrdersTab = () => {
 
               {/* Order Items */}
               <div>
-                <h3 className="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
                   <Package size={18} className="text-indigo-600" />
                   Sản phẩm ({selectedOrder.orderItems?.length || 0})
                 </h3>
@@ -269,8 +271,8 @@ const AdminOrdersTab = () => {
                     }) => (
                       <div
                         key={item.id}
-                        className="flex items-center gap-4 bg-slate-50 rounded-xl p-3">
-                        <div className="w-16 h-16 bg-slate-200 rounded-lg overflow-hidden flex-shrink-0">
+                        className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                        <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden flex-shrink-0">
                           {item.product.imageUrl ? (
                             <img
                               src={item.product.imageUrl}
@@ -278,27 +280,27 @@ const AdminOrdersTab = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
+                            <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">
                               N/A
                             </div>
                           )}
                         </div>
                         <div className="flex-1">
-                          <p className="font-semibold text-slate-800">
+                          <p className="font-semibold text-slate-800 dark:text-white">
                             {item.product.name}
                           </p>
-                          <p className="text-sm text-slate-500">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
                             Số lượng: {item.quantity}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-slate-900">
+                          <p className="font-bold text-slate-900 dark:text-white">
                             {(item.price * item.quantity).toLocaleString(
                               "vi-VN",
                             )}{" "}
                             đ
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-slate-400 dark:text-slate-500">
                             {item.price.toLocaleString("vi-VN")} đ/sp
                           </p>
                         </div>
@@ -309,8 +311,8 @@ const AdminOrdersTab = () => {
               </div>
 
               {/* Total */}
-              <div className="bg-indigo-50 rounded-2xl p-4 flex items-center justify-between">
-                <span className="text-lg font-bold text-indigo-900">
+              <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4 flex items-center justify-between">
+                <span className="text-lg font-bold text-indigo-900 dark:text-indigo-200">
                   Tổng cộng
                 </span>
                 <span className="text-2xl font-black text-indigo-600">

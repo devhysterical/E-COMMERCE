@@ -164,7 +164,7 @@ const AdminCouponsTab = () => {
     return (
       <div className="animate-pulse space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="h-20 bg-slate-100 rounded-xl"></div>
+          <div key={i} className="h-20 bg-slate-100 dark:bg-slate-800 rounded-xl"></div>
         ))}
       </div>
     );
@@ -176,7 +176,7 @@ const AdminCouponsTab = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Ticket className="text-indigo-600" size={28} />
-          <h2 className="text-2xl font-bold text-slate-900">Mã giảm giá</h2>
+          <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Mã giảm giá</h2>
         </div>
         <button
           onClick={() => setShowForm(true)}
@@ -189,21 +189,21 @@ const AdminCouponsTab = () => {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 border border-slate-100 dark:border-slate-700">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-slate-900">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">
                 {editingCoupon ? "Sửa mã giảm giá" : "Thêm mã giảm giá"}
               </h3>
               <button
                 onClick={resetForm}
-                className="p-2 hover:bg-slate-100 rounded-lg">
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X size={20} />
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Mã giảm giá
                 </label>
                 <input
@@ -215,14 +215,14 @@ const AdminCouponsTab = () => {
                       code: e.target.value.toUpperCase(),
                     })
                   }
-                  className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none uppercase"
+                  className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none uppercase"
                   placeholder="VD: SALE20"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                   Mô tả
                 </label>
                 <input
@@ -231,14 +231,14 @@ const AdminCouponsTab = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, description: e.target.value })
                   }
-                  className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                   placeholder="Giảm 20% cho đơn hàng đầu tiên"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Loại giảm giá
                   </label>
                   <select
@@ -249,14 +249,14 @@ const AdminCouponsTab = () => {
                         discountType: e.target.value as DiscountType,
                       })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none">
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none">
                     <option value="PERCENTAGE">Phần trăm (%)</option>
                     <option value="FIXED">Số tiền (đ)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Giá trị
                   </label>
                   <input
@@ -268,7 +268,7 @@ const AdminCouponsTab = () => {
                         discountValue: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     min={1}
                     required
                   />
@@ -277,7 +277,7 @@ const AdminCouponsTab = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Đơn tối thiểu (đ)
                   </label>
                   <input
@@ -289,13 +289,13 @@ const AdminCouponsTab = () => {
                         minOrderAmount: parseInt(e.target.value) || 0,
                       })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     min={0}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Giảm tối đa (đ)
                   </label>
                   <input
@@ -307,7 +307,7 @@ const AdminCouponsTab = () => {
                         maxDiscount: parseInt(e.target.value) || undefined,
                       })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     min={0}
                     placeholder="Không giới hạn"
                   />
@@ -316,7 +316,7 @@ const AdminCouponsTab = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Số lần sử dụng tối đa
                   </label>
                   <input
@@ -328,14 +328,14 @@ const AdminCouponsTab = () => {
                         maxUses: parseInt(e.target.value) || undefined,
                       })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                     min={1}
                     placeholder="Không giới hạn"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                     Ngày hết hạn
                   </label>
                   <input
@@ -344,7 +344,7 @@ const AdminCouponsTab = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, expiresAt: e.target.value })
                     }
-                    className="w-full px-4 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none"
                   />
                 </div>
               </div>
@@ -359,7 +359,7 @@ const AdminCouponsTab = () => {
                   }
                   className="w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                 />
-                <label htmlFor="isActive" className="text-sm text-slate-700">
+                <label htmlFor="isActive" className="text-sm text-slate-700 dark:text-slate-300">
                   Kích hoạt mã giảm giá
                 </label>
               </div>
@@ -368,7 +368,7 @@ const AdminCouponsTab = () => {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 py-3 border border-slate-200 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 transition-colors">
+                  className="flex-1 py-3 border border-slate-200 dark:border-slate-700 rounded-xl font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                   Hủy
                 </button>
                 <button
@@ -391,9 +391,9 @@ const AdminCouponsTab = () => {
 
       {/* Coupons List */}
       {coupons.length === 0 ? (
-        <div className="text-center py-12 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-          <Ticket size={48} className="mx-auto text-slate-400 mb-4" />
-          <p className="text-slate-500">Chưa có mã giảm giá nào</p>
+        <div className="text-center py-12 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-dashed border-slate-200 dark:border-slate-700">
+          <Ticket size={48} className="mx-auto text-slate-400 dark:text-slate-500 mb-4" />
+          <p className="text-slate-500 dark:text-slate-400">Chưa có mã giảm giá nào</p>
         </div>
       ) : (
         <>
@@ -401,11 +401,11 @@ const AdminCouponsTab = () => {
             {coupons.slice((page - 1) * limit, page * limit).map((coupon) => (
               <div
                 key={coupon.id}
-                className="bg-white border border-slate-100 rounded-2xl p-5 hover:shadow-md transition-shadow">
+                className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl p-5 hover:shadow-md dark:hover:shadow-slate-950/40 transition-shadow">
                 <div className="flex items-start justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg font-mono font-bold text-lg">
+                      <span className="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg font-mono font-bold text-lg">
                         {coupon.code}
                       </span>
                       {(() => {
@@ -424,12 +424,12 @@ const AdminCouponsTab = () => {
                     </div>
 
                     {coupon.description && (
-                      <p className="text-slate-500 text-sm">
+                      <p className="text-slate-500 dark:text-slate-400 text-sm">
                         {coupon.description}
                       </p>
                     )}
 
-                    <div className="flex flex-wrap gap-4 text-sm text-slate-600">
+                    <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-300">
                       <div className="flex items-center gap-1">
                         {coupon.discountType === "PERCENTAGE" ? (
                           <Percent size={16} className="text-indigo-600" />
@@ -442,7 +442,7 @@ const AdminCouponsTab = () => {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <Calendar size={16} className="text-slate-400" />
+                        <Calendar size={16} className="text-slate-400 dark:text-slate-500" />
                         Hết hạn: {formatDate(coupon.expiresAt)}
                       </div>
 
@@ -468,7 +468,7 @@ const AdminCouponsTab = () => {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleEdit(coupon)}
-                      className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
+                      className="p-2 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors">
                       <Pencil size={18} />
                     </button>
                     <button
@@ -477,7 +477,7 @@ const AdminCouponsTab = () => {
                           deleteMutation.mutate(coupon.id);
                         }
                       }}
-                      className="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      className="p-2 text-slate-500 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                       <Trash2 size={18} />
                     </button>
                   </div>

@@ -21,7 +21,9 @@ export default function FlashSaleSection() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Zap className="text-orange-500" size={22} />
-          <h2 className="text-xl font-bold text-slate-900">Flash Sale</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+            Flash Sale
+          </h2>
           <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">
             Hot
           </span>
@@ -41,7 +43,7 @@ export default function FlashSaleSection() {
             <Link
               to={`/products/${item.productId}`}
               key={item.id}
-              className="bg-white border border-slate-100 rounded-xl overflow-hidden hover:shadow-lg transition-all group">
+              className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-xl overflow-hidden hover:shadow-lg dark:hover:shadow-slate-950/40 transition-all group">
               <div className="relative aspect-square">
                 <img
                   src={item.product.imageUrl || "/placeholder.png"}
@@ -54,7 +56,7 @@ export default function FlashSaleSection() {
               </div>
 
               <div className="p-3">
-                <p className="text-sm font-medium text-slate-800 truncate">
+                <p className="text-sm font-medium text-slate-800 dark:text-white truncate">
                   {item.product.shortName || item.product.name}
                 </p>
 
@@ -62,20 +64,20 @@ export default function FlashSaleSection() {
                   <span className="text-red-600 font-bold text-sm">
                     {formatVND(item.salePrice)}đ
                   </span>
-                  <span className="text-slate-400 text-xs line-through">
+                  <span className="text-slate-400 dark:text-slate-500 text-xs line-through">
                     {formatVND(item.product.price)}đ
                   </span>
                 </div>
 
                 {/* Progress bar */}
                 <div className="mt-2">
-                  <div className="w-full h-2 bg-red-100 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-red-100 dark:bg-red-950/40 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all"
                       style={{ width: `${Math.min(progress, 100)}%` }}
                     />
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-1 text-center">
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 text-center">
                     Đã bán {item.soldQty}/{item.saleQty}
                   </p>
                 </div>

@@ -13,10 +13,10 @@ import {
 import { useState, useRef, useEffect } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { CartService } from "../../services/cart.service";
-import { WishlistService } from "../../services/api.service";
 import ThemeToggle from "../ThemeToggle";
 import { LanguageSwitcherCompact } from "../LanguageSwitcher";
 import NotificationBell from "../NotificationBell";
+import { getWishlistQueryOptions } from "../../utils/wishlist";
 
 const Navbar = () => {
   const { user, logout, isAuthenticated } = useAuthStore();
@@ -50,10 +50,7 @@ const Navbar = () => {
 
   // Lấy số lượng sản phẩm trong wishlist
   const { data: wishlist } = useQuery({
-    queryKey: ["wishlist"],
-    queryFn: WishlistService.getAll,
-    enabled: isAuthenticated,
-    staleTime: 30_000,
+    ...getWishlistQueryOptions(isAuthenticated),
   });
 
   const cartItemCount =
@@ -87,7 +84,7 @@ const Navbar = () => {
             {isAuthenticated && <NotificationBell />}
             <Link
               to="/wishlist"
-              className="relative p-2 text-slate-600 hover:text-red-500 transition-colors"
+              className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
               title="Yêu thích">
               <Heart size={24} />
               {wishlistCount > 0 && (
@@ -98,7 +95,7 @@ const Navbar = () => {
             </Link>
             <Link
               to="/cart"
-              className="relative p-2 text-slate-600 hover:text-indigo-600 transition-colors">
+              className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
               <ShoppingCart size={24} />
               {cartItemCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
@@ -119,49 +116,52 @@ const Navbar = () => {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 text-slate-700 bg-slate-50 px-4 py-2 rounded-full border border-slate-100 hover:bg-slate-100 transition-colors">
+                className="flex items-center gap-2 text-slate-700 dark:text-slate-200 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-full border border-slate-100 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                 <UserIcon size={18} className="text-indigo-600" />
                 <span className="text-sm font-bold tracking-tight hidden sm:inline">
                   {user?.fullName || user?.email}
                 </span>
-                <ChevronDown size={16} className="text-slate-400" />
+                <ChevronDown
+                  size={16}
+                  className="text-slate-400 dark:text-slate-500"
+                />
               </button>
 
               {showUserMenu && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 z-50">
                   <Link
                     to="/profile"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors">
+                    className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <UserIcon size={18} className="text-indigo-600" />
                     <span className="font-medium">Hồ sơ cá nhân</span>
                   </Link>
                   <Link
                     to="/orders"
                     onClick={() => setShowUserMenu(false)}
-                    className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors">
+                    className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <Package size={18} className="text-indigo-600" />
                     <span className="font-medium">Lịch sử đơn hàng</span>
                   </Link>
                   {user?.role === "ADMIN" && (
                     <>
-                      <hr className="my-2 border-slate-100" />
+                      <hr className="my-2 border-slate-100 dark:border-slate-700" />
                       <Link
                         to="/admin"
                         onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-3 px-4 py-3 text-slate-700 hover:bg-slate-50 transition-colors">
+                        className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                         <Layout size={18} className="text-purple-600" />
                         <span className="font-medium">Quản trị hệ thống</span>
                       </Link>
                     </>
                   )}
-                  <hr className="my-2 border-slate-100" />
+                  <hr className="my-2 border-slate-100 dark:border-slate-700" />
                   <button
                     onClick={() => {
                       setShowUserMenu(false);
                       logout();
                     }}
-                    className="flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors w-full">
+                    className="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full">
                     <LogOut size={18} />
                     <span className="font-medium">Đăng xuất</span>
                   </button>

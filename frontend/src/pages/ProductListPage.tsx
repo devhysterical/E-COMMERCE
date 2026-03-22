@@ -149,9 +149,9 @@ const ProductListPage = () => {
             <div className="space-y-2">
               <button
                 onClick={() => handleCategoryChange("")}
-                className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                className={`w-full rounded-lg px-4 py-2 text-left transition-all ${
                   selectedCategory === ""
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20 dark:shadow-none dark:ring-1 dark:ring-inset dark:ring-indigo-300/20"
                     : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                 }`}>
                 {t("product.allProducts")}
@@ -160,9 +160,9 @@ const ProductListPage = () => {
                 <button
                   key={cat.id}
                   onClick={() => handleCategoryChange(cat.id)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                  className={`w-full rounded-lg px-4 py-2 text-left transition-all ${
                     selectedCategory === cat.id
-                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-100"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20 dark:shadow-none dark:ring-1 dark:ring-inset dark:ring-indigo-300/20"
                       : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                   }`}>
                   {cat.name}
@@ -181,9 +181,9 @@ const ProductListPage = () => {
                 <button
                   key={index}
                   onClick={() => handlePriceRangeChange(index)}
-                  className={`w-full text-left px-4 py-2 rounded-lg transition-colors ${
+                  className={`w-full rounded-lg px-4 py-2 text-left transition-all ${
                     priceRange === index
-                      ? "bg-green-600 text-white shadow-md shadow-green-100"
+                      ? "bg-green-600 text-white shadow-md shadow-emerald-500/20 dark:shadow-none dark:ring-1 dark:ring-inset dark:ring-emerald-300/20"
                       : "hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300"
                   }`}>
                   {range.label}
@@ -194,14 +194,14 @@ const ProductListPage = () => {
         </div>
 
         {/* Mobile Filters */}
-        <div className="md:hidden w-full space-y-3">
+          <div className="md:hidden w-full space-y-3">
           {/* Category Dropdown */}
           <div className="flex items-center gap-2">
-            <Filter size={18} className="text-slate-600" />
+            <Filter size={18} className="text-slate-600 dark:text-slate-400" />
             <select
               value={selectedCategory}
               onChange={(e) => handleCategoryChange(e.target.value)}
-              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+              className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-700 outline-none transition-all focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
               <option value="">{t("product.allCategories")}</option>
               {categories?.map((cat: { id: string; name: string }) => (
                 <option key={cat.id} value={cat.id}>
@@ -213,11 +213,14 @@ const ProductListPage = () => {
 
           {/* Price Range Dropdown */}
           <div className="flex items-center gap-2">
-            <SlidersHorizontal size={18} className="text-slate-600" />
+            <SlidersHorizontal
+              size={18}
+              className="text-slate-600 dark:text-slate-400"
+            />
             <select
               value={priceRange}
               onChange={(e) => handlePriceRangeChange(Number(e.target.value))}
-              className="flex-1 px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+              className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 font-medium text-slate-700 outline-none transition-all focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
               {PRICE_RANGES.map((range, index) => (
                 <option key={index} value={index}>
                   {range.label}
@@ -250,14 +253,17 @@ const ProductListPage = () => {
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2">
-              <ArrowUpDown size={18} className="text-slate-500" />
+              <ArrowUpDown
+                size={18}
+                className="text-slate-500 dark:text-slate-400"
+              />
               <span className="text-sm text-slate-600 dark:text-slate-400">
                 {t("product.sort")}:
               </span>
               <select
                 value={sortOption}
                 onChange={(e) => handleSortChange(e.target.value)}
-                className="px-4 py-2 rounded-xl border border-slate-200 bg-white text-slate-700 font-medium focus:ring-2 focus:ring-indigo-500 outline-none transition-all">
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2 font-medium text-slate-700 outline-none transition-all focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200">
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
                     {opt.label}
@@ -272,7 +278,7 @@ const ProductListPage = () => {
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl h-80 animate-pulse border border-slate-100"
+                  className="h-80 animate-pulse rounded-2xl border border-slate-100 bg-white dark:border-slate-800 dark:bg-slate-900"
                 />
               ))}
             </div>
@@ -296,7 +302,7 @@ const ProductListPage = () => {
               <button
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                className="rounded-lg border border-slate-200 p-2 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                 <ChevronLeft size={20} />
               </button>
 
@@ -314,10 +320,10 @@ const ProductListPage = () => {
                     )}
                     <button
                       onClick={() => setPage(p)}
-                      className={`w-10 h-10 rounded-lg font-medium transition-colors ${
+                      className={`h-10 w-10 rounded-lg font-medium transition-colors ${
                         page === p
                           ? "bg-indigo-600 text-white"
-                          : "hover:bg-slate-100 text-slate-600"
+                          : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                       }`}>
                       {p}
                     </button>
@@ -327,7 +333,7 @@ const ProductListPage = () => {
               <button
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page === meta.totalPages}
-                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                className="rounded-lg border border-slate-200 p-2 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
                 <ChevronRight size={20} />
               </button>
             </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -75,6 +76,10 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
 
       {/* Right Side - Auth Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-6 sm:p-12 relative overflow-hidden">
+        <div className="absolute right-6 top-6 z-20">
+          <ThemeToggle />
+        </div>
+
         {/* Subtle Background Pattern */}
         <div className="absolute inset-0 opacity-5 dark:opacity-10">
           <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
@@ -84,7 +89,7 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
         {/* Form Container */}
         <div className="w-full max-w-md relative z-10">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center mb-8">
+          <div className="lg:hidden flex justify-center mb-8 pt-14 sm:pt-10">
             <Link to="/" className="flex items-center gap-2">
               <div className="p-3 bg-indigo-600 rounded-xl">
                 <ShoppingBag size={24} className="text-white" />

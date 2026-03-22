@@ -56,7 +56,7 @@ export default function FlashSaleBanner() {
   const totalQty = activeSale.items.reduce((s, i) => s + i.saleQty, 0);
 
   return (
-    <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 rounded-2xl p-5 sm:p-6 relative overflow-hidden">
+    <div className="bg-gradient-to-r from-orange-500 via-red-500 to-pink-500 dark:shadow-2xl dark:shadow-orange-950/30 rounded-2xl p-5 sm:p-6 relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-40 h-40 bg-white rounded-full -translate-y-1/2 translate-x-1/2" />

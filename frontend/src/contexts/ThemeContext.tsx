@@ -32,12 +32,10 @@ interface ThemeProviderProps {
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isMobile, setIsMobile] = useState(getIsMobile);
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Mobile: always use system
-    if (getIsMobile()) return "system";
-
-    // Desktop: check localStorage
     const stored = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
-    return stored || "light";
+    return stored === "light" || stored === "dark" || stored === "system"
+      ? stored
+      : "system";
   });
 
   const [systemTheme, setSystemTheme] = useState<"light" | "dark">(
@@ -53,11 +51,14 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   // Apply theme to document
   useEffect(() => {
     const root = document.documentElement;
-    if (resolvedTheme === "dark") {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+
+    root.classList.toggle("dark", resolvedTheme === "dark");
+    root.style.colorScheme = resolvedTheme;
+    metaThemeColor?.setAttribute(
+      "content",
+      resolvedTheme === "dark" ? "#020617" : "#f8fafc",
+    );
   }, [resolvedTheme]);
 
   // Listen for system theme changes
@@ -77,25 +78,18 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
       const mobile = getIsMobile();
       setIsMobile(mobile);
 
-      // If switching to mobile, force system theme
-      if (mobile && theme !== "system") {
-        setThemeState("system");
-      }
     };
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, [theme]);
+  }, []);
 
   const setTheme = useCallback(
     (newTheme: Theme) => {
-      // Mobile always uses system
-      if (isMobile) return;
-
       setThemeState(newTheme);
       localStorage.setItem(THEME_STORAGE_KEY, newTheme);
     },
-    [isMobile],
+    [],
   );
 
   const value = useMemo(

@@ -38,20 +38,24 @@ const ConfirmModal = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-sm animate-in fade-in zoom-in-95">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm animate-in fade-in zoom-in-95 border border-slate-100 dark:border-slate-700">
         <div className="p-6 text-center">
           <div
             className={`inline-flex items-center justify-center w-14 h-14 rounded-full mb-4 ${colors.icon}`}>
             <AlertTriangle size={28} />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
-          <p className="text-sm text-slate-500 leading-relaxed">{message}</p>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
+            {title}
+          </h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+            {message}
+          </p>
         </div>
         <div className="flex gap-3 px-6 pb-6">
           <button
             onClick={onCancel}
             disabled={isPending}
-            className="flex-1 px-4 py-3 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50">
+            className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50">
             {cancelLabel}
           </button>
           <button

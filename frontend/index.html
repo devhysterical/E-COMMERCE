@@ -10,6 +10,40 @@
     <meta name="description" content="L-TECH SOLUTIONS — Mua sắm sản phẩm công nghệ, phụ kiện chính hãng với giá tốt nhất. Giao hàng nhanh, thanh toán an toàn, đổi trả dễ dàng." />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#4f46e5" />
+    <script>
+      (() => {
+        const storageKey = "e-commerce-theme";
+        const root = document.documentElement;
+        const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+
+        try {
+          const storedTheme = localStorage.getItem(storageKey);
+          const theme =
+            storedTheme === "light" ||
+            storedTheme === "dark" ||
+            storedTheme === "system"
+              ? storedTheme
+              : "system";
+          const resolvedTheme =
+            theme === "system"
+              ? window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light"
+              : theme;
+
+          root.classList.toggle("dark", resolvedTheme === "dark");
+          root.style.colorScheme = resolvedTheme;
+          themeColorMeta?.setAttribute(
+            "content",
+            resolvedTheme === "dark" ? "#020617" : "#f8fafc",
+          );
+        } catch {
+          root.classList.remove("dark");
+          root.style.colorScheme = "light";
+          themeColorMeta?.setAttribute("content", "#f8fafc");
+        }
+      })();
+    </script>
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />

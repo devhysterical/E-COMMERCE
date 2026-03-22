@@ -23,22 +23,22 @@ const statusConfig: Record<
 > = {
   OPEN: {
     label: "Mở",
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
     icon: <Clock size={14} />,
   },
   IN_PROGRESS: {
     label: "Đang xử lý",
-    color: "bg-yellow-100 text-yellow-700",
+    color: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
     icon: <Loader size={14} />,
   },
   RESOLVED: {
     label: "Đã giải quyết",
-    color: "bg-green-100 text-green-700",
+    color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
     icon: <CheckCircle size={14} />,
   },
   CLOSED: {
     label: "Đã đóng",
-    color: "bg-slate-100 text-slate-700",
+    color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
     icon: <XCircle size={14} />,
   },
 };
@@ -92,8 +92,8 @@ const AdminContactTab = () => {
   return (
     <>
       {/* Filter */}
-      <div className="p-4 border-b border-slate-100 flex items-center gap-3">
-        <span className="text-sm font-bold text-slate-500">Lọc:</span>
+      <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
+        <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Lọc:</span>
         {["", "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
           <button
             key={status}
@@ -101,7 +101,7 @@ const AdminContactTab = () => {
             className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
               filterStatus === status
                 ? "bg-slate-900 text-white"
-                : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
             }`}>
             {status === "" ? "Tất cả" : statusConfig[status]?.label || status}
           </button>
@@ -110,7 +110,7 @@ const AdminContactTab = () => {
 
       {/* Table */}
       <table className="w-full text-left border-collapse">
-        <thead className="bg-slate-50 border-b border-slate-100">
+        <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
               Khách hàng
@@ -129,10 +129,10 @@ const AdminContactTab = () => {
             </th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-50">
+        <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
           {tickets.length === 0 ? (
             <tr>
-              <td colSpan={5} className="px-6 py-12 text-center text-slate-400">
+              <td colSpan={5} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
                 Chưa có yêu cầu hỗ trợ nào
               </td>
             </tr>
@@ -140,14 +140,14 @@ const AdminContactTab = () => {
             tickets.slice((page - 1) * limit, page * limit).map((ticket) => (
               <tr
                 key={ticket.id}
-                className="hover:bg-slate-50/50 transition-colors">
+                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
                 <td className="px-6 py-4">
                   <div>
-                    <p className="font-bold text-slate-900">{ticket.name}</p>
-                    <p className="text-sm text-slate-400">{ticket.email}</p>
+                    <p className="font-bold text-slate-900 dark:text-white">{ticket.name}</p>
+                    <p className="text-sm text-slate-400 dark:text-slate-500">{ticket.email}</p>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-slate-700 font-medium">
+                <td className="px-6 py-4 text-slate-700 dark:text-slate-200 font-medium">
                   {ticket.subject}
                 </td>
                 <td className="px-6 py-4">
@@ -159,7 +159,7 @@ const AdminContactTab = () => {
                     {statusConfig[ticket.status]?.label || ticket.status}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-sm text-slate-500">
+                <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
                   {new Date(ticket.createdAt).toLocaleDateString("vi-VN")}
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -168,7 +168,7 @@ const AdminContactTab = () => {
                       setSelectedTicket(ticket);
                       setAdminNote(ticket.adminNote || "");
                     }}
-                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
                     <Eye size={18} />
                   </button>
                 </td>
@@ -189,50 +189,50 @@ const AdminContactTab = () => {
       {/* Detail Modal */}
       {selectedTicket && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-slate-900">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
+            <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                 Chi tiết yêu cầu hỗ trợ
               </h3>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg">
+                className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
                 <X size={20} />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-500">Họ tên</p>
-                  <p className="font-semibold text-slate-900">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Họ tên</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
                     {selectedTicket.name}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500">Email</p>
-                  <p className="font-semibold text-slate-900">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
+                  <p className="font-semibold text-slate-900 dark:text-white">
                     {selectedTicket.email}
                   </p>
                 </div>
               </div>
               <div>
-                <p className="text-sm text-slate-500">Chủ đề</p>
-                <p className="font-semibold text-slate-900">
+                <p className="text-sm text-slate-500 dark:text-slate-400">Chủ đề</p>
+                <p className="font-semibold text-slate-900 dark:text-white">
                   {selectedTicket.subject}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 mb-1">Nội dung</p>
-                <div className="bg-slate-50 rounded-xl p-4 text-slate-700 whitespace-pre-wrap">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Nội dung</p>
+                <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
                   {selectedTicket.message}
                 </div>
               </div>
 
-              <hr className="border-slate-100" />
+              <hr className="border-slate-100 dark:border-slate-700" />
 
               {/* Admin actions */}
               <div>
-                <p className="text-sm font-bold text-slate-500 mb-2">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">
                   Cập nhật trạng thái
                 </p>
                 <select
@@ -240,7 +240,7 @@ const AdminContactTab = () => {
                   onChange={(e) =>
                     handleUpdateStatus(selectedTicket.id, e.target.value)
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
                   <option value="OPEN">Mở</option>
                   <option value="IN_PROGRESS">Đang xử lý</option>
                   <option value="RESOLVED">Đã giải quyết</option>
@@ -249,14 +249,14 @@ const AdminContactTab = () => {
               </div>
 
               <div>
-                <p className="text-sm font-bold text-slate-500 mb-2">
+                <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">
                   Ghi chú admin
                 </p>
                 <textarea
                   value={adminNote}
                   onChange={(e) => setAdminNote(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y"
                   placeholder="Ghi chú nội bộ..."
                 />
                 <button

@@ -26,12 +26,27 @@ function getSaleStatus(sale: FlashSale) {
   const end = new Date(sale.endTime).getTime();
 
   if (!sale.isActive)
-    return { label: "Tắt", color: "bg-gray-100 text-gray-600" };
+    return {
+      label: "Tắt",
+      color:
+        "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300",
+    };
   if (now < start)
-    return { label: "Sắp diễn ra", color: "bg-blue-100 text-blue-700" };
+    return {
+      label: "Sắp diễn ra",
+      color: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-200",
+    };
   if (now > end)
-    return { label: "Đã kết thúc", color: "bg-gray-100 text-gray-500" };
-  return { label: "Đang diễn ra", color: "bg-green-100 text-green-700" };
+    return {
+      label: "Đã kết thúc",
+      color:
+        "bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400",
+    };
+  return {
+    label: "Đang diễn ra",
+    color:
+      "bg-green-100 text-green-700 dark:bg-emerald-500/15 dark:text-emerald-200",
+  };
 }
 
 export default function AdminFlashSaleTab() {
@@ -188,7 +203,7 @@ export default function AdminFlashSaleTab() {
     );
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -196,8 +211,10 @@ export default function AdminFlashSaleTab() {
             <Zap className="text-white" size={20} />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Flash Sale</h2>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
+              Flash Sale
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {flashSales.length} chương trình
             </p>
           </div>
@@ -212,81 +229,83 @@ export default function AdminFlashSaleTab() {
 
       {/* Create Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 space-y-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-2xl bg-white p-6 dark:border dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold">Tạo Flash Sale mới</h3>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                Tạo Flash Sale mới
+              </h3>
               <button
                 onClick={resetForm}
-                className="p-2 hover:bg-slate-100 rounded-lg">
+                className="rounded-lg p-2 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
                 <X size={20} />
               </button>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Tên chương trình
                 </label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="VD: Flash Sale Cuối Tuần"
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Bắt đầu
                   </label>
                   <input
                     type="datetime-local"
                     value={startTime}
                     onChange={(e) => setStartTime(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Kết thúc
                   </label>
                   <input
                     type="datetime-local"
                     value={endTime}
                     onChange={(e) => setEndTime(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                   />
                 </div>
               </div>
 
               {/* Product search */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
                   Thêm sản phẩm
                 </label>
                 <div className="relative">
                   <Search
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500"
                     size={16}
                   />
                   <input
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
                     placeholder="Tìm sản phẩm..."
-                    className="w-full border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
+                    className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
                 {productSearch && (
-                  <div className="mt-1 border border-slate-200 rounded-xl max-h-40 overflow-y-auto">
+                  <div className="mt-1 max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-950">
                     {filteredProducts.slice(0, 8).map((p: Product) => (
                       <button
                         key={p.id}
                         onClick={() => addProductToList(p)}
-                        className="w-full text-left px-4 py-2 hover:bg-slate-50 text-sm flex justify-between items-center">
+                        className="flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
                         <span>{p.name}</span>
-                        <span className="text-slate-400">
+                        <span className="text-slate-400 dark:text-slate-500">
                           {formatVND(p.price)}đ
                         </span>
                       </button>
@@ -298,20 +317,20 @@ export default function AdminFlashSaleTab() {
               {/* Items list */}
               {items.length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-sm font-medium text-slate-700">
+                  <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Sản phẩm đã chọn ({items.length})
                   </p>
                   {items.map((item, idx) => (
                     <div
                       key={item.productId}
-                      className="flex items-center gap-3 bg-slate-50 rounded-xl p-3">
+                      className="flex items-center gap-3 rounded-xl bg-slate-50 p-3 dark:bg-slate-800/70">
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">
+                        <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                           {item.productName}
                         </p>
                         <div className="flex gap-3 mt-2">
                           <div>
-                            <label className="text-xs text-slate-500">
+                            <label className="text-xs text-slate-500 dark:text-slate-400">
                               Giá sale
                             </label>
                             <input
@@ -322,11 +341,11 @@ export default function AdminFlashSaleTab() {
                                 n[idx].salePrice = Number(e.target.value);
                                 setItems(n);
                               }}
-                              className="w-28 border border-slate-200 rounded-lg px-2 py-1 text-sm mt-0.5"
+                              className="mt-0.5 w-28 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-slate-500">
+                            <label className="text-xs text-slate-500 dark:text-slate-400">
                               Số lượng
                             </label>
                             <input
@@ -337,11 +356,11 @@ export default function AdminFlashSaleTab() {
                                 n[idx].saleQty = Number(e.target.value);
                                 setItems(n);
                               }}
-                              className="w-20 border border-slate-200 rounded-lg px-2 py-1 text-sm mt-0.5"
+                              className="mt-0.5 w-20 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                           </div>
                           <div>
-                            <label className="text-xs text-slate-500">
+                            <label className="text-xs text-slate-500 dark:text-slate-400">
                               Giới hạn/người
                             </label>
                             <input
@@ -352,7 +371,7 @@ export default function AdminFlashSaleTab() {
                                 n[idx].limitPerUser = Number(e.target.value);
                                 setItems(n);
                               }}
-                              className="w-20 border border-slate-200 rounded-lg px-2 py-1 text-sm mt-0.5"
+                              className="mt-0.5 w-20 rounded-lg border border-slate-200 bg-white px-2 py-1 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                             />
                           </div>
                         </div>
@@ -361,7 +380,7 @@ export default function AdminFlashSaleTab() {
                         onClick={() =>
                           setItems(items.filter((_, i) => i !== idx))
                         }
-                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                        className="rounded-lg p-1.5 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-red-300 dark:hover:bg-red-500/10 dark:hover:text-red-200">
                         <Trash2 size={16} />
                       </button>
                     </div>
@@ -373,7 +392,7 @@ export default function AdminFlashSaleTab() {
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={resetForm}
-                className="px-5 py-2.5 text-sm text-slate-600 hover:bg-slate-100 rounded-xl font-medium">
+                className="rounded-xl px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
                 Hủy
               </button>
               <button
@@ -390,7 +409,7 @@ export default function AdminFlashSaleTab() {
       {/* Flash Sales List */}
       <div className="space-y-4">
         {flashSales.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
+          <div className="py-16 text-center text-slate-400 dark:text-slate-500">
             <Zap size={48} className="mx-auto mb-3 opacity-30" />
             <p className="font-medium">Chưa có Flash Sale nào</p>
             <p className="text-sm mt-1">Tạo chương trình Flash Sale đầu tiên</p>
@@ -411,16 +430,18 @@ export default function AdminFlashSaleTab() {
             return (
               <div
                 key={sale.id}
-                className="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm">
+                className="overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 {/* Sale Header */}
-                <div className="p-5 flex items-center justify-between border-b border-slate-50">
+                <div className="flex items-center justify-between border-b border-slate-50 p-5 dark:border-slate-800">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-gradient-to-br from-orange-100 to-red-100 rounded-xl flex items-center justify-center">
                       <Zap className="text-orange-500" size={18} />
                     </div>
                     <div>
-                      <h3 className="font-bold text-slate-900">{sale.name}</h3>
-                      <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
+                      <h3 className="font-bold text-slate-900 dark:text-slate-100">
+                        {sale.name}
+                      </h3>
+                      <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <Clock size={12} />
                         <span>
                           {formatDateTime(sale.startTime)} -{" "}
@@ -446,30 +467,30 @@ export default function AdminFlashSaleTab() {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-9 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-orange-500" />
+                      <div className="peer h-5 w-9 rounded-full bg-gray-200 peer-focus:ring-2 peer-focus:ring-orange-300 peer-checked:bg-orange-500 peer-checked:after:translate-x-full peer-checked:after:border-white after:absolute after:left-[2px] after:top-[2px] after:h-4 after:w-4 after:rounded-full after:bg-white after:transition-all after:content-[''] dark:bg-slate-700" />
                     </label>
                     <button
                       onClick={() => {
                         if (confirm("Xóa Flash Sale này?"))
                           deleteMutation.mutate(sale.id);
                       }}
-                      className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                      className="rounded-lg p-2 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-red-300 dark:hover:bg-red-500/10 dark:hover:text-red-200">
                       <Trash2 size={16} />
                     </button>
                   </div>
                 </div>
 
                 {/* Progress */}
-                <div className="px-5 py-3 bg-slate-50/50">
+                <div className="bg-slate-50/50 px-5 py-3 dark:bg-slate-800/50">
                   <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-xs font-medium text-slate-600">
+                    <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
                       Đã bán: {totalSold}/{totalQty}
                     </span>
                     <span className="text-xs font-semibold text-orange-600">
                       {progress.toFixed(0)}%
                     </span>
                   </div>
-                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                     <div
                       className="h-full bg-gradient-to-r from-orange-400 to-red-500 rounded-full transition-all"
                       style={{ width: `${Math.min(progress, 100)}%` }}
@@ -480,7 +501,7 @@ export default function AdminFlashSaleTab() {
                 {/* Items */}
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-3">
-                    <p className="text-sm font-semibold text-slate-700">
+                    <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                       Sản phẩm ({sale.items.length})
                     </p>
                     <button
@@ -495,7 +516,7 @@ export default function AdminFlashSaleTab() {
 
                   {/* Add Item inline form */}
                   {showAddItem === sale.id && (
-                    <div className="mb-4 border border-orange-200 rounded-xl p-4 bg-orange-50/50 space-y-3">
+                    <div className="mb-4 space-y-3 rounded-xl border border-orange-200 bg-orange-50/50 p-4 dark:border-orange-500/30 dark:bg-orange-500/10">
                       <select
                         value={addProductId}
                         onChange={(e) => {
@@ -505,7 +526,7 @@ export default function AdminFlashSaleTab() {
                           );
                           if (p) setAddSalePrice(Math.floor(p.price * 0.5));
                         }}
-                        className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white">
+                        className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
                         <option value="">Chọn sản phẩm</option>
                         {products
                           .filter(
@@ -522,7 +543,7 @@ export default function AdminFlashSaleTab() {
                       </select>
                       <div className="grid grid-cols-3 gap-3">
                         <div>
-                          <label className="text-xs text-slate-500">
+                          <label className="text-xs text-slate-500 dark:text-slate-400">
                             Giá sale
                           </label>
                           <input
@@ -531,11 +552,11 @@ export default function AdminFlashSaleTab() {
                             onChange={(e) =>
                               setAddSalePrice(Number(e.target.value))
                             }
-                            className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm mt-0.5"
+                            className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-slate-500">
+                          <label className="text-xs text-slate-500 dark:text-slate-400">
                             Số lượng
                           </label>
                           <input
@@ -544,11 +565,11 @@ export default function AdminFlashSaleTab() {
                             onChange={(e) =>
                               setAddSaleQty(Number(e.target.value))
                             }
-                            className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm mt-0.5"
+                            className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                           />
                         </div>
                         <div>
-                          <label className="text-xs text-slate-500">
+                          <label className="text-xs text-slate-500 dark:text-slate-400">
                             Giới hạn/người
                           </label>
                           <input
@@ -557,14 +578,14 @@ export default function AdminFlashSaleTab() {
                             onChange={(e) =>
                               setAddLimitPerUser(Number(e.target.value))
                             }
-                            className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm mt-0.5"
+                            className="mt-0.5 w-full rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100"
                           />
                         </div>
                       </div>
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => setShowAddItem(null)}
-                          className="px-3 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg">
+                          className="rounded-lg px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
                           Hủy
                         </button>
                         <button
@@ -603,33 +624,33 @@ export default function AdminFlashSaleTab() {
                       return (
                         <div
                           key={item.id}
-                          className="flex items-center gap-3 py-2 px-3 rounded-xl hover:bg-slate-50 group">
+                          className="group flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/70">
                           <img
                             src={item.product.imageUrl || "/placeholder.png"}
                             alt={item.product.name}
-                            className="w-10 h-10 rounded-lg object-cover border border-slate-100"
+                            className="h-10 w-10 rounded-lg border border-slate-100 object-cover dark:border-slate-700"
                           />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
+                            <p className="truncate text-sm font-medium text-slate-900 dark:text-slate-100">
                               {item.product.name}
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-sm font-bold text-red-600">
                                 {formatVND(item.salePrice)}đ
                               </span>
-                              <span className="text-xs text-slate-400 line-through">
+                              <span className="text-xs text-slate-400 line-through dark:text-slate-500">
                                 {formatVND(item.product.price)}đ
                               </span>
-                              <span className="text-xs font-semibold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded">
+                              <span className="rounded bg-orange-50 px-1.5 py-0.5 text-xs font-semibold text-orange-600 dark:bg-orange-500/15 dark:text-orange-200">
                                 -{discount}%
                               </span>
                             </div>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-slate-500">
+                            <p className="text-xs text-slate-500 dark:text-slate-400">
                               {item.soldQty}/{item.saleQty}
                             </p>
-                            <div className="w-16 h-1.5 bg-slate-200 rounded-full mt-1 overflow-hidden">
+                            <div className="mt-1 h-1.5 w-16 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700">
                               <div
                                 className="h-full bg-orange-400 rounded-full"
                                 style={{
@@ -645,7 +666,7 @@ export default function AdminFlashSaleTab() {
                                 itemId: item.id,
                               })
                             }
-                            className="p-1.5 text-red-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                            className="p-1.5 text-red-300 opacity-0 transition-all group-hover:opacity-100 hover:text-red-500 dark:text-red-400 dark:hover:text-red-200">
                             <Trash2 size={14} />
                           </button>
                         </div>

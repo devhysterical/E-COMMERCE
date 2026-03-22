@@ -107,7 +107,7 @@ const LoyaltyPage = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 py-8 space-y-8 text-slate-900 dark:text-slate-100">
       {/* Balance Card */}
       <div
         className={`rounded-3xl p-8 ${
@@ -121,8 +121,10 @@ const LoyaltyPage = () => {
         }`}>
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-slate-600 mb-1">Điểm tích lũy</p>
-            <p className="text-4xl font-bold text-slate-800">
+            <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
+              Điểm tích lũy
+            </p>
+            <p className="text-4xl font-bold text-slate-800 dark:text-white">
               {formatVND(balance?.totalPoints ?? 0)}
             </p>
             {currentTier && (
@@ -134,7 +136,7 @@ const LoyaltyPage = () => {
                   }`}>
                   Hạng {currentTier.name}
                 </span>
-                <span className="text-xs bg-white/60 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-white/60 dark:bg-slate-950/40 px-2 py-0.5 rounded-full">
                   x{currentTier.multiplier} điểm
                 </span>
               </div>
@@ -146,19 +148,19 @@ const LoyaltyPage = () => {
         {/* Progress to next tier */}
         {nextTier && (
           <div className="mt-6">
-            <div className="flex justify-between text-xs text-slate-500 mb-1">
+            <div className="flex justify-between text-xs text-slate-500 dark:text-slate-300 mb-1">
               <span>{currentTier?.name ?? "Chưa có hạng"}</span>
               <span>
                 {nextTier.name} ({formatVND(nextTier.minPoints)} điểm)
               </span>
             </div>
-            <div className="h-2.5 bg-white/50 rounded-full overflow-hidden">
+            <div className="h-2.5 bg-white/50 dark:bg-slate-950/40 rounded-full overflow-hidden">
               <div
                 className="h-full bg-orange-500 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-300 mt-1">
               Còn {formatVND(nextTier.minPoints - (balance?.totalPoints ?? 0))}{" "}
               điểm để lên hạng {nextTier.name}
             </p>
@@ -168,7 +170,7 @@ const LoyaltyPage = () => {
 
       {/* Rewards */}
       <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
           <Gift size={22} className="text-orange-500" /> Đổi điểm lấy thưởng
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -177,13 +179,13 @@ const LoyaltyPage = () => {
             return (
               <div
                 key={reward.id}
-                className="bg-white rounded-2xl border border-slate-200 p-5 space-y-3 hover:shadow-lg transition-shadow">
+                className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 p-5 space-y-3 hover:shadow-lg dark:hover:shadow-slate-950/40 transition-shadow">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="font-semibold text-slate-800">
+                    <h3 className="font-semibold text-slate-800 dark:text-white">
                       {reward.name}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                       {reward.rewardType === "COUPON"
                         ? `Giảm ${formatVND(reward.couponValue ?? 0)}đ`
                         : "Miễn phí vận chuyển"}
@@ -202,8 +204,8 @@ const LoyaltyPage = () => {
                   className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     canRedeem
                       ? "bg-orange-500 text-white hover:bg-orange-600"
-                      : "bg-slate-100 text-slate-400 cursor-not-allowed"
-                  }`}>
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                   }`}>
                   {redeemingId === reward.id && redeemMut.isPending
                     ? "Đang xử lý..."
                     : canRedeem
@@ -218,7 +220,7 @@ const LoyaltyPage = () => {
 
       {/* Tiers Info */}
       <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
           <Crown size={22} className="text-orange-500" /> Hạng thành viên
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -230,33 +232,35 @@ const LoyaltyPage = () => {
                 className={`rounded-2xl p-5 border-2 transition-all ${
                   isActive
                     ? `${tierColors[tier.name]?.border ?? "border-orange-500"} ${tierColors[tier.name]?.bg ?? "bg-orange-50"} shadow-lg`
-                    : "border-slate-200 bg-white"
-                }`}>
+                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                 }`}>
                 <div className="text-center space-y-2">
                   <Crown
                     size={28}
                     className={
                       isActive
                         ? "text-orange-500 mx-auto"
-                        : "text-slate-300 mx-auto"
-                    }
-                  />
+                        : "text-slate-300 dark:text-slate-600 mx-auto"
+                     }
+                   />
                   <h3
                     className={`font-bold text-lg ${
                       isActive
                         ? (tierColors[tier.name]?.text ?? "text-orange-700")
-                        : "text-slate-600"
-                    }`}>
+                        : "text-slate-600 dark:text-slate-300"
+                     }`}>
                     {tier.name}
                   </h3>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Từ {formatVND(tier.minPoints)} điểm
                   </p>
                   <p className="text-sm font-medium text-orange-500">
                     x{tier.pointMultiplier} điểm
                   </p>
                   {tier.benefits && (
-                    <p className="text-xs text-slate-400">{tier.benefits}</p>
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
+                      {tier.benefits}
+                    </p>
                   )}
                 </div>
               </div>
@@ -267,27 +271,29 @@ const LoyaltyPage = () => {
 
       {/* History */}
       <div>
-        <h2 className="text-xl font-bold text-slate-800 mb-4">Lịch sử điểm</h2>
-        <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+        <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">
+          Lịch sử điểm
+        </h2>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {history.length === 0 ? (
-            <p className="text-center text-slate-400 py-12">
+            <p className="text-center text-slate-400 dark:text-slate-500 py-12">
               Chưa có giao dịch nào
             </p>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {history.map((tx: PointTransaction) => (
                 <div
                   key={tx.id}
-                  className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50">
+                  className="flex items-center justify-between px-6 py-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/70">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                       {typeIcons[tx.type]}
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-slate-800">
+                      <p className="text-sm font-medium text-slate-800 dark:text-white">
                         {tx.description}
                       </p>
-                      <p className="text-xs text-slate-400">
+                      <p className="text-xs text-slate-400 dark:text-slate-500">
                         {typeLabels[tx.type]} -{" "}
                         {new Date(tx.createdAt).toLocaleDateString("vi-VN")}
                       </p>

@@ -1,41 +1,52 @@
-import { useState, useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Trash2, Package } from "lucide-react";
 import { WishlistService, type WishlistItem } from "../services/api.service";
 import { CartService } from "../services/cart.service";
 import { toast } from "react-toastify";
+import {
+  getWishlistQueryOptions,
+  removeWishlistItemFromCache,
+  WISHLIST_QUERY_KEY,
+} from "../utils/wishlist";
+import { useAuthStore } from "../store/useAuthStore";
 
 const WishlistPage = () => {
-  const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const { isAuthenticated } = useAuthStore();
 
-  useEffect(() => {
-    fetchWishlist();
-  }, []);
+  const {
+    data: wishlist = [],
+    isLoading: loading,
+  } = useQuery({
+    ...getWishlistQueryOptions(isAuthenticated),
+  });
 
-  const fetchWishlist = async () => {
-    try {
-      const data = await WishlistService.getAll();
-      setWishlist(data);
-    } catch (error) {
-      console.error("Error fetching wishlist:", error);
-      toast.error("Không thể tải danh sách yêu thích");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const removeMutation = useMutation({
+    mutationFn: (productId: string) => WishlistService.remove(productId),
+    onMutate: async (productId) => {
+      await queryClient.cancelQueries({ queryKey: WISHLIST_QUERY_KEY });
+      const previousWishlist =
+        queryClient.getQueryData<WishlistItem[]>(WISHLIST_QUERY_KEY);
 
-  const handleRemove = async (productId: string) => {
-    try {
-      await WishlistService.remove(productId);
-      setWishlist((prev) =>
-        prev.filter((item) => item.productId !== productId)
-      );
+      removeWishlistItemFromCache(queryClient, productId);
+      return { previousWishlist };
+    },
+    onSuccess: () => {
       toast.success("Đã xóa khỏi danh sách yêu thích");
-    } catch (error) {
+    },
+    onError: (error, _productId, context) => {
       console.error("Error removing from wishlist:", error);
+      queryClient.setQueryData(WISHLIST_QUERY_KEY, context?.previousWishlist);
       toast.error("Không thể xóa khỏi danh sách yêu thích");
-    }
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
+    },
+  });
+
+  const handleRemove = (productId: string) => {
+    removeMutation.mutate(productId);
   };
 
   const handleAddToCart = async (item: WishlistItem) => {
@@ -57,7 +68,7 @@ const WishlistPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center transition-colors">
         <div className="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full"></div>
       </div>
     );
@@ -65,15 +76,15 @@ const WishlistPage = () => {
 
   if (wishlist.length === 0) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center px-4 transition-colors">
         <div className="text-center">
-          <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-24 h-24 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart size={48} className="text-indigo-600" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
             Danh sách yêu thích trống
           </h1>
-          <p className="text-slate-500 mb-6">
+          <p className="text-slate-500 dark:text-slate-400 mb-6">
             Bạn chưa có sản phẩm nào trong danh sách yêu thích
           </p>
           <Link
@@ -88,11 +99,11 @@ const WishlistPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-8 px-4">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 py-8 px-4 transition-colors">
       <div className="max-w-6xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <Heart size={32} className="text-red-500" fill="currentColor" />
-          <h1 className="text-3xl font-bold text-slate-900">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
             Danh sách yêu thích ({wishlist.length})
           </h1>
         </div>
@@ -101,9 +112,9 @@ const WishlistPage = () => {
           {wishlist.map((item) => (
             <div
               key={item.id}
-              className="bg-white rounded-2xl shadow-lg shadow-slate-100 overflow-hidden border border-slate-100 hover:shadow-xl transition-shadow">
+              className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg shadow-slate-100 dark:shadow-slate-950/40 overflow-hidden border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-shadow">
               <Link to={`/product/${item.product.id}`}>
-                <div className="aspect-square bg-slate-100 relative">
+                <div className="aspect-square bg-slate-100 dark:bg-slate-800 relative">
                   {item.product.imageUrl ? (
                     <img
                       src={item.product.imageUrl}
@@ -111,7 +122,7 @@ const WishlistPage = () => {
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400">
+                    <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
                       <Package size={48} />
                     </div>
                   )}
@@ -120,7 +131,7 @@ const WishlistPage = () => {
 
               <div className="p-4">
                 <Link to={`/product/${item.product.id}`}>
-                  <h3 className="font-semibold text-slate-900 mb-1 line-clamp-2 hover:text-indigo-600 transition-colors">
+                  <h3 className="font-semibold text-slate-900 dark:text-white mb-1 line-clamp-2 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
                     {item.product.name}
                   </h3>
                 </Link>
@@ -137,7 +148,7 @@ const WishlistPage = () => {
                   </button>
                   <button
                     onClick={() => handleRemove(item.productId)}
-                    className="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
+                    className="p-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
                     title="Xóa khỏi yêu thích">
                     <Trash2 size={18} />
                   </button>

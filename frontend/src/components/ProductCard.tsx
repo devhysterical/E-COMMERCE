@@ -1,35 +1,31 @@
-import { useState, useEffect, useCallback } from "react";
+import type { WishlistItem } from "../services/api.service";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Package } from "lucide-react";
 import { WishlistService, type Product } from "../services/api.service";
 import { CartService } from "../services/cart.service";
 import { toast } from "react-toastify";
 import { useAuthStore } from "../store/useAuthStore";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  getWishlistQueryOptions,
+  hasProductInWishlist,
+  syncWishlistCache,
+  WISHLIST_QUERY_KEY,
+} from "../utils/wishlist";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const [inWishlist, setInWishlist] = useState(false);
-  const [wishlistLoading, setWishlistLoading] = useState(false);
   const { isAuthenticated } = useAuthStore();
+  const queryClient = useQueryClient();
 
-  const checkWishlist = useCallback(async () => {
-    try {
-      const result = await WishlistService.check(product.id);
-      setInWishlist(result.inWishlist);
-    } catch (error) {
-      console.error("Error checking wishlist:", error);
-    }
-  }, [product.id]);
+  const { data: wishlist } = useQuery({
+    ...getWishlistQueryOptions(isAuthenticated),
+  });
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      checkWishlist();
-    }
-  }, [isAuthenticated, checkWishlist]);
+  const inWishlist = hasProductInWishlist(wishlist, product.id);
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,20 +36,31 @@ const ProductCard = ({ product }: ProductCardProps) => {
       return;
     }
 
-    setWishlistLoading(true);
-    try {
-      const result = await WishlistService.toggle(product.id);
-      setInWishlist(result.inWishlist);
-      toast.success(result.message);
-    } catch (error) {
-      console.error("Error toggling wishlist:", error);
-      toast.error("Không thể cập nhật danh sách yêu thích");
-    } finally {
-      setWishlistLoading(false);
-    }
+    toggleWishlistMutation.mutate();
   };
 
-  const queryClient = useQueryClient();
+  const toggleWishlistMutation = useMutation({
+    mutationFn: () => WishlistService.toggle(product.id),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: WISHLIST_QUERY_KEY });
+      const previousWishlist =
+        queryClient.getQueryData<WishlistItem[]>(WISHLIST_QUERY_KEY);
+      syncWishlistCache(queryClient, product, !inWishlist);
+      return { previousWishlist };
+    },
+    onSuccess: (result) => {
+      syncWishlistCache(queryClient, product, result.inWishlist);
+      toast.success(result.message);
+    },
+    onError: (error, _variables, context) => {
+      console.error("Error toggling wishlist:", error);
+      queryClient.setQueryData(WISHLIST_QUERY_KEY, context?.previousWishlist);
+      toast.error("Không thể cập nhật danh sách yêu thích");
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
+    },
+  });
 
   const addToCartMutation = useMutation({
     mutationFn: () => CartService.add(product.id, 1),
@@ -95,12 +102,12 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Heart icon */}
           <button
             onClick={handleToggleWishlist}
-            disabled={wishlistLoading}
+            disabled={toggleWishlistMutation.isPending}
             className={`absolute top-2 left-2 p-2 rounded-full transition-all ${
               inWishlist
                 ? "bg-red-500 text-white"
                 : "bg-white/90 backdrop-blur-sm text-slate-600 hover:text-red-500"
-            } ${wishlistLoading ? "opacity-50" : ""}`}
+            } ${toggleWishlistMutation.isPending ? "opacity-50" : ""}`}
             title={inWishlist ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}>
             <Heart size={18} fill={inWishlist ? "currentColor" : "none"} />
           </button>

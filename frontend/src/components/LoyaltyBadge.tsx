@@ -20,7 +20,7 @@ const LoyaltyBadge = () => {
 
   return (
     <div
-      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
+      className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ring-1 ring-white/20 dark:ring-white/10 ${
         tierStyles[balance.tier.name] ?? "bg-slate-500 text-white"
       }`}>
       <Crown size={12} />

@@ -34,6 +34,7 @@ import {
   ArrowUpRight,
   ArrowDownRight,
 } from "lucide-react";
+import { useTheme } from "../hooks/useTheme";
 
 type Period = "7d" | "30d" | "90d";
 
@@ -67,15 +68,15 @@ function PeriodSelector({
   onChange: (p: Period) => void;
 }) {
   return (
-    <div className="flex gap-1 bg-slate-100 rounded-lg p-1">
+    <div className="flex gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
       {(["7d", "30d", "90d"] as Period[]).map((p) => (
         <button
           key={p}
           onClick={() => onChange(p)}
           className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
             value === p
-              ? "bg-white text-indigo-600 shadow-sm"
-              : "text-slate-500 hover:text-slate-700"
+              ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+              : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
           }`}>
           {p === "7d" ? "7 ngày" : p === "30d" ? "30 ngày" : "90 ngày"}
         </button>
@@ -100,7 +101,7 @@ function StatCard({
   trend?: number;
 }) {
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+    <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
       <div className="flex items-center justify-between mb-3">
         <div
           className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
@@ -120,16 +121,33 @@ function StatCard({
           </span>
         )}
       </div>
-      <p className="text-2xl font-black text-slate-900">{value}</p>
-      <p className="text-sm text-slate-500 mt-1">{label}</p>
-      {sub && <p className="text-xs text-slate-400 mt-0.5">{sub}</p>}
+      <p className="text-2xl font-black text-slate-900 dark:text-white">
+        {value}
+      </p>
+      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{label}</p>
+      {sub && (
+        <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
+          {sub}
+        </p>
+      )}
     </div>
   );
 }
 
 export default function AdminAnalyticsTab() {
+  const { resolvedTheme } = useTheme();
   const [revenuePeriod, setRevenuePeriod] = useState<Period>("30d");
   const [orderPeriod, setOrderPeriod] = useState<Period>("30d");
+  const isDark = resolvedTheme === "dark";
+  const chartGridColor = isDark ? "#1e293b" : "#f1f5f9";
+  const chartAxisColor = isDark ? "#64748b" : "#94a3b8";
+  const tooltipStyle = {
+    borderRadius: "12px",
+    border: `1px solid ${isDark ? "#334155" : "#e2e8f0"}`,
+    fontSize: "13px",
+    backgroundColor: isDark ? "#0f172a" : "#ffffff",
+    color: isDark ? "#e2e8f0" : "#0f172a",
+  };
 
   const { data: revenueData = [] } = useQuery<RevenueDataPoint[]>({
     queryKey: ["analytics-revenue", revenuePeriod],
@@ -165,11 +183,11 @@ export default function AdminAnalyticsTab() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <BarChart3 size={22} className="text-indigo-600" />
           Bảng thống kê
         </h2>
-        <p className="text-sm text-slate-500 mt-1">
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Thống kê doanh thu, đơn hàng và khách hàng
         </p>
       </div>
@@ -211,9 +229,9 @@ export default function AdminAnalyticsTab() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Chart */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <TrendingUp size={18} className="text-indigo-500" />
               Doanh thu
             </h3>
@@ -221,17 +239,17 @@ export default function AdminAnalyticsTab() {
           </div>
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={revenueData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
               <XAxis
                 dataKey="date"
                 tickFormatter={formatDate}
                 fontSize={11}
-                stroke="#94a3b8"
+                stroke={chartAxisColor}
               />
               <YAxis
                 tickFormatter={formatVND}
                 fontSize={11}
-                stroke="#94a3b8"
+                stroke={chartAxisColor}
                 width={60}
               />
               <Tooltip
@@ -243,11 +261,7 @@ export default function AdminAnalyticsTab() {
                   const d = new Date(String(label));
                   return d.toLocaleDateString("vi-VN");
                 }}
-                contentStyle={{
-                  borderRadius: "12px",
-                  border: "1px solid #e2e8f0",
-                  fontSize: "13px",
-                }}
+                contentStyle={tooltipStyle}
               />
               <Line
                 type="monotone"
@@ -262,9 +276,9 @@ export default function AdminAnalyticsTab() {
         </div>
 
         {/* Orders Chart */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2">
               <ShoppingCart size={18} className="text-emerald-500" />
               Đơn hàng
             </h3>
@@ -272,24 +286,20 @@ export default function AdminAnalyticsTab() {
           </div>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={orderData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
               <XAxis
                 dataKey="date"
                 tickFormatter={formatDate}
                 fontSize={11}
-                stroke="#94a3b8"
+                stroke={chartAxisColor}
               />
-              <YAxis fontSize={11} stroke="#94a3b8" />
+              <YAxis fontSize={11} stroke={chartAxisColor} />
               <Tooltip
                 labelFormatter={(label: unknown) => {
                   const d = new Date(String(label));
                   return d.toLocaleDateString("vi-VN");
                 }}
-                contentStyle={{
-                  borderRadius: "12px",
-                  border: "1px solid #e2e8f0",
-                  fontSize: "13px",
-                }}
+                contentStyle={tooltipStyle}
               />
               <Legend />
               <Bar
@@ -318,8 +328,8 @@ export default function AdminAnalyticsTab() {
       {/* Category & Conversion Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Category Pie Chart */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-          <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+          <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-4">
             <PieChartIcon size={18} className="text-amber-500" />
             Doanh thu theo danh mục
           </h3>
@@ -348,11 +358,7 @@ export default function AdminAnalyticsTab() {
                       `${(value ?? 0).toLocaleString("vi-VN")}đ`,
                       "Doanh thu",
                     ]}
-                    contentStyle={{
-                      borderRadius: "12px",
-                      border: "1px solid #e2e8f0",
-                      fontSize: "13px",
-                    }}
+                    contentStyle={tooltipStyle}
                   />
                 </PieChart>
               </ResponsiveContainer>
@@ -367,10 +373,10 @@ export default function AdminAnalyticsTab() {
                         backgroundColor: COLORS[i % COLORS.length],
                       }}
                     />
-                    <span className="text-slate-600 truncate flex-1">
+                    <span className="text-slate-600 dark:text-slate-300 truncate flex-1">
                       {cat.name}
                     </span>
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-slate-800 dark:text-white">
                       {formatVND(cat.revenue)}đ
                     </span>
                   </div>
@@ -378,7 +384,7 @@ export default function AdminAnalyticsTab() {
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center h-[220px] text-slate-400 text-sm">
+            <div className="flex items-center justify-center h-[220px] text-slate-400 dark:text-slate-500 text-sm">
               Chưa có dữ liệu
             </div>
           )}
@@ -386,8 +392,8 @@ export default function AdminAnalyticsTab() {
 
         {/* Conversion Breakdown */}
         {conversionStats && (
-          <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-            <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+            <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-4">
               <BarChart3 size={18} className="text-rose-500" />
               Chỉ số chuyển đổi
             </h3>
@@ -411,12 +417,12 @@ export default function AdminAnalyticsTab() {
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-slate-600">{stat.label}</span>
-                    <span className="font-bold text-slate-800">
+                    <span className="text-slate-600 dark:text-slate-300">{stat.label}</span>
+                    <span className="font-bold text-slate-800 dark:text-white">
                       {stat.value}%
                     </span>
                   </div>
-                  <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full ${stat.color} transition-all duration-500`}
                       style={{ width: `${Math.min(stat.value, 100)}%` }}
@@ -432,15 +438,15 @@ export default function AdminAnalyticsTab() {
       {/* Tables Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Top Products */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-          <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+          <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-4">
             <Package size={18} className="text-indigo-500" />
             Top sản phẩm bán chạy
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-slate-100 dark:border-slate-700">
                   <th className="text-left py-2 text-xs font-bold text-slate-400 uppercase">
                     Sản phẩm
                   </th>
@@ -452,9 +458,11 @@ export default function AdminAnalyticsTab() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {topProducts.map((product, i) => (
-                  <tr key={product.productId} className="hover:bg-slate-50/50">
+                  <tr
+                    key={product.productId}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70">
                     <td className="py-2.5">
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-bold text-slate-400 w-5">
@@ -467,22 +475,22 @@ export default function AdminAnalyticsTab() {
                             className="w-8 h-8 rounded-lg object-cover"
                           />
                         )}
-                        <span className="font-medium text-slate-700 truncate max-w-[180px]">
+                        <span className="font-medium text-slate-700 dark:text-slate-200 truncate max-w-[180px]">
                           {product.name}
                         </span>
                       </div>
                     </td>
-                    <td className="text-right py-2.5 font-semibold text-slate-600">
+                    <td className="text-right py-2.5 font-semibold text-slate-600 dark:text-slate-300">
                       {product.totalQuantity}
                     </td>
-                    <td className="text-right py-2.5 font-bold text-slate-800">
+                    <td className="text-right py-2.5 font-bold text-slate-800 dark:text-white">
                       {formatVND(product.totalRevenue)}đ
                     </td>
                   </tr>
                 ))}
                 {topProducts.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-8 text-center text-slate-400">
+                    <td colSpan={3} className="py-8 text-center text-slate-400 dark:text-slate-500">
                       Chưa có dữ liệu
                     </td>
                   </tr>
@@ -493,15 +501,15 @@ export default function AdminAnalyticsTab() {
         </div>
 
         {/* Top Customers */}
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
-          <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-700 p-5 shadow-sm">
+          <h3 className="font-bold text-slate-800 dark:text-white flex items-center gap-2 mb-4">
             <Users size={18} className="text-emerald-500" />
             Top khách hàng
           </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-100">
+                <tr className="border-b border-slate-100 dark:border-slate-700">
                   <th className="text-left py-2 text-xs font-bold text-slate-400 uppercase">
                     Khách hàng
                   </th>
@@ -513,15 +521,17 @@ export default function AdminAnalyticsTab() {
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-50">
+              <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
                 {topCustomers.map((customer, i) => (
-                  <tr key={customer.userId} className="hover:bg-slate-50/50">
+                  <tr
+                    key={customer.userId}
+                    className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70">
                     <td className="py-2.5">
                       <div className="flex items-center gap-3">
                         <span className="text-xs font-bold text-slate-400 w-5">
                           {i + 1}
                         </span>
-                        <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden">
                           {customer.avatarUrl ? (
                             <img
                               src={customer.avatarUrl}
@@ -537,26 +547,26 @@ export default function AdminAnalyticsTab() {
                           )}
                         </div>
                         <div>
-                          <p className="font-medium text-slate-700 truncate max-w-[160px]">
+                          <p className="font-medium text-slate-700 dark:text-slate-200 truncate max-w-[160px]">
                             {customer.fullName || "N/A"}
                           </p>
-                          <p className="text-xs text-slate-400 truncate max-w-[160px]">
+                          <p className="text-xs text-slate-400 dark:text-slate-500 truncate max-w-[160px]">
                             {customer.email}
                           </p>
                         </div>
                       </div>
                     </td>
-                    <td className="text-right py-2.5 font-semibold text-slate-600">
+                    <td className="text-right py-2.5 font-semibold text-slate-600 dark:text-slate-300">
                       {customer.orderCount}
                     </td>
-                    <td className="text-right py-2.5 font-bold text-slate-800">
+                    <td className="text-right py-2.5 font-bold text-slate-800 dark:text-white">
                       {formatVND(customer.totalSpent)}đ
                     </td>
                   </tr>
                 ))}
                 {topCustomers.length === 0 && (
                   <tr>
-                    <td colSpan={3} className="py-8 text-center text-slate-400">
+                    <td colSpan={3} className="py-8 text-center text-slate-400 dark:text-slate-500">
                       Chưa có dữ liệu
                     </td>
                   </tr>
