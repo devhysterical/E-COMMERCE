@@ -4,53 +4,47 @@ import { useTranslation } from "react-i18next";
 
 const ThemeToggle = () => {
   const { t } = useTranslation();
-  const { theme, setTheme, isMobile, resolvedTheme } = useTheme();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const buttonClasses =
-    "flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-sm font-medium";
+    "grid h-10 w-10 place-items-center rounded-lg transition-all duration-200";
 
   return (
-    <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
+    <div className="flex items-center gap-1 rounded-xl border border-slate-200/80 bg-white/80 p-1 shadow-sm shadow-slate-200/60 backdrop-blur-sm dark:border-slate-700/80 dark:bg-slate-900/80 dark:shadow-slate-950/60">
       <button
         onClick={() => setTheme("system")}
         className={`${buttonClasses} ${
           theme === "system"
-            ? "bg-white dark:bg-slate-700 shadow-sm text-slate-700 dark:text-slate-100"
-            : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            ? "bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         }`}
         aria-label={`${t("settings.system")} (${resolvedTheme === "dark" ? t("settings.dark") : t("settings.light")})`}
         aria-pressed={theme === "system"}>
         <Monitor size={18} />
-        <span className={isMobile ? "hidden" : "hidden sm:inline"}>
-          {t("settings.system")}
-        </span>
+        <span className="sr-only">{t("settings.system")}</span>
       </button>
       <button
         onClick={() => setTheme("light")}
         className={`${buttonClasses} ${
           theme === "light"
-            ? "bg-white dark:bg-slate-700 shadow-sm text-amber-600"
-            : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            ? "bg-amber-100 text-amber-700 shadow-sm dark:bg-amber-400/20 dark:text-amber-200"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         }`}
         aria-label={t("settings.light")}
         aria-pressed={theme === "light"}>
         <Sun size={18} />
-        <span className={isMobile ? "hidden" : "hidden sm:inline"}>
-          {t("settings.light")}
-        </span>
+        <span className="sr-only">{t("settings.light")}</span>
       </button>
       <button
         onClick={() => setTheme("dark")}
         className={`${buttonClasses} ${
           theme === "dark"
-            ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400"
-            : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
+            ? "bg-indigo-100 text-indigo-700 shadow-sm dark:bg-indigo-500/20 dark:text-indigo-200"
+            : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-100"
         }`}
         aria-label={t("settings.dark")}
         aria-pressed={theme === "dark"}>
         <Moon size={18} />
-        <span className={isMobile ? "hidden" : "hidden sm:inline"}>
-          {t("settings.dark")}
-        </span>
+        <span className="sr-only">{t("settings.dark")}</span>
       </button>
     </div>
   );

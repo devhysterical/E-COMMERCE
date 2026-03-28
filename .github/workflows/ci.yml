@@ -23,7 +23,8 @@ jobs:
           echo "🔍 Scanning tracked files for hardcoded secrets..."
           FOUND=0
 
-          # Patterns: JWT tokens, private keys, common password/secret assignments
+          # Patterns: JWT tokens, private keys, provider secrets,
+          # and direct assignments to secret-like variable names.
           PATTERNS=(
             'eyJhbGciOi'
             'PRIVATE KEY'
@@ -32,16 +33,25 @@ jobs:
             'sk_test_'
             'AKIA[0-9A-Z]{16}'
             'smtp_pass'
-            'password.*=.*["\x27].{8,}'
+            '(^|[^[:alnum:]_])[A-Za-z_][A-Za-z0-9_]*(password|passwd|pwd|secret|api[_-]?key|token)[A-Za-z0-9_]*[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}["\x27]'
           )
 
-          # Only scan tracked source files; exclude non-source directories and files
-          FILES=$(git ls-files -- ':!*.lock' ':!package-lock.json' ':!*.env.example' ':!.github/workflows/ci.yml' ':!.agent/**' ':!.shared/**' ':!**/dist/**' ':!*.map' ':!*.csv')
-
           for pattern in "${PATTERNS[@]}"; do
-            MATCHES=$(echo "$FILES" | xargs grep -rlnE "$pattern" 2>/dev/null || true)
+            MATCHES=$(
+              git ls-files -z -- \
+                ':!*.lock' \
+                ':!package-lock.json' \
+                ':!*.env.example' \
+                ':!.github/workflows/ci.yml' \
+                ':!.agent/**' \
+                ':!.shared/**' \
+                ':!**/dist/**' \
+                ':!*.map' \
+                ':!*.csv' \
+              | xargs -0 grep -nEI -- "$pattern" 2>/dev/null || true
+            )
             if [ -n "$MATCHES" ]; then
-              echo "🔴 BLOCKED — Pattern '$pattern' found in:"
+              echo "🔴BLOCKED — Pattern '$pattern' found in:"
               echo "$MATCHES" | while read -r file; do
                 echo "   → $file"
               done
@@ -51,12 +61,12 @@ jobs:
 
           if [ "$FOUND" -eq 1 ]; then
             echo ""
-            echo "❌ Secret scan FAILED. Remove hardcoded secrets before pushing."
+            echo "❌Secret scan FAILED. Remove hardcoded secrets before pushing."
             echo "   Use environment variables or GitHub Secrets instead."
             exit 1
           fi
 
-          echo "✅ No hardcoded secrets detected."
+          echo "✅No hardcoded secrets detected."
 
   # ============================================
   # Backend CI
