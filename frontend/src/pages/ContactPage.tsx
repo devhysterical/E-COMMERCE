@@ -1,19 +1,12 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Send, Loader2, CheckCircle, HelpCircle } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import api from "../api/axios";
 
-const subjectOptions = [
-  "Hỏi về sản phẩm",
-  "Vấn đề đơn hàng",
-  "Đổi trả và hoàn tiền",
-  "Vấn đề tài khoản",
-  "Góp ý và phản hồi",
-  "Khác",
-];
-
 const ContactPage = () => {
+  const { t } = useTranslation();
   const { user, isAuthenticated } = useAuthStore();
   const [formData, setFormData] = useState({
     name: user?.fullName || "",
@@ -24,6 +17,9 @@ const ContactPage = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const subjectOptions = t("contact.subjectOptions", {
+    returnObjects: true,
+  }) as string[];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +34,7 @@ const ContactPage = () => {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
         error.response?.data?.message ||
-          "Gửi yêu cầu thất bại. Vui lòng thử lại.",
+          t("contact.errorFallback"),
       );
     } finally {
       setLoading(false);
@@ -53,22 +49,21 @@ const ContactPage = () => {
             <CheckCircle size={32} className="text-green-600" />
           </div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-            Gửi thành công!
+            {t("contact.successTitle")}
           </h2>
           <p className="text-slate-600 dark:text-slate-300 mb-6">
-            Chúng tôi đã nhận được yêu cầu hỗ trợ của bạn và sẽ phản hồi trong
-            vòng 24 giờ làm việc.
+            {t("contact.successText")}
           </p>
           <div className="flex gap-3 justify-center">
             <button
               onClick={() => setSuccess(false)}
               className="px-5 py-2.5 border border-slate-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              Gửi yêu cầu khác
+              {t("contact.sendAnother")}
             </button>
             <Link
               to="/"
               className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
-              Về trang chủ
+              {t("common.home")}
             </Link>
           </div>
         </div>
@@ -84,9 +79,11 @@ const ContactPage = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-2xl mb-6">
             <Send size={32} className="text-white" />
           </div>
-          <h1 className="text-4xl font-black text-white mb-3">Liên hệ</h1>
+          <h1 className="text-4xl font-black text-white mb-3">
+            {t("contact.title")}
+          </h1>
           <p className="text-indigo-100 text-lg">
-            Gửi yêu cầu hỗ trợ và chúng tôi sẽ phản hồi sớm nhất
+            {t("contact.subtitle")}
           </p>
         </div>
       </div>
@@ -99,10 +96,10 @@ const ContactPage = () => {
           <HelpCircle size={24} className="text-indigo-600 shrink-0" />
           <div>
             <p className="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-              Xem câu hỏi thường gặp
+              {t("contact.faqTitle")}
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Có thể bạn sẽ tìm thấy câu trả lời nhanh hơn tại đây
+              {t("contact.faqText")}
             </p>
           </div>
         </Link>
@@ -119,7 +116,7 @@ const ContactPage = () => {
             {/* Name */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                Họ và tên
+                {t("contact.name")}
               </label>
               <input
                 type="text"
@@ -129,14 +126,14 @@ const ContactPage = () => {
                   setFormData({ ...formData, name: e.target.value })
                 }
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all"
-                placeholder="Nhập họ và tên"
+                placeholder={t("contact.namePlaceholder")}
               />
             </div>
 
             {/* Email */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                Email
+                {t("contact.email")}
               </label>
               <input
                 type="email"
@@ -154,7 +151,7 @@ const ContactPage = () => {
             {/* Subject */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                Chủ đề
+                {t("contact.subject")}
               </label>
               <select
                 required
@@ -163,7 +160,7 @@ const ContactPage = () => {
                   setFormData({ ...formData, subject: e.target.value })
                 }
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all">
-                <option value="">Chọn chủ đề</option>
+                <option value="">{t("contact.chooseSubject")}</option>
                 {subjectOptions.map((opt) => (
                   <option key={opt} value={opt}>
                     {opt}
@@ -175,7 +172,7 @@ const ContactPage = () => {
             {/* Message */}
             <div className="space-y-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                Nội dung
+                {t("contact.message")}
               </label>
               <textarea
                 required
@@ -186,7 +183,7 @@ const ContactPage = () => {
                 rows={5}
                 maxLength={2000}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all resize-y min-h-[120px]"
-                placeholder="Mô tả chi tiết vấn đề bạn gặp phải..."
+                placeholder={t("contact.messagePlaceholder")}
               />
               <p className="text-xs text-slate-400 text-right">
                 {formData.message.length}/2000
@@ -203,7 +200,7 @@ const ContactPage = () => {
               ) : (
                 <>
                   <Send size={18} />
-                  <span>Gửi yêu cầu hỗ trợ</span>
+                  <span>{t("contact.submit")}</span>
                 </>
               )}
             </button>

@@ -8,9 +8,13 @@ import type {
 } from "../services/api.service";
 import { toast } from "react-toastify";
 import { Plus, Trash2, Star, Gift, Users, Edit2, X, Crown } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { formatCurrency, formatNumber } from "../utils/language";
 
 const AdminLoyaltyTab = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  const language = i18n.resolvedLanguage ?? i18n.language;
   const [activeSection, setActiveSection] = useState<
     "tiers" | "rewards" | "users"
   >("tiers");
@@ -56,7 +60,7 @@ const AdminLoyaltyTab = () => {
     mutationFn: LoyaltyService.adminCreateTier,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-tiers-admin"] });
-      toast.success("Tạo hạng thành công");
+      toast.success(t("admin.loyalty.createTierSuccess"));
       resetTierForm();
     },
   });
@@ -76,7 +80,7 @@ const AdminLoyaltyTab = () => {
     }) => LoyaltyService.adminUpdateTier(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-tiers-admin"] });
-      toast.success("Cập nhật hạng thành công");
+      toast.success(t("admin.loyalty.updateTierSuccess"));
       resetTierForm();
     },
   });
@@ -85,7 +89,7 @@ const AdminLoyaltyTab = () => {
     mutationFn: LoyaltyService.adminDeleteTier,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-tiers-admin"] });
-      toast.success("Xóa hạng thành công");
+      toast.success(t("admin.loyalty.deleteTierSuccess"));
     },
   });
 
@@ -93,7 +97,7 @@ const AdminLoyaltyTab = () => {
     mutationFn: LoyaltyService.adminCreateReward,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-rewards-admin"] });
-      toast.success("Tạo phần thưởng thành công");
+      toast.success(t("admin.loyalty.createRewardSuccess"));
       resetRewardForm();
     },
   });
@@ -114,7 +118,7 @@ const AdminLoyaltyTab = () => {
     }) => LoyaltyService.adminUpdateReward(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-rewards-admin"] });
-      toast.success("Cập nhật phần thưởng thành công");
+      toast.success(t("admin.loyalty.updateRewardSuccess"));
       resetRewardForm();
     },
   });
@@ -123,7 +127,7 @@ const AdminLoyaltyTab = () => {
     mutationFn: LoyaltyService.adminDeleteReward,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-rewards-admin"] });
-      toast.success("Xóa phần thưởng thành công");
+      toast.success(t("admin.loyalty.deleteRewardSuccess"));
     },
   });
 
@@ -131,7 +135,7 @@ const AdminLoyaltyTab = () => {
     mutationFn: LoyaltyService.adminAdjustPoints,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-users"] });
-      toast.success("Điều chỉnh điểm thành công");
+      toast.success(t("admin.loyalty.adjustPointsSuccess"));
       setAdjustUserId("");
       setAdjustPoints(0);
       setAdjustDesc("");
@@ -209,8 +213,6 @@ const AdminLoyaltyTab = () => {
     Platinum: "from-indigo-400 to-indigo-600",
   };
 
-  const formatVND = (value: number) => value.toLocaleString("vi-VN");
-
   return (
     <div className="space-y-6">
       {/* Section Tabs */}
@@ -218,17 +220,17 @@ const AdminLoyaltyTab = () => {
         {[
           {
             key: "tiers" as const,
-            label: "Hạng thành viên",
+            label: t("admin.loyalty.memberTiers"),
             icon: <Crown size={16} />,
           },
           {
             key: "rewards" as const,
-            label: "Phần thưởng",
+            label: t("admin.loyalty.rewards"),
             icon: <Gift size={16} />,
           },
           {
             key: "users" as const,
-            label: "Người dùng",
+            label: t("admin.loyalty.users"),
             icon: <Users size={16} />,
           },
         ].map((tab) => (
@@ -251,12 +253,12 @@ const AdminLoyaltyTab = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-              Hạng thành viên
+              {t("admin.loyalty.memberTiers")}
             </h3>
             <button
               onClick={() => setShowTierForm(true)}
               className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition-colors text-sm">
-              <Plus size={16} /> Thêm hạng
+              <Plus size={16} /> {t("admin.loyalty.addTier")}
             </button>
           </div>
 
@@ -265,7 +267,9 @@ const AdminLoyaltyTab = () => {
             <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-slate-700 dark:text-slate-200">
-                  {editTierId ? "Sửa hạng" : "Tạo hạng mới"}
+                  {editTierId
+                    ? t("admin.loyalty.editTier")
+                    : t("admin.loyalty.createTier")}
                 </h4>
                 <button onClick={resetTierForm} className="dark:text-slate-400">
                   <X size={18} className="text-slate-400" />
@@ -274,18 +278,18 @@ const AdminLoyaltyTab = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Tên hạng
+                    {t("admin.loyalty.tierName")}
                   </label>
                   <input
                     value={tierName}
                     onChange={(e) => setTierName(e.target.value)}
-                    placeholder="Bronze, Silver, Gold..."
+                    placeholder={t("admin.loyalty.tierNamePlaceholder")}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Điểm tối thiểu
+                    {t("admin.loyalty.minPoints")}
                   </label>
                   <input
                     type="number"
@@ -296,7 +300,7 @@ const AdminLoyaltyTab = () => {
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Hệ số nhân điểm
+                    {t("admin.loyalty.pointMultiplier")}
                   </label>
                   <input
                     type="number"
@@ -308,12 +312,12 @@ const AdminLoyaltyTab = () => {
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Quyền lợi
+                    {t("admin.loyalty.benefits")}
                   </label>
                   <input
                     value={tierBenefits}
                     onChange={(e) => setTierBenefits(e.target.value)}
-                    placeholder="Mô tả quyền lợi..."
+                    placeholder={t("admin.loyalty.benefitsPlaceholder")}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
@@ -324,7 +328,7 @@ const AdminLoyaltyTab = () => {
                   !tierName || createTier.isPending || updateTier.isPending
                 }
                 className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
-                {editTierId ? "Cập nhật" : "Tạo mới"}
+                {editTierId ? t("admin.common.update") : t("admin.common.create")}
               </button>
             </div>
           )}
@@ -348,7 +352,9 @@ const AdminLoyaltyTab = () => {
                     </span>
                   </div>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Từ {formatVND(tier.minPoints)} điểm
+                    {t("admin.loyalty.fromPoints", {
+                      points: formatNumber(tier.minPoints, language),
+                    })}
                   </p>
                   {tier.benefits && (
                     <p className="text-xs text-slate-400 dark:text-slate-500">
@@ -359,7 +365,7 @@ const AdminLoyaltyTab = () => {
                     <button
                       onClick={() => handleEditTier(tier)}
                       className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-slate-200 py-1.5 text-sm text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
-                      <Edit2 size={14} /> Sửa
+                      <Edit2 size={14} /> {t("admin.common.edit")}
                     </button>
                     <button
                       onClick={() => deleteTier.mutate(tier.id)}
@@ -379,12 +385,12 @@ const AdminLoyaltyTab = () => {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-              Phan thuong
+              {t("admin.loyalty.rewards")}
             </h3>
             <button
               onClick={() => setShowRewardForm(true)}
               className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-xl hover:bg-orange-600 transition-colors text-sm">
-              <Plus size={16} /> Thêm phần thưởng
+              <Plus size={16} /> {t("admin.loyalty.addReward")}
             </button>
           </div>
 
@@ -393,7 +399,9 @@ const AdminLoyaltyTab = () => {
             <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
               <div className="flex items-center justify-between">
                 <h4 className="font-medium text-slate-700 dark:text-slate-200">
-                  {editRewardId ? "Sửa phần thưởng" : "Tạo phần thưởng mới"}
+                  {editRewardId
+                    ? t("admin.loyalty.editReward")
+                    : t("admin.loyalty.createReward")}
                 </h4>
                 <button
                   onClick={resetRewardForm}
@@ -404,18 +412,18 @@ const AdminLoyaltyTab = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Tên
+                    {t("admin.loyalty.rewardName")}
                   </label>
                   <input
                     value={rewardName}
                     onChange={(e) => setRewardName(e.target.value)}
-                    placeholder="Giảm 50k, Free Ship..."
+                    placeholder={t("admin.loyalty.rewardNamePlaceholder")}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Điểm cần đổi
+                    {t("admin.loyalty.pointsCost")}
                   </label>
                   <input
                     type="number"
@@ -428,20 +436,20 @@ const AdminLoyaltyTab = () => {
                 </div>
                 <div>
                   <label className="text-xs text-slate-500 dark:text-slate-400">
-                    Loại
+                    {t("admin.loyalty.rewardType")}
                   </label>
                   <select
                     value={rewardType}
                     onChange={(e) => setRewardType(e.target.value)}
                     className="mt-1 w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                    <option value="COUPON">Coupon giảm giá</option>
-                    <option value="FREE_SHIPPING">Miễn phí vận chuyển</option>
+                    <option value="COUPON">{t("admin.loyalty.couponDiscount")}</option>
+                    <option value="FREE_SHIPPING">{t("admin.loyalty.freeShipping")}</option>
                   </select>
                 </div>
                 {rewardType === "COUPON" && (
                   <div>
                     <label className="text-xs text-slate-500 dark:text-slate-400">
-                      Giá trị coupon (VND)
+                      {t("admin.loyalty.couponValue")}
                     </label>
                     <input
                       type="number"
@@ -463,7 +471,7 @@ const AdminLoyaltyTab = () => {
                   updateReward.isPending
                 }
                 className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
-                {editRewardId ? "Cập nhật" : "Tạo mới"}
+                {editRewardId ? t("admin.common.update") : t("admin.common.create")}
               </button>
             </div>
           )}
@@ -474,22 +482,22 @@ const AdminLoyaltyTab = () => {
               <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/80">
                 <tr>
                   <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
-                    Phần thưởng
+                    {t("admin.loyalty.rewards")}
                   </th>
                   <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
-                    Loại
+                    {t("admin.loyalty.rewardType")}
                   </th>
                   <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
-                    Điểm cần
+                    {t("admin.loyalty.pointsCost")}
                   </th>
                   <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
-                    Giá trị
+                    {t("admin.loyalty.rewardValue")}
                   </th>
                   <th className="px-6 py-3 text-center font-medium text-slate-600 dark:text-slate-300">
-                    Trạng thái
+                    {t("admin.loyalty.rewardStatus")}
                   </th>
                   <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
-                    Thao tác
+                    {t("admin.loyalty.rewardActions")}
                   </th>
                 </tr>
               </thead>
@@ -506,15 +514,15 @@ const AdminLoyaltyTab = () => {
                     </td>
                     <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                       {reward.rewardType === "COUPON"
-                        ? "Coupon giảm giá"
-                        : "Miễn phí ship"}
+                        ? t("admin.loyalty.couponDiscount")
+                        : t("admin.loyalty.freeShipping")}
                     </td>
                     <td className="px-6 py-4 text-right font-medium text-orange-600">
-                      {formatVND(reward.pointsCost)}
+                      {formatNumber(reward.pointsCost, language)}
                     </td>
                     <td className="px-6 py-4 text-right text-slate-600 dark:text-slate-300">
                       {reward.couponValue
-                        ? `${formatVND(reward.couponValue)}đ`
+                        ? formatCurrency(reward.couponValue, language)
                         : "-"}
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -524,7 +532,9 @@ const AdminLoyaltyTab = () => {
                             ? "bg-green-100 text-green-700 dark:bg-emerald-500/15 dark:text-emerald-200"
                             : "bg-red-100 text-red-700 dark:bg-red-500/15 dark:text-red-200"
                         }`}>
-                        {reward.isActive ? "Hoạt động" : "Ngừng"}
+                        {reward.isActive
+                          ? t("admin.loyalty.activeReward")
+                          : t("admin.loyalty.inactiveReward")}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -553,23 +563,23 @@ const AdminLoyaltyTab = () => {
       {activeSection === "users" && (
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-            Người dùng có điểm
+            {t("admin.loyalty.usersWithPoints")}
           </h3>
 
           {/* Adjust Points Form */}
           <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
             <h4 className="font-medium text-slate-700 dark:text-slate-200">
-              Điều chỉnh điểm
+              {t("admin.loyalty.adjustPoints")}
             </h4>
             <div className="grid grid-cols-3 gap-4">
               <select
                 value={adjustUserId}
                 onChange={(e) => setAdjustUserId(e.target.value)}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                <option value="">Chọn người dùng</option>
+                <option value="">{t("admin.loyalty.selectUser")}</option>
                 {users.map((u: LoyaltyUser) => (
                   <option key={u.id} value={u.id}>
-                    {u.fullName ?? u.email} ({formatVND(u.totalPoints)} điểm)
+                    {u.fullName ?? u.email} ({formatNumber(u.totalPoints, language)} {t("admin.loyalty.points")})
                   </option>
                 ))}
               </select>
@@ -577,13 +587,13 @@ const AdminLoyaltyTab = () => {
                 type="number"
                 value={adjustPoints}
                 onChange={(e) => setAdjustPoints(Number(e.target.value))}
-                placeholder="Số điểm (+/-)"
+                placeholder={t("admin.loyalty.pointsAmount")}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
               <input
                 value={adjustDesc}
                 onChange={(e) => setAdjustDesc(e.target.value)}
-                placeholder="Lý do..."
+                placeholder={t("admin.loyalty.reasonPlaceholder")}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
               />
             </div>
@@ -602,7 +612,7 @@ const AdminLoyaltyTab = () => {
                 adjustPointsMut.isPending
               }
               className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm text-white hover:bg-orange-600 disabled:opacity-50">
-              Điều chỉnh
+              {t("admin.loyalty.adjust")}
             </button>
           </div>
 
@@ -612,16 +622,16 @@ const AdminLoyaltyTab = () => {
               <thead className="border-b border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/80">
                 <tr>
                   <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
-                    Người dùng
+                    {t("admin.loyalty.users")}
                   </th>
                   <th className="px-6 py-3 text-left font-medium text-slate-600 dark:text-slate-300">
                     Email
                   </th>
                   <th className="px-6 py-3 text-right font-medium text-slate-600 dark:text-slate-300">
-                    Tổng điểm
+                    {t("admin.loyalty.totalPoints")}
                   </th>
                   <th className="px-6 py-3 text-center font-medium text-slate-600 dark:text-slate-300">
-                    Hạng
+                    {t("admin.loyalty.tier")}
                   </th>
                 </tr>
               </thead>
@@ -643,14 +653,14 @@ const AdminLoyaltyTab = () => {
                       <td className="px-6 py-4 font-medium text-slate-800 dark:text-slate-100">
                         <div className="flex items-center gap-2">
                           <Star size={16} className="text-yellow-500" />
-                          {user.fullName ?? "Chưa cập nhật"}
+                          {user.fullName ?? t("admin.loyalty.notUpdated")}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                         {user.email}
                       </td>
                       <td className="px-6 py-4 text-right font-bold text-orange-600">
-                        {formatVND(user.totalPoints)}
+                        {formatNumber(user.totalPoints, language)}
                       </td>
                       <td className="px-6 py-4 text-center">
                         {userTier && (

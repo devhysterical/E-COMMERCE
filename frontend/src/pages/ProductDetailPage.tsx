@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useTranslation } from "react-i18next";
+import { Trans, useTranslation } from "react-i18next";
 import {
   ProductService,
   ReviewService,
@@ -32,12 +32,18 @@ import {
   syncWishlistCache,
   WISHLIST_QUERY_KEY,
 } from "../utils/wishlist";
+import { formatCurrency, formatDate } from "../utils/language";
+
+type CartFeedback = {
+  type: "success" | "error";
+  message: string;
+};
 
 const ProductDetailPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const queryClient = useQueryClient();
-  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [cartFeedback, setCartFeedback] = useState<CartFeedback | null>(null);
   const { user, isAuthenticated } = useAuthStore();
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
@@ -89,12 +95,12 @@ const ProductDetailPage = () => {
     mutationFn: () => CartService.add(id!, 1),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      setCartMessage("Đã thêm vào giỏ hàng!");
-      setTimeout(() => setCartMessage(null), 3000);
+      setCartFeedback({ type: "success", message: t("cart.added") });
+      setTimeout(() => setCartFeedback(null), 3000);
     },
     onError: () => {
-      setCartMessage("Không thể thêm vào giỏ hàng!");
-      setTimeout(() => setCartMessage(null), 3000);
+      setCartFeedback({ type: "error", message: t("cart.addError") });
+      setTimeout(() => setCartFeedback(null), 3000);
     },
   });
 
@@ -222,7 +228,7 @@ const ProductDetailPage = () => {
             </h1>
             <div className="flex items-center gap-4">
               <p className="text-3xl font-black text-indigo-600 dark:text-indigo-400">
-                {product.price.toLocaleString("vi-VN")} đ
+                {formatCurrency(product.price, i18n.resolvedLanguage)}
               </p>
               {stats && stats.totalReviews > 0 && (
                 <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
@@ -244,7 +250,7 @@ const ProductDetailPage = () => {
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/40">
                 <div className="border-b border-slate-200 bg-slate-100 px-5 py-3 dark:border-slate-800 dark:bg-slate-900/80">
                   <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                    Thông số nổi bật
+                    {t("product.highlightSpecs")}
                   </h3>
                 </div>
                 <table className="w-full">
@@ -298,15 +304,14 @@ const ProductDetailPage = () => {
             </div>
 
             {/* Cart Message */}
-            {cartMessage && (
+            {cartFeedback && (
               <div
                 className={`p-3 rounded-xl text-center font-medium ${
-                  cartMessage.includes("Đã thêm") ||
-                  cartMessage.includes("Added")
+                  cartFeedback.type === "success"
                     ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                     : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                 }`}>
-                {cartMessage}
+                {cartFeedback.message}
               </div>
             )}
 
@@ -363,7 +368,7 @@ const ProductDetailPage = () => {
                 size={28}
               />
               <span className="text-xs font-bold text-slate-900 dark:text-white uppercase">
-                Đổi trả 7 ngày
+                {t("product.sevenDayReturn")}
               </span>
             </div>
           </div>
@@ -373,7 +378,7 @@ const ProductDetailPage = () => {
       {/* Reviews Section */}
       <div className="mt-16 space-y-8">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Đánh giá sản phẩm
+          {t("review.sectionTitle")}
         </h2>
 
         {/* Write Review Form */}
@@ -382,11 +387,11 @@ const ProductDetailPage = () => {
             onSubmit={handleSubmitReview}
             className="space-y-4 rounded-2xl border border-slate-100 bg-slate-50 p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:shadow-slate-950/40">
             <p className="font-semibold text-slate-700 dark:text-slate-200">
-              Viết đánh giá của bạn
+              {t("review.writeReview")}
             </p>
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-500 dark:text-slate-400">
-                Đánh giá:
+                {t("review.yourRating")}:
               </span>
               {renderStars(rating, true)}
             </div>
@@ -395,7 +400,7 @@ const ProductDetailPage = () => {
               name="comment"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Chia sẻ trải nghiệm của bạn về sản phẩm..."
+              placeholder={t("review.placeholder")}
               className="h-24 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:border-slate-700 dark:bg-slate-950 dark:text-white dark:placeholder:text-slate-500"
             />
             <button
@@ -403,19 +408,25 @@ const ProductDetailPage = () => {
               disabled={createReviewMutation.isPending}
               className="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-indigo-700 disabled:bg-indigo-400 dark:disabled:bg-indigo-500/60">
               <Send size={18} />
-              {createReviewMutation.isPending ? "Đang gửi..." : "Gửi đánh giá"}
+              {createReviewMutation.isPending
+                ? t("review.submitting")
+                : t("review.submit")}
             </button>
           </form>
         ) : (
           <div className="rounded-2xl border border-slate-100 bg-slate-50 p-6 text-center dark:border-slate-800 dark:bg-slate-900">
             <p className="text-slate-500 dark:text-slate-400">
-              Vui lòng{" "}
-              <Link
-                to="/login"
-                className="text-indigo-600 font-semibold hover:underline">
-                đăng nhập
-              </Link>{" "}
-              để viết đánh giá.
+              <Trans
+                i18nKey="review.loginPrompt"
+                components={{
+                  link: (
+                    <Link
+                      to="/login"
+                      className="text-indigo-600 font-semibold hover:underline"
+                    />
+                  ),
+                }}
+              />
             </p>
           </div>
         )}
@@ -424,7 +435,7 @@ const ProductDetailPage = () => {
         <div className="space-y-4">
           {reviews.length === 0 ? (
             <p className="py-8 text-center text-slate-500 dark:text-slate-400">
-              Chưa có đánh giá nào cho sản phẩm này.
+              {t("review.noReviews")}
             </p>
           ) : (
             reviews.map((review: Review) => (
@@ -443,9 +454,7 @@ const ProductDetailPage = () => {
                           {review.user.fullName || review.user.email}
                         </p>
                         <p className="text-xs text-slate-400 dark:text-slate-500">
-                          {new Date(review.createdAt).toLocaleDateString(
-                            "vi-VN",
-                          )}
+                          {formatDate(review.createdAt, i18n.resolvedLanguage)}
                         </p>
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { ShoppingBag } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ThemeToggle from "./ThemeToggle";
 
 interface AuthLayoutProps {
@@ -10,6 +11,8 @@ interface AuthLayoutProps {
 }
 
 const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Hero/Branding */}
@@ -47,12 +50,14 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
           {/* Tagline */}
           <div className="text-center max-w-md">
             <h1 className="text-4xl font-bold mb-6 leading-tight">
-              Khám phá công nghệ
+              {t("authLayout.heroTitleLine1")}
               <br />
-              <span className="text-white/80">theo cách của bạn</span>
+              <span className="text-white/80">
+                {t("authLayout.heroTitleLine2")}
+              </span>
             </h1>
             <p className="text-white/70 text-lg">
-              Nền tảng mua sắm điện tử hiện đại với hàng nghìn sản phẩm chất lượng cao
+              {t("authLayout.heroDescription")}
             </p>
           </div>
 
@@ -60,15 +65,21 @@ const AuthLayout = ({ children, title, subtitle }: AuthLayoutProps) => {
           <div className="mt-12 grid grid-cols-3 gap-8 text-center">
             <div className="p-4">
               <div className="text-3xl font-bold">10K+</div>
-              <div className="text-white/60 text-sm">Sản phẩm</div>
+              <div className="text-white/60 text-sm">
+                {t("authLayout.stats.products")}
+              </div>
             </div>
             <div className="p-4">
               <div className="text-3xl font-bold">50K+</div>
-              <div className="text-white/60 text-sm">Khách hàng</div>
+              <div className="text-white/60 text-sm">
+                {t("authLayout.stats.customers")}
+              </div>
             </div>
             <div className="p-4">
               <div className="text-3xl font-bold">99%</div>
-              <div className="text-white/60 text-sm">Hài lòng</div>
+              <div className="text-white/60 text-sm">
+                {t("authLayout.stats.satisfaction")}
+              </div>
             </div>
           </div>
         </div>

@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ProductService } from "../services/api.service";
 import { Link } from "react-router-dom";
 import { Search, X, Loader2 } from "lucide-react";
+import { formatCurrency } from "../utils/language";
 
 interface SearchAutocompleteProps {
   onSearch: (value: string) => void;
@@ -11,8 +13,9 @@ interface SearchAutocompleteProps {
 
 const SearchAutocomplete = ({
   onSearch,
-  placeholder = "Tìm kiếm sản phẩm...",
+  placeholder,
 }: SearchAutocompleteProps) => {
+  const { t, i18n } = useTranslation();
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
@@ -85,7 +88,7 @@ const SearchAutocomplete = ({
         <input
           ref={inputRef}
           type="text"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t("header.searchPlaceholder")}
           className="w-full pl-10 pr-10 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all"
           value={query}
           onChange={(e) => handleInputChange(e.target.value)}
@@ -107,7 +110,7 @@ const SearchAutocomplete = ({
           {isLoading ? (
             <div className="flex items-center justify-center py-6 text-slate-500 dark:text-slate-400">
               <Loader2 size={20} className="animate-spin mr-2" />
-              Đang tìm kiếm...
+              {t("search.searching")}
             </div>
           ) : suggestions.length > 0 ? (
             <ul className="py-2">
@@ -126,7 +129,7 @@ const SearchAutocomplete = ({
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                          N/A
+                          {t("product.noImage")}
                         </div>
                       )}
                     </div>
@@ -135,7 +138,7 @@ const SearchAutocomplete = ({
                         {product.shortName || product.name}
                       </p>
                       <p className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                        {product.price.toLocaleString("vi-VN")}đ
+                        {formatCurrency(product.price, i18n.resolvedLanguage)}
                       </p>
                     </div>
                   </Link>
@@ -148,13 +151,13 @@ const SearchAutocomplete = ({
                     setIsOpen(false);
                   }}
                   className="w-full text-center py-2 text-sm text-indigo-600 hover:bg-indigo-50 font-medium">
-                  Xem tất cả kết quả cho "{query}"
+                  {t("search.viewAllResults", { query })}
                 </button>
               </li>
             </ul>
           ) : (
             <div className="py-8 text-center text-slate-500 dark:text-slate-400">
-              Không tìm thấy sản phẩm phù hợp
+              {t("search.noResults")}
             </div>
           )}
         </div>

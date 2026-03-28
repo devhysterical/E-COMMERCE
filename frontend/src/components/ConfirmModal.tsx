@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -16,13 +17,14 @@ const ConfirmModal = ({
   isOpen,
   title,
   message,
-  confirmLabel = "Xác nhận",
-  cancelLabel = "Huỷ bỏ",
+  confirmLabel,
+  cancelLabel,
   variant = "danger",
   isPending = false,
   onConfirm,
   onCancel,
 }: ConfirmModalProps) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   const colors =
@@ -56,13 +58,15 @@ const ConfirmModal = ({
             onClick={onCancel}
             disabled={isPending}
             className="flex-1 px-4 py-3 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors disabled:opacity-50">
-            {cancelLabel}
+            {cancelLabel ?? t("modal.cancel")}
           </button>
           <button
             onClick={onConfirm}
             disabled={isPending}
             className={`flex-1 px-4 py-3 text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 ${colors.button}`}>
-            {isPending ? "Đang xử lý..." : confirmLabel}
+            {isPending
+              ? t("common.processing")
+              : confirmLabel ?? t("modal.confirm")}
           </button>
         </div>
       </div>

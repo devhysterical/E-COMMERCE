@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import {
   LogOut,
   User as UserIcon,
@@ -19,6 +20,7 @@ import NotificationBell from "../NotificationBell";
 import { getWishlistQueryOptions } from "../../utils/wishlist";
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const { user, logout, isAuthenticated } = useAuthStore();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -76,7 +78,7 @@ const Navbar = () => {
                 to="/faq"
                 className="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors flex items-center gap-1.5">
                 <HelpCircle size={16} />
-                FAQ
+                {t("header.faq")}
               </Link>
             </div>
           </div>
@@ -85,7 +87,7 @@ const Navbar = () => {
             <Link
               to="/wishlist"
               className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 transition-colors"
-              title="Yêu thích">
+              title={t("header.wishlist")}>
               <Heart size={24} />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -134,14 +136,14 @@ const Navbar = () => {
                     onClick={() => setShowUserMenu(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <UserIcon size={18} className="text-indigo-600" />
-                    <span className="font-medium">Hồ sơ cá nhân</span>
+                    <span className="font-medium">{t("header.profile")}</span>
                   </Link>
                   <Link
                     to="/orders"
                     onClick={() => setShowUserMenu(false)}
                     className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                     <Package size={18} className="text-indigo-600" />
-                    <span className="font-medium">Lịch sử đơn hàng</span>
+                    <span className="font-medium">{t("order.orderHistory")}</span>
                   </Link>
                   {user?.role === "ADMIN" && (
                     <>
@@ -151,7 +153,7 @@ const Navbar = () => {
                         onClick={() => setShowUserMenu(false)}
                         className="flex items-center gap-3 px-4 py-3 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                         <Layout size={18} className="text-purple-600" />
-                        <span className="font-medium">Quản trị hệ thống</span>
+                        <span className="font-medium">{t("header.admin")}</span>
                       </Link>
                     </>
                   )}
@@ -163,7 +165,7 @@ const Navbar = () => {
                     }}
                     className="flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors w-full">
                     <LogOut size={18} />
-                    <span className="font-medium">Đăng xuất</span>
+                    <span className="font-medium">{t("common.logout")}</span>
                   </button>
                 </div>
               )}

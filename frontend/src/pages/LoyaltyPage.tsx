@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { LoyaltyService } from "../services/api.service";
 import type {
   PointTransaction,
@@ -16,8 +17,7 @@ import {
   Clock,
   CheckCircle,
 } from "lucide-react";
-
-const formatVND = (value: number) => value.toLocaleString("vi-VN");
+import { formatCurrency, formatDate, formatNumber } from "../utils/language";
 
 const tierColors: Record<string, { bg: string; text: string; border: string }> =
   {
@@ -44,6 +44,7 @@ const tierColors: Record<string, { bg: string; text: string; border: string }> =
   };
 
 const LoyaltyPage = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
 
@@ -72,11 +73,11 @@ const LoyaltyPage = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["loyalty-balance"] });
       queryClient.invalidateQueries({ queryKey: ["loyalty-history"] });
-      toast.success(`Đổi thưởng thành công! Mã coupon: ${data.couponCode}`);
+      toast.success(t("loyalty.redeemSuccess", { code: data.couponCode }));
       setRedeemingId(null);
     },
     onError: () => {
-      toast.error("Không đủ điểm hoặc phần thưởng đã hết");
+      toast.error(t("loyalty.redeemError"));
       setRedeemingId(null);
     },
   });
@@ -100,10 +101,10 @@ const LoyaltyPage = () => {
   };
 
   const typeLabels: Record<string, string> = {
-    EARN: "Tích điểm",
-    REDEEM: "Đổi điểm",
-    EXPIRE: "Hết hạn",
-    ADJUST: "Điều chỉnh",
+    EARN: t("loyalty.transactionTypes.earn"),
+    REDEEM: t("loyalty.transactionTypes.redeem"),
+    EXPIRE: t("loyalty.transactionTypes.expire"),
+    ADJUST: t("loyalty.transactionTypes.adjust"),
   };
 
   return (
@@ -122,10 +123,10 @@ const LoyaltyPage = () => {
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-slate-600 dark:text-slate-300 mb-1">
-              Điểm tích lũy
+              {t("loyalty.totalPoints")}
             </p>
             <p className="text-4xl font-bold text-slate-800 dark:text-white">
-              {formatVND(balance?.totalPoints ?? 0)}
+              {formatNumber(balance?.totalPoints ?? 0, i18n.resolvedLanguage)}
             </p>
             {currentTier && (
               <div className="flex items-center gap-2 mt-3">
@@ -134,10 +135,15 @@ const LoyaltyPage = () => {
                   className={`font-semibold ${
                     tierColors[currentTier.name]?.text ?? "text-slate-700"
                   }`}>
-                  Hạng {currentTier.name}
+                  {t("loyalty.currentTier", {
+                    tier: t(
+                      `loyalty.tiers.${currentTier.name}`,
+                      currentTier.name,
+                    ),
+                  })}
                 </span>
                 <span className="text-xs bg-white/60 dark:bg-slate-950/40 px-2 py-0.5 rounded-full">
-                  x{currentTier.multiplier} điểm
+                  {t("loyalty.multiplier", { multiplier: currentTier.multiplier })}
                 </span>
               </div>
             )}
@@ -149,9 +155,15 @@ const LoyaltyPage = () => {
         {nextTier && (
           <div className="mt-6">
             <div className="flex justify-between text-xs text-slate-500 dark:text-slate-300 mb-1">
-              <span>{currentTier?.name ?? "Chưa có hạng"}</span>
               <span>
-                {nextTier.name} ({formatVND(nextTier.minPoints)} điểm)
+                {currentTier
+                  ? t(`loyalty.tiers.${currentTier.name}`, currentTier.name)
+                  : t("loyalty.noTier")}
+              </span>
+              <span>
+                {t(`loyalty.tiers.${nextTier.name}`, nextTier.name)} (
+                {formatNumber(nextTier.minPoints, i18n.resolvedLanguage)}{" "}
+                {t("loyalty.points")})
               </span>
             </div>
             <div className="h-2.5 bg-white/50 dark:bg-slate-950/40 rounded-full overflow-hidden">
@@ -161,8 +173,13 @@ const LoyaltyPage = () => {
               />
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-300 mt-1">
-              Còn {formatVND(nextTier.minPoints - (balance?.totalPoints ?? 0))}{" "}
-              điểm để lên hạng {nextTier.name}
+              {t("loyalty.pointsToNextTier", {
+                points: formatNumber(
+                  nextTier.minPoints - (balance?.totalPoints ?? 0),
+                  i18n.resolvedLanguage,
+                ),
+                tier: t(`loyalty.tiers.${nextTier.name}`, nextTier.name),
+              })}
             </p>
           </div>
         )}
@@ -171,7 +188,8 @@ const LoyaltyPage = () => {
       {/* Rewards */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-          <Gift size={22} className="text-orange-500" /> Đổi điểm lấy thưởng
+          <Gift size={22} className="text-orange-500" />{" "}
+          {t("loyalty.rewardsTitle")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {rewards.map((reward: PointReward) => {
@@ -187,12 +205,17 @@ const LoyaltyPage = () => {
                     </h3>
                     <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">
                       {reward.rewardType === "COUPON"
-                        ? `Giảm ${formatVND(reward.couponValue ?? 0)}đ`
-                        : "Miễn phí vận chuyển"}
+                        ? t("loyalty.couponReward", {
+                            amount: formatCurrency(
+                              reward.couponValue ?? 0,
+                              i18n.resolvedLanguage,
+                            ),
+                          })
+                        : t("loyalty.freeShippingReward")}
                     </p>
                   </div>
                   <span className="bg-orange-100 text-orange-600 text-sm font-bold px-3 py-1 rounded-full">
-                    {formatVND(reward.pointsCost)}
+                    {formatNumber(reward.pointsCost, i18n.resolvedLanguage)}
                   </span>
                 </div>
                 <button
@@ -204,13 +227,18 @@ const LoyaltyPage = () => {
                   className={`w-full py-2.5 rounded-xl text-sm font-medium transition-colors ${
                     canRedeem
                       ? "bg-orange-500 text-white hover:bg-orange-600"
-                        : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                      : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
                    }`}>
                   {redeemingId === reward.id && redeemMut.isPending
-                    ? "Đang xử lý..."
+                    ? t("common.processing")
                     : canRedeem
-                      ? "Đổi ngay"
-                      : `Thiếu ${formatVND(reward.pointsCost - (balance?.totalPoints ?? 0))} điểm`}
+                      ? t("loyalty.redeemNow")
+                      : t("loyalty.missingPoints", {
+                          points: formatNumber(
+                            reward.pointsCost - (balance?.totalPoints ?? 0),
+                            i18n.resolvedLanguage,
+                          ),
+                        })}
                 </button>
               </div>
             );
@@ -221,7 +249,8 @@ const LoyaltyPage = () => {
       {/* Tiers Info */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-2">
-          <Crown size={22} className="text-orange-500" /> Hạng thành viên
+          <Crown size={22} className="text-orange-500" />{" "}
+          {t("loyalty.tiersTitle")}
         </h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {sortedTiers.map((tier: LoyaltyTier) => {
@@ -249,13 +278,20 @@ const LoyaltyPage = () => {
                         ? (tierColors[tier.name]?.text ?? "text-orange-700")
                         : "text-slate-600 dark:text-slate-300"
                      }`}>
-                    {tier.name}
+                    {t(`loyalty.tiers.${tier.name}`, tier.name)}
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    Từ {formatVND(tier.minPoints)} điểm
+                    {t("loyalty.fromPoints", {
+                      points: formatNumber(
+                        tier.minPoints,
+                        i18n.resolvedLanguage,
+                      ),
+                    })}
                   </p>
                   <p className="text-sm font-medium text-orange-500">
-                    x{tier.pointMultiplier} điểm
+                    {t("loyalty.multiplier", {
+                      multiplier: tier.pointMultiplier,
+                    })}
                   </p>
                   {tier.benefits && (
                     <p className="text-xs text-slate-400 dark:text-slate-500">
@@ -272,12 +308,12 @@ const LoyaltyPage = () => {
       {/* History */}
       <div>
         <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-4">
-          Lịch sử điểm
+          {t("loyalty.historyTitle")}
         </h2>
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden">
           {history.length === 0 ? (
             <p className="text-center text-slate-400 dark:text-slate-500 py-12">
-              Chưa có giao dịch nào
+              {t("loyalty.emptyHistory")}
             </p>
           ) : (
             <div className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -295,7 +331,7 @@ const LoyaltyPage = () => {
                       </p>
                       <p className="text-xs text-slate-400 dark:text-slate-500">
                         {typeLabels[tx.type]} -{" "}
-                        {new Date(tx.createdAt).toLocaleDateString("vi-VN")}
+                        {formatDate(tx.createdAt, i18n.resolvedLanguage)}
                       </p>
                     </div>
                   </div>
@@ -304,7 +340,7 @@ const LoyaltyPage = () => {
                       tx.points > 0 ? "text-green-600" : "text-red-500"
                     }`}>
                     {tx.points > 0 ? "+" : ""}
-                    {formatVND(tx.points)}
+                    {formatNumber(tx.points, i18n.resolvedLanguage)}
                   </span>
                 </div>
               ))}

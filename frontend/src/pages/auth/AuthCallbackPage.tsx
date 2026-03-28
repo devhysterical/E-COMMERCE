@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../../services/supabase";
 import { useAuthStore } from "../../store/useAuthStore";
 import api from "../../api/axios";
 
 const AuthCallbackPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ const AuthCallbackPage = () => {
         }
 
         if (!session) {
-          throw new Error("Không tìm thấy session");
+          throw new Error(t("auth.sessionNotFound"));
         }
 
         // Gửi access token lên backend để tạo JWT
@@ -36,13 +38,13 @@ const AuthCallbackPage = () => {
         navigate("/");
       } catch (err: unknown) {
         const error = err as { message?: string };
-        setError(error.message || "Đăng nhập thất bại");
+        setError(error.message || t("auth.loginFailed"));
         setTimeout(() => navigate("/login"), 3000);
       }
     };
 
     handleCallback();
-  }, [navigate, setAuth]);
+  }, [navigate, setAuth, t]);
 
   if (error) {
     return (
@@ -50,7 +52,7 @@ const AuthCallbackPage = () => {
         <div className="text-center">
           <div className="text-red-600 font-semibold mb-2">{error}</div>
           <p className="text-slate-500 dark:text-slate-400">
-            Đang chuyển hướng về trang đăng nhập...
+            {t("auth.redirectingToLogin")}
           </p>
         </div>
       </div>
@@ -62,7 +64,7 @@ const AuthCallbackPage = () => {
       <div className="text-center">
         <div className="animate-spin h-12 w-12 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4" />
         <p className="text-slate-600 dark:text-slate-300 font-medium">
-          Đang xử lý đăng nhập...
+          {t("auth.processingCallback")}
         </p>
       </div>
     </div>

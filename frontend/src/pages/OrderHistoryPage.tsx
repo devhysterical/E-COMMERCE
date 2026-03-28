@@ -14,9 +14,10 @@ import {
   XCircle,
   Loader,
 } from "lucide-react";
+import { formatCurrency, formatDate } from "../utils/language";
 
 const OrderHistoryPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [page, setPage] = useState(1);
   const limit = 10;
 
@@ -122,10 +123,10 @@ const OrderHistoryPage = () => {
                         </span>
                       </div>
                       <p className="text-xl font-bold text-slate-900 dark:text-white">
-                        {order.totalAmount.toLocaleString("vi-VN")} đ
+                        {formatCurrency(order.totalAmount, i18n.resolvedLanguage)}
                       </p>
                       <p className="text-sm text-slate-500 dark:text-slate-400">
-                        {new Date(order.createdAt).toLocaleDateString("vi-VN", {
+                        {formatDate(order.createdAt, i18n.resolvedLanguage, {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
@@ -161,7 +162,7 @@ const OrderHistoryPage = () => {
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">
-                                N/A
+                                {t("common.notAvailable")}
                               </div>
                             )}
                           </div>
@@ -195,7 +196,7 @@ const OrderHistoryPage = () => {
                 disabled={page === 1}
                 className="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
                 <ChevronLeft size={16} />
-                {t("common.previous", "Trước")}
+                {t("common.previous")}
               </button>
               <span className="text-sm text-slate-500 dark:text-slate-400">
                 {page} / {meta.totalPages}
@@ -204,7 +205,7 @@ const OrderHistoryPage = () => {
                 onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
                 disabled={page === meta.totalPages}
                 className="flex items-center gap-1 px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:border-indigo-300 dark:hover:border-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-                {t("common.next", "Sau")}
+                {t("common.next")}
                 <ChevronRight size={16} />
               </button>
             </div>

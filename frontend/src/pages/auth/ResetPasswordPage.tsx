@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "../../services/supabase";
 import { Lock, ArrowLeft, CheckCircle, AlertTriangle } from "lucide-react";
 
 const ResetPasswordPage = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
@@ -40,12 +42,12 @@ const ResetPasswordPage = () => {
     setError("");
 
     if (password !== confirmPassword) {
-      setError("Mật khẩu xác nhận không khớp");
+      setError(t("auth.confirmPasswordMismatchError"));
       return;
     }
 
     if (password.length < 8) {
-      setError("Mật khẩu phải có ít nhất 8 ký tự");
+      setError(t("auth.passwordTooShort"));
       return;
     }
 
@@ -64,7 +66,7 @@ const ResetPasswordPage = () => {
       setTimeout(() => navigate("/login"), 3000);
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setError(error.message || "Có lỗi xảy ra. Vui lòng thử lại.");
+      setError(error.message || t("auth.resetPasswordError"));
     } finally {
       setLoading(false);
     }
@@ -86,15 +88,15 @@ const ResetPasswordPage = () => {
             <AlertTriangle size={32} className="text-red-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-            Link không hợp lệ hoặc đã hết hạn
+            {t("auth.resetInvalidTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            Vui lòng yêu cầu link đặt lại mật khẩu mới.
+            {t("auth.resetInvalidDescription")}
           </p>
           <Link
             to="/forgot-password"
             className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
-            Yêu cầu link mới
+            {t("auth.requestNewResetLink")}
           </Link>
         </div>
       </div>
@@ -109,10 +111,10 @@ const ResetPasswordPage = () => {
             <CheckCircle size={32} className="text-green-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-            Đặt lại mật khẩu thành công!
+            {t("auth.resetSuccessTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            Đang chuyển hướng đến trang đăng nhập...
+            {t("auth.resetSuccessDescription")}
           </p>
         </div>
       </div>
@@ -127,10 +129,10 @@ const ResetPasswordPage = () => {
             <Lock size={32} className="text-indigo-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Đặt mật khẩu mới
+            {t("auth.resetPasswordTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2">
-            Nhập mật khẩu mới cho tài khoản của bạn
+            {t("auth.resetPasswordDescription")}
           </p>
         </div>
 
@@ -143,7 +145,7 @@ const ResetPasswordPage = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
-              Mật khẩu mới
+              {t("auth.newPassword")}
             </label>
             <input
               type="password"
@@ -157,7 +159,7 @@ const ResetPasswordPage = () => {
 
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
-              Xác nhận mật khẩu
+              {t("auth.confirmPassword")}
             </label>
             <input
               type="password"
@@ -173,7 +175,7 @@ const ResetPasswordPage = () => {
               type="submit"
               disabled={loading}
               className="w-full bg-slate-900 dark:bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 dark:hover:bg-indigo-700 transition-all shadow-xl shadow-slate-200 dark:shadow-none disabled:bg-slate-400 dark:disabled:bg-slate-700 uppercase tracking-widest">
-              {loading ? "Đang xử lý..." : "Đặt mật khẩu mới"}
+              {loading ? t("common.processing") : t("auth.setNewPassword")}
             </button>
         </form>
 
@@ -182,7 +184,7 @@ const ResetPasswordPage = () => {
             to="/login"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             <ArrowLeft size={18} />
-            Quay lại đăng nhập
+            {t("auth.backToLogin")}
           </Link>
         </div>
       </div>

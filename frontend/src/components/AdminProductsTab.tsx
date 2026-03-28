@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ProductService,
@@ -8,11 +9,13 @@ import {
 import type { SpecificationItem } from "../services/product.service";
 import { toast } from "react-toastify";
 import type { Product } from "../services/api.service";
+import { formatCurrency } from "../utils/language";
 import { Plus, Edit, Trash2, X, Save, Upload, Loader } from "lucide-react";
 import ConfirmModal from "./ConfirmModal";
 import Pagination from "./Pagination";
 
 const AdminProductsTab = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [showProductModal, setShowProductModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -36,10 +39,10 @@ const AdminProductsTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setShowProductModal(false);
-      toast.success("Thêm sản phẩm thành công!");
+      toast.success(t("admin.products.createSuccess"));
     },
     onError: () => {
-      toast.error("Thêm sản phẩm thất bại. Vui lòng thử lại.");
+      toast.error(t("admin.products.createFailed"));
     },
   });
 
@@ -63,10 +66,10 @@ const AdminProductsTab = () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
       setShowProductModal(false);
       setEditingProduct(null);
-      toast.success("Cập nhật sản phẩm thành công!");
+      toast.success(t("admin.products.updateSuccess"));
     },
     onError: () => {
-      toast.error("Cập nhật sản phẩm thất bại. Vui lòng thử lại.");
+      toast.error(t("admin.products.updateFailed"));
     },
   });
 
@@ -74,10 +77,10 @@ const AdminProductsTab = () => {
     mutationFn: ProductService.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      toast.success("Xóa sản phẩm thành công!");
+      toast.success(t("admin.products.deleteSuccess"));
     },
     onError: () => {
-      toast.error("Xóa sản phẩm thất bại. Vui lòng thử lại.");
+      toast.error(t("admin.products.deleteFailed"));
     },
   });
 
@@ -99,8 +102,9 @@ const AdminProductsTab = () => {
             setEditingProduct(null);
             setShowProductModal(true);
           }}
-          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none">
-          <Plus size={20} /> Thêm sản phẩm
+          className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 dark:shadow-none"
+        >
+          <Plus size={20} /> {t("admin.products.addProduct")}
         </button>
       </div>
 
@@ -109,19 +113,19 @@ const AdminProductsTab = () => {
         <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Sản phẩm
+              {t("admin.products.product")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Danh mục
+              {t("admin.products.category")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Giá
+              {t("admin.products.price")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Kho
+              {t("admin.products.stock")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-              Hành động
+              {t("admin.common.actions")}
             </th>
           </tr>
         </thead>
@@ -129,7 +133,8 @@ const AdminProductsTab = () => {
           {products.slice((page - 1) * limit, page * limit).map((product: Product) => (
             <tr
               key={product.id}
-              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors"
+            >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 overflow-hidden">
@@ -152,13 +157,14 @@ const AdminProductsTab = () => {
                 </span>
               </td>
               <td className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">
-                {product.price.toLocaleString("vi-VN")} đ
+                {formatCurrency(product.price, i18n.language)}
               </td>
               <td className="px-6 py-4">
                 <span
                   className={`font-bold ${
                     product.stock > 0 ? "text-green-600" : "text-red-500"
-                  }`}>
+                  }`}
+                >
                   {product.stock}
                 </span>
               </td>
@@ -166,12 +172,14 @@ const AdminProductsTab = () => {
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => handleEditProduct(product)}
-                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
+                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
+                  >
                     <Edit size={18} />
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
-                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all">
+                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all"
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -185,7 +193,7 @@ const AdminProductsTab = () => {
         page={page}
         totalPages={Math.ceil(products.length / limit)}
         totalItems={products.length}
-        label="sản phẩm"
+        label={t("admin.products.product")}
         onPageChange={setPage}
       />
 
@@ -218,9 +226,9 @@ const AdminProductsTab = () => {
 
       <ConfirmModal
         isOpen={!!deleteProductId}
-        title="Xoá sản phẩm"
-        message="Bạn có chắc muốn xoá sản phẩm này? Hành động này không thể hoàn tác."
-        confirmLabel="Xoá sản phẩm"
+        title={t("admin.products.deleteProduct")}
+        message={t("admin.products.confirmDelete")}
+        confirmLabel={t("admin.products.deleteProduct")}
         variant="danger"
         isPending={deleteProductMutation.isPending}
         onConfirm={() => {
@@ -260,6 +268,7 @@ const ProductModal = ({
   onSubmit,
   isPending,
 }: ProductModalProps) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: product?.name || "",
     shortName: product?.shortName || "",
@@ -298,7 +307,7 @@ const ProductModal = ({
       setFormData({ ...formData, imageUrl: result.url });
     } catch (error) {
       console.error("Upload failed:", error);
-      toast.error("Tải ảnh lên thất bại. Vui lòng thử lại.");
+      toast.error(t("admin.products.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -320,11 +329,12 @@ const ProductModal = ({
       <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
         <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            {product ? "Chỉnh sửa sản phẩm" : "Thêm sản phẩm mới"}
+            {product ? t("admin.products.editProduct") : t("admin.products.addNewProduct")}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+            className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
+          >
             <X size={24} />
           </button>
         </div>
@@ -332,7 +342,7 @@ const ProductModal = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-              Tên hiển thị (trang chủ)
+              {t("admin.products.shortName")}
             </label>
             <input
               type="text"
@@ -340,17 +350,17 @@ const ProductModal = ({
               onChange={(e) =>
                 setFormData({ ...formData, shortName: e.target.value })
               }
-              placeholder="VD: Lenovo ThinkPad X1 Carbon Gen 13 2025 Aura Edition"
+              placeholder={t("admin.products.shortNamePlaceholder")}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
             />
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-              Tên ngắn gọn hiển thị trên trang chủ. Nếu để trống sẽ dùng tên đầy đủ.
+              {t("admin.products.shortNameHint")}
             </p>
           </div>
 
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-              Tên đầy đủ sản phẩm
+              {t("admin.products.fullName")}
             </label>
             <input
               type="text"
@@ -358,19 +368,19 @@ const ProductModal = ({
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
               }
-              placeholder="VD: Lenovo ThinkPad X1 Carbon Gen 13 2025 Aura Edition Core Ultra 7 258V RAM 32GB SSD 1TB 14INCH 2.8K OLED"
+              placeholder={t("admin.products.fullNamePlaceholder")}
               className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
               required
             />
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-              Tên đầy đủ hiển thị trên trang chi tiết sản phẩm.
+              {t("admin.products.fullNameHint")}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                Giá (VND)
+                {t("admin.products.priceLabel")}
               </label>
               <input
                 type="number"
@@ -385,7 +395,7 @@ const ProductModal = ({
             </div>
             <div>
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-                Số lượng
+                {t("admin.products.quantity")}
               </label>
               <input
                 type="number"
@@ -402,7 +412,7 @@ const ProductModal = ({
 
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-              Hình ảnh sản phẩm
+              {t("admin.products.productImage")}
             </label>
 
             {formData.imageUrl && (
@@ -413,13 +423,14 @@ const ProductModal = ({
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     (e.target as HTMLImageElement).src =
-                      'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f1f5f9" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%2394a3b8" font-size="12">Lỗi ảnh</text></svg>';
+                      'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect fill="%23f1f5f9" width="100" height="100"/><text x="50" y="55" text-anchor="middle" fill="%2394a3b8" font-size="12">Error</text></svg>';
                   }}
                 />
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, imageUrl: "" })}
-                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors">
+                  className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                >
                   <X size={14} />
                 </button>
               </div>
@@ -432,16 +443,17 @@ const ProductModal = ({
                     isUploading
                       ? "bg-slate-200 dark:bg-slate-800 text-slate-400 dark:text-slate-500 cursor-not-allowed"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700"
-                  }`}>
+                  }`}
+                >
                   {isUploading ? (
                     <>
                       <Loader size={18} className="animate-spin" />
-                      Đang tải lên...
+                      {t("admin.products.uploading")}
                     </>
                   ) : (
                     <>
                       <Upload size={18} />
-                      Chọn hình ảnh
+                      {t("admin.products.selectImage")}
                     </>
                   )}
                   <input
@@ -463,7 +475,7 @@ const ProductModal = ({
 
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">
-              Danh mục
+              {t("admin.products.category")}
             </label>
             <select
               value={formData.categoryId}
@@ -471,7 +483,8 @@ const ProductModal = ({
                 setFormData({ ...formData, categoryId: e.target.value })
               }
               className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
-              required>
+              required
+            >
               {categories.map((cat) => (
                 <option key={cat.id} value={cat.id}>
                   {cat.name}
@@ -484,13 +497,14 @@ const ProductModal = ({
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-bold text-slate-700 dark:text-slate-300">
-                Thông số nổi bật
+                {t("admin.products.specifications")}
               </label>
               <button
                 type="button"
                 onClick={addSpecRow}
-                className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
-                <Plus size={14} /> Thêm thông số
+                className="flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+              >
+                <Plus size={14} /> {t("admin.products.addSpec")}
               </button>
             </div>
 
@@ -499,7 +513,8 @@ const ProductModal = ({
                 {specifications.map((spec, index) => (
                   <div
                     key={index}
-                    className="flex gap-2 items-start bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
+                    className="flex gap-2 items-start bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-100 dark:border-slate-700"
+                  >
                     <div className="flex-1 space-y-2">
                       <input
                         type="text"
@@ -507,7 +522,7 @@ const ProductModal = ({
                         onChange={(e) =>
                           updateSpecRow(index, "label", e.target.value)
                         }
-                        placeholder="Tiêu đề (VD: CPU, RAM, SSD...)"
+                        placeholder={t("admin.products.specLabelPlaceholder")}
                         className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
                       />
                       <textarea
@@ -515,7 +530,7 @@ const ProductModal = ({
                         onChange={(e) =>
                           updateSpecRow(index, "value", e.target.value)
                         }
-                        placeholder="Giá trị (VD: Intel Core Ultra 7 258V) — có thể xuống dòng"
+                        placeholder={t("admin.products.specValuePlaceholder")}
                         className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm resize-y min-h-[40px]"
                         rows={1}
                       />
@@ -523,7 +538,8 @@ const ProductModal = ({
                     <button
                       type="button"
                       onClick={() => removeSpecRow(index)}
-                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all mt-1">
+                      className="p-2 text-slate-400 dark:text-slate-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all mt-1"
+                    >
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -531,7 +547,7 @@ const ProductModal = ({
               </div>
             ) : (
               <p className="text-xs text-slate-400 dark:text-slate-500 italic">
-                Chưa có thông số nào. Nhấn "Thêm thông số" để bắt đầu.
+                {t("admin.products.noSpecs")}
               </p>
             )}
           </div>
@@ -539,9 +555,10 @@ const ProductModal = ({
           <button
             type="submit"
             disabled={isPending}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400 dark:disabled:bg-indigo-900/50">
+            className="w-full flex items-center justify-center gap-2 bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-all disabled:bg-indigo-400 dark:disabled:bg-indigo-900/50"
+          >
             <Save size={20} />
-            {isPending ? "Đang lưu..." : product ? "Cập nhật" : "Thêm sản phẩm"}
+            {isPending ? t("admin.common.saving") : product ? t("admin.common.update") : t("admin.products.addProduct")}
           </button>
         </form>
       </div>

@@ -8,11 +8,14 @@ import type {
 } from "../services/api.service";
 import { toast } from "react-toastify";
 import { Plus, Trash2, Zap, Clock, X, Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { formatCurrency, formatDate } from "../utils/language";
 
-const formatVND = (value: number) => value.toLocaleString("vi-VN");
+const formatMoney = (value: number, language: string) =>
+  formatCurrency(value, language);
 
-const formatDateTime = (iso: string) =>
-  new Date(iso).toLocaleString("vi-VN", {
+const formatDateTime = (iso: string, language: string) =>
+  formatDate(iso, language, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -20,37 +23,42 @@ const formatDateTime = (iso: string) =>
     minute: "2-digit",
   });
 
-function getSaleStatus(sale: FlashSale) {
+function getSaleStatus(
+  sale: FlashSale,
+  translate: (key: string) => string,
+) {
   const now = Date.now();
   const start = new Date(sale.startTime).getTime();
   const end = new Date(sale.endTime).getTime();
 
   if (!sale.isActive)
     return {
-      label: "Tắt",
+      label: translate("admin.flashSale.statusLabels.off"),
       color:
         "bg-gray-100 text-gray-600 dark:bg-slate-800 dark:text-slate-300",
     };
   if (now < start)
     return {
-      label: "Sắp diễn ra",
+      label: translate("admin.flashSale.statusLabels.upcoming"),
       color: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-200",
     };
   if (now > end)
     return {
-      label: "Đã kết thúc",
+      label: translate("admin.flashSale.statusLabels.ended"),
       color:
         "bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400",
     };
   return {
-    label: "Đang diễn ra",
+    label: translate("admin.flashSale.statusLabels.ongoing"),
     color:
       "bg-green-100 text-green-700 dark:bg-emerald-500/15 dark:text-emerald-200",
   };
 }
 
 export default function AdminFlashSaleTab() {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
+  const language = i18n.resolvedLanguage ?? i18n.language;
   const [showForm, setShowForm] = useState(false);
   const [showAddItem, setShowAddItem] = useState<string | null>(null);
   const [productSearch, setProductSearch] = useState("");
@@ -91,17 +99,17 @@ export default function AdminFlashSaleTab() {
     mutationFn: FlashSaleService.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flash-sales"] });
-      toast.success("Tạo Flash Sale thành công");
+      toast.success(t("admin.flashSale.createSuccess"));
       resetForm();
     },
-    onError: () => toast.error("Lỗi khi tạo Flash Sale"),
+    onError: () => toast.error(t("admin.flashSale.createFailed")),
   });
 
   const deleteMutation = useMutation({
     mutationFn: FlashSaleService.remove,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flash-sales"] });
-      toast.success("Đã xóa Flash Sale");
+      toast.success(t("admin.flashSale.deleteSuccess"));
     },
   });
 
@@ -128,10 +136,10 @@ export default function AdminFlashSaleTab() {
     }) => FlashSaleService.addItem(flashSaleId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flash-sales"] });
-      toast.success("Đã thêm sản phẩm");
+      toast.success(t("admin.flashSale.addItemSuccess"));
       setShowAddItem(null);
     },
-    onError: () => toast.error("Sản phẩm đã có trong Flash Sale này"),
+    onError: () => toast.error(t("admin.flashSale.addItemFailed")),
   });
 
   const removeItemMutation = useMutation({
@@ -144,7 +152,7 @@ export default function AdminFlashSaleTab() {
     }) => FlashSaleService.removeItem(flashSaleId, itemId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["flash-sales"] });
-      toast.success("Đã xóa sản phẩm");
+      toast.success(t("admin.flashSale.removeItemSuccess"));
     },
   });
 
@@ -173,7 +181,7 @@ export default function AdminFlashSaleTab() {
 
   const handleCreate = () => {
     if (!name || !startTime || !endTime || items.length === 0) {
-      toast.error("Vui lòng điền đầy đủ thông tin");
+      toast.error(t("admin.flashSale.fillAllFields"));
       return;
     }
     createMutation.mutate({
@@ -212,10 +220,10 @@ export default function AdminFlashSaleTab() {
           </div>
           <div>
             <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-              Flash Sale
+              {t("admin.flashSale.title")}
             </h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {flashSales.length} chương trình
+              {t("admin.flashSale.programCount", { count: flashSales.length })}
             </p>
           </div>
         </div>
@@ -223,7 +231,7 @@ export default function AdminFlashSaleTab() {
           onClick={() => setShowForm(true)}
           className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-red-500 text-white px-5 py-2.5 rounded-xl font-semibold text-sm hover:shadow-lg transition-all">
           <Plus size={18} />
-          Tạo Flash Sale
+          {t("admin.flashSale.createFlashSale")}
         </button>
       </div>
 
@@ -233,7 +241,7 @@ export default function AdminFlashSaleTab() {
           <div className="max-h-[90vh] w-full max-w-2xl space-y-5 overflow-y-auto rounded-2xl bg-white p-6 dark:border dark:border-slate-800 dark:bg-slate-900">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
-                Tạo Flash Sale mới
+                {t("admin.flashSale.createNew")}
               </h3>
               <button
                 onClick={resetForm}
@@ -245,12 +253,12 @@ export default function AdminFlashSaleTab() {
             <div className="space-y-4">
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Tên chương trình
+                  {t("admin.flashSale.programName")}
                 </label>
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="VD: Flash Sale Cuối Tuần"
+                  placeholder={t("admin.flashSale.programNamePlaceholder")}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                 />
               </div>
@@ -258,7 +266,7 @@ export default function AdminFlashSaleTab() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Bắt đầu
+                    {t("admin.flashSale.startTime")}
                   </label>
                   <input
                     type="datetime-local"
@@ -269,7 +277,7 @@ export default function AdminFlashSaleTab() {
                 </div>
                 <div>
                   <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Kết thúc
+                    {t("admin.flashSale.endTime")}
                   </label>
                   <input
                     type="datetime-local"
@@ -283,7 +291,7 @@ export default function AdminFlashSaleTab() {
               {/* Product search */}
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700 dark:text-slate-300">
-                  Thêm sản phẩm
+                  {t("admin.flashSale.addProducts")}
                 </label>
                 <div className="relative">
                   <Search
@@ -293,7 +301,7 @@ export default function AdminFlashSaleTab() {
                   <input
                     value={productSearch}
                     onChange={(e) => setProductSearch(e.target.value)}
-                    placeholder="Tìm sản phẩm..."
+                    placeholder={t("admin.flashSale.searchProducts")}
                     className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none transition-colors focus:border-transparent focus:ring-2 focus:ring-orange-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100 dark:placeholder:text-slate-500"
                   />
                 </div>
@@ -306,7 +314,7 @@ export default function AdminFlashSaleTab() {
                         className="flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800">
                         <span>{p.name}</span>
                         <span className="text-slate-400 dark:text-slate-500">
-                          {formatVND(p.price)}đ
+                          {formatMoney(p.price, language)}
                         </span>
                       </button>
                     ))}
@@ -318,7 +326,7 @@ export default function AdminFlashSaleTab() {
               {items.length > 0 && (
                 <div className="space-y-3">
                   <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                    Sản phẩm đã chọn ({items.length})
+                    {t("admin.flashSale.selectedProducts", { count: items.length })}
                   </p>
                   {items.map((item, idx) => (
                     <div
@@ -331,7 +339,7 @@ export default function AdminFlashSaleTab() {
                         <div className="flex gap-3 mt-2">
                           <div>
                             <label className="text-xs text-slate-500 dark:text-slate-400">
-                              Giá sale
+                              {t("admin.flashSale.salePrice")}
                             </label>
                             <input
                               type="number"
@@ -346,7 +354,7 @@ export default function AdminFlashSaleTab() {
                           </div>
                           <div>
                             <label className="text-xs text-slate-500 dark:text-slate-400">
-                              Số lượng
+                              {t("admin.flashSale.quantity")}
                             </label>
                             <input
                               type="number"
@@ -361,7 +369,7 @@ export default function AdminFlashSaleTab() {
                           </div>
                           <div>
                             <label className="text-xs text-slate-500 dark:text-slate-400">
-                              Giới hạn/người
+                              {t("admin.flashSale.limitPerUser")}
                             </label>
                             <input
                               type="number"
@@ -393,13 +401,15 @@ export default function AdminFlashSaleTab() {
               <button
                 onClick={resetForm}
                 className="rounded-xl px-5 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
-                Hủy
+                {t("admin.common.cancel")}
               </button>
               <button
                 onClick={handleCreate}
                 disabled={createMutation.isPending}
                 className="px-5 py-2.5 text-sm bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50">
-                {createMutation.isPending ? "Đang tạo..." : "Tạo Flash Sale"}
+                {createMutation.isPending
+                  ? t("admin.common.creating")
+                  : t("admin.flashSale.createFlashSale")}
               </button>
             </div>
           </div>
@@ -411,12 +421,12 @@ export default function AdminFlashSaleTab() {
         {flashSales.length === 0 ? (
           <div className="py-16 text-center text-slate-400 dark:text-slate-500">
             <Zap size={48} className="mx-auto mb-3 opacity-30" />
-            <p className="font-medium">Chưa có Flash Sale nào</p>
-            <p className="text-sm mt-1">Tạo chương trình Flash Sale đầu tiên</p>
+            <p className="font-medium">{t("admin.flashSale.noFlashSales")}</p>
+            <p className="text-sm mt-1">{t("admin.flashSale.createFirst")}</p>
           </div>
         ) : (
           flashSales.map((sale: FlashSale) => {
-            const status = getSaleStatus(sale);
+            const status = getSaleStatus(sale, t);
             const totalSold = sale.items.reduce(
               (s: number, i: FlashSaleItem) => s + i.soldQty,
               0,
@@ -444,8 +454,8 @@ export default function AdminFlashSaleTab() {
                       <div className="mt-0.5 flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                         <Clock size={12} />
                         <span>
-                          {formatDateTime(sale.startTime)} -{" "}
-                          {formatDateTime(sale.endTime)}
+                          {formatDateTime(sale.startTime, language)} -{" "}
+                          {formatDateTime(sale.endTime, language)}
                         </span>
                       </div>
                     </div>
@@ -471,7 +481,7 @@ export default function AdminFlashSaleTab() {
                     </label>
                     <button
                       onClick={() => {
-                        if (confirm("Xóa Flash Sale này?"))
+                        if (confirm(t("admin.flashSale.deleteConfirm")))
                           deleteMutation.mutate(sale.id);
                       }}
                       className="rounded-lg p-2 text-red-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-red-300 dark:hover:bg-red-500/10 dark:hover:text-red-200">
@@ -484,7 +494,10 @@ export default function AdminFlashSaleTab() {
                 <div className="bg-slate-50/50 px-5 py-3 dark:bg-slate-800/50">
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
-                      Đã bán: {totalSold}/{totalQty}
+                      {t("admin.flashSale.sold", {
+                        sold: totalSold,
+                        total: totalQty,
+                      })}
                     </span>
                     <span className="text-xs font-semibold text-orange-600">
                       {progress.toFixed(0)}%
@@ -502,7 +515,7 @@ export default function AdminFlashSaleTab() {
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      Sản phẩm ({sale.items.length})
+                      {t("admin.flashSale.products", { count: sale.items.length })}
                     </p>
                     <button
                       onClick={() =>
@@ -510,7 +523,7 @@ export default function AdminFlashSaleTab() {
                       }
                       className="text-xs flex items-center gap-1 text-orange-600 hover:text-orange-700 font-medium">
                       <Plus size={14} />
-                      Thêm
+                      {t("admin.common.add")}
                     </button>
                   </div>
 
@@ -527,7 +540,7 @@ export default function AdminFlashSaleTab() {
                           if (p) setAddSalePrice(Math.floor(p.price * 0.5));
                         }}
                         className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-100">
-                        <option value="">Chọn sản phẩm</option>
+                        <option value="">{t("admin.flashSale.selectProduct")}</option>
                         {products
                           .filter(
                             (p: Product) =>
@@ -537,14 +550,14 @@ export default function AdminFlashSaleTab() {
                           )
                           .map((p: Product) => (
                             <option key={p.id} value={p.id}>
-                              {p.name} - {formatVND(p.price)}đ
+                              {p.name} - {formatMoney(p.price, language)}
                             </option>
                           ))}
                       </select>
                       <div className="grid grid-cols-3 gap-3">
                         <div>
                           <label className="text-xs text-slate-500 dark:text-slate-400">
-                            Giá sale
+                            {t("admin.flashSale.salePrice")}
                           </label>
                           <input
                             type="number"
@@ -557,7 +570,7 @@ export default function AdminFlashSaleTab() {
                         </div>
                         <div>
                           <label className="text-xs text-slate-500 dark:text-slate-400">
-                            Số lượng
+                            {t("admin.flashSale.quantity")}
                           </label>
                           <input
                             type="number"
@@ -570,7 +583,7 @@ export default function AdminFlashSaleTab() {
                         </div>
                         <div>
                           <label className="text-xs text-slate-500 dark:text-slate-400">
-                            Giới hạn/người
+                            {t("admin.flashSale.limitPerUser")}
                           </label>
                           <input
                             type="number"
@@ -586,7 +599,7 @@ export default function AdminFlashSaleTab() {
                         <button
                           onClick={() => setShowAddItem(null)}
                           className="rounded-lg px-3 py-1.5 text-xs text-slate-600 transition-colors hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800">
-                          Hủy
+                          {t("admin.common.cancel")}
                         </button>
                         <button
                           onClick={() => {
@@ -602,7 +615,7 @@ export default function AdminFlashSaleTab() {
                             });
                           }}
                           className="px-3 py-1.5 text-xs bg-orange-500 text-white rounded-lg font-medium hover:bg-orange-600">
-                          Thêm
+                          {t("admin.common.add")}
                         </button>
                       </div>
                     </div>
@@ -636,10 +649,10 @@ export default function AdminFlashSaleTab() {
                             </p>
                             <div className="flex items-center gap-2 mt-0.5">
                               <span className="text-sm font-bold text-red-600">
-                                {formatVND(item.salePrice)}đ
+                                {formatMoney(item.salePrice, language)}
                               </span>
                               <span className="text-xs text-slate-400 line-through dark:text-slate-500">
-                                {formatVND(item.product.price)}đ
+                                {formatMoney(item.product.price, language)}
                               </span>
                               <span className="rounded bg-orange-50 px-1.5 py-0.5 text-xs font-semibold text-orange-600 dark:bg-orange-500/15 dark:text-orange-200">
                                 -{discount}%

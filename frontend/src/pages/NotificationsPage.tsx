@@ -2,52 +2,12 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bell, Package, Star, Megaphone, Info, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   NotificationService,
   type Notification,
 } from "../services/notification.service";
-
-const typeConfig: Record<
-  string,
-  { icon: typeof Bell; label: string; color: string; bg: string }
-> = {
-  ORDER_STATUS: {
-    icon: Package,
-    label: "Đơn hàng",
-    color: "text-blue-600",
-    bg: "bg-blue-50 dark:bg-blue-900/30",
-  },
-  NEW_REVIEW: {
-    icon: Star,
-    label: "Đánh giá",
-    color: "text-amber-600",
-    bg: "bg-amber-50 dark:bg-amber-900/30",
-  },
-  PROMOTION: {
-    icon: Megaphone,
-    label: "Khuyến mãi",
-    color: "text-green-600",
-    bg: "bg-green-50 dark:bg-green-900/30",
-  },
-  SYSTEM: {
-    icon: Info,
-    label: "Hệ thống",
-    color: "text-slate-600",
-    bg: "bg-slate-50 dark:bg-slate-900/30",
-  },
-};
-
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "Vừa xong";
-  if (minutes < 60) return `${minutes} phút trước`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} giờ trước`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} ngày trước`;
-  return new Date(dateStr).toLocaleDateString("vi-VN");
-}
+import { formatDate, getLanguageTag } from "../utils/language";
 
 function getNotificationLink(notification: Notification): string | null {
   if (!notification.metadata) return null;
@@ -60,9 +20,57 @@ function getNotificationLink(notification: Notification): string | null {
 type FilterType = "all" | "unread";
 
 export default function NotificationsPage() {
+  const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("all");
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
+  const languageTag = getLanguageTag(i18n.resolvedLanguage);
+
+  const typeConfig: Record<
+    string,
+    { icon: typeof Bell; label: string; color: string; bg: string }
+  > = {
+    ORDER_STATUS: {
+      icon: Package,
+      label: t("notifications.types.order"),
+      color: "text-blue-600",
+      bg: "bg-blue-50 dark:bg-blue-900/30",
+    },
+    NEW_REVIEW: {
+      icon: Star,
+      label: t("notifications.types.review"),
+      color: "text-amber-600",
+      bg: "bg-amber-50 dark:bg-amber-900/30",
+    },
+    PROMOTION: {
+      icon: Megaphone,
+      label: t("notifications.types.promotion"),
+      color: "text-green-600",
+      bg: "bg-green-50 dark:bg-green-900/30",
+    },
+    SYSTEM: {
+      icon: Info,
+      label: t("notifications.types.system"),
+      color: "text-slate-600",
+      bg: "bg-slate-50 dark:bg-slate-900/30",
+    },
+  };
+
+  const relativeTime = new Intl.RelativeTimeFormat(languageTag, {
+    numeric: "auto",
+  });
+
+  const timeAgo = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return t("notifications.justNow");
+    if (minutes < 60) return relativeTime.format(-minutes, "minute");
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return relativeTime.format(-hours, "hour");
+    const days = Math.floor(hours / 24);
+    if (days < 7) return relativeTime.format(-days, "day");
+    return formatDate(dateStr, i18n.resolvedLanguage);
+  };
 
   const { data, isLoading } = useQuery({
     queryKey: ["notifications-page", page],
@@ -107,12 +115,12 @@ export default function NotificationsPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Thông báo
+              {t("notifications.title")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               {unreadCount > 0
-                ? `${unreadCount} thông báo chưa đọc`
-                : "Tất cả đã đọc"}
+                ? t("notifications.unreadCount", { count: unreadCount })
+                : t("notifications.allRead")}
             </p>
           </div>
           {unreadCount > 0 && (
@@ -121,7 +129,7 @@ export default function NotificationsPage() {
               disabled={markAllReadMutation.isPending}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50">
               <Check size={16} />
-              Đọc tất cả
+              {t("notifications.markAllRead")}
             </button>
           )}
         </div>
@@ -135,7 +143,7 @@ export default function NotificationsPage() {
                 ? "bg-indigo-600 text-white"
                 : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
             }`}>
-            Tất cả
+            {t("common.all")}
           </button>
           <button
             onClick={() => setFilter("unread")}
@@ -144,7 +152,7 @@ export default function NotificationsPage() {
                 ? "bg-indigo-600 text-white"
                 : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700"
             }`}>
-            Chưa đọc
+            {t("notifications.unreadFilter")}
           </button>
         </div>
 
@@ -153,16 +161,16 @@ export default function NotificationsPage() {
           {isLoading ? (
             <div className="px-4 py-12 text-center text-slate-400">
               <div className="animate-spin w-8 h-8 border-2 border-indigo-600 border-t-transparent rounded-full mx-auto mb-3" />
-              <p className="text-sm">Đang tải...</p>
+              <p className="text-sm">{t("common.loading")}</p>
             </div>
           ) : filteredNotifications.length === 0 ? (
             <div className="px-4 py-12 text-center text-slate-400 dark:text-slate-500">
               <Bell size={40} className="mx-auto mb-3 opacity-50" />
-              <p className="font-medium">Không có thông báo nào</p>
+              <p className="font-medium">{t("notifications.empty")}</p>
               <p className="text-sm mt-1">
                 {filter === "unread"
-                  ? "Tất cả thông báo đã được đọc"
-                  : "Thông báo sẽ xuất hiện ở đây"}
+                  ? t("notifications.emptyUnread")
+                  : t("notifications.emptyAll")}
               </p>
             </div>
           ) : (
@@ -231,7 +239,7 @@ export default function NotificationsPage() {
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page <= 1}
               className="px-4 py-2 text-sm font-medium rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors">
-              Trang trước
+              {t("notifications.previousPage")}
             </button>
             <span className="text-sm text-slate-600 dark:text-slate-400">
               {page} / {totalPages}
@@ -240,7 +248,7 @@ export default function NotificationsPage() {
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page >= totalPages}
               className="px-4 py-2 text-sm font-medium rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors">
-              Trang sau
+              {t("notifications.nextPage")}
             </button>
           </div>
         )}

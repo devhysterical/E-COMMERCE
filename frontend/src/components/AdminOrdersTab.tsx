@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import { AdminService } from "../services/api.service";
 import type { Order } from "../services/api.service";
+import { formatCurrency, formatDate } from "../utils/language";
 import {
   Eye,
   X,
@@ -18,38 +20,33 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ReactNode }
-> = {
+const statusIcons: Record<string, { color: string; icon: React.ReactNode }> = {
   PENDING: {
-    label: "Chờ xử lý",
     color: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
     icon: <Clock size={14} />,
   },
   PROCESSING: {
-    label: "Đang xử lý",
     color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
     icon: <Loader size={14} />,
   },
   SHIPPED: {
-    label: "Đang giao",
     color: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300",
     icon: <Truck size={14} />,
   },
   DELIVERED: {
-    label: "Đã giao",
     color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
     icon: <CheckCircle size={14} />,
   },
   CANCELLED: {
-    label: "Đã hủy",
     color: "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300",
     icon: <XCircle size={14} />,
   },
 };
 
+const ORDER_STATUSES = ["PENDING", "PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"] as const;
+
 const AdminOrdersTab = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [page, setPage] = useState(1);
@@ -79,22 +76,22 @@ const AdminOrdersTab = () => {
         <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Mã đơn
+              {t("admin.orders.orderId")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Khách hàng
+              {t("admin.orders.customer")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Tổng tiền
+              {t("admin.orders.totalAmount")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Trạng thái
+              {t("admin.orders.status")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Ngày đặt
+              {t("admin.orders.orderDate")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-              Hành động
+              {t("admin.common.actions")}
             </th>
           </tr>
         </thead>
@@ -102,7 +99,8 @@ const AdminOrdersTab = () => {
           {orders.map((order: Order) => (
             <tr
               key={order.id}
-              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors"
+            >
               <td className="px-6 py-4 font-mono text-sm text-slate-600 dark:text-slate-300">
                 #{order.id.slice(0, 8)}
               </td>
@@ -117,7 +115,7 @@ const AdminOrdersTab = () => {
                 </div>
               </td>
               <td className="px-6 py-4 font-bold text-slate-700 dark:text-slate-200">
-                {order.totalAmount.toLocaleString("vi-VN")} đ
+                {formatCurrency(order.totalAmount, i18n.language)}
               </td>
               <td className="px-6 py-4">
                 <select
@@ -129,22 +127,24 @@ const AdminOrdersTab = () => {
                     })
                   }
                   className={`px-3 py-1 rounded-full text-sm font-semibold border-0 cursor-pointer ${
-                    statusConfig[order.status]?.color || "bg-slate-100"
-                  } dark:bg-slate-800`}>
-                  <option value="PENDING">Chờ xử lý</option>
-                  <option value="PROCESSING">Đang xử lý</option>
-                  <option value="SHIPPED">Đang giao</option>
-                  <option value="DELIVERED">Đã giao</option>
-                  <option value="CANCELLED">Đã hủy</option>
+                    statusIcons[order.status]?.color || "bg-slate-100"
+                  } dark:bg-slate-800`}
+                >
+                  {ORDER_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {t(`admin.orders.statusLabels.${s}`)}
+                    </option>
+                  ))}
                 </select>
               </td>
               <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                {new Date(order.createdAt).toLocaleDateString("vi-VN")}
+                {formatDate(order.createdAt, i18n.language)}
               </td>
               <td className="px-6 py-4 text-right">
                 <button
                   onClick={() => setSelectedOrder(order)}
-                  className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
+                  className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
+                >
                   <Eye size={18} />
                 </button>
               </td>
@@ -157,24 +157,26 @@ const AdminOrdersTab = () => {
       {meta && meta.totalPages > 1 && (
         <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-700">
           <span className="text-sm text-slate-500 dark:text-slate-400">
-            Tổng {meta.total} đơn hàng
+            {t("admin.common.total", { count: meta.total, label: t("admin.orders.orderId") })}
           </span>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
               <ChevronLeft size={16} />
-              Trước
+              {t("admin.common.previous")}
             </button>
             <span className="text-sm text-slate-500 dark:text-slate-400">
-              {page} / {meta.totalPages}
+              {t("admin.common.page", { current: page, total: meta.totalPages })}
             </span>
             <button
               onClick={() => setPage((p) => Math.min(meta.totalPages, p + 1))}
               disabled={page === meta.totalPages}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all">
-              Sau
+              className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+            >
+              {t("admin.common.next")}
               <ChevronRight size={16} />
             </button>
           </div>
@@ -187,11 +189,12 @@ const AdminOrdersTab = () => {
           <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden border border-slate-100 dark:border-slate-700">
             <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-700">
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                Chi tiết đơn hàng #{selectedOrder.id.slice(0, 8)}
+                {t("admin.orders.detail", { id: selectedOrder.id.slice(0, 8) })}
               </h2>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors">
+                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+              >
                 <X size={20} />
               </button>
             </div>
@@ -201,11 +204,11 @@ const AdminOrdersTab = () => {
               <div className="bg-slate-50 dark:bg-slate-800 rounded-2xl p-4 space-y-3">
                 <h3 className="font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
                   <Users size={18} className="text-indigo-600" />
-                  Thông tin khách hàng
+                  {t("admin.orders.customerInfo")}
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="text-slate-400 dark:text-slate-500">Họ tên:</span>
+                    <span className="text-slate-400 dark:text-slate-500">{t("admin.orders.fullName")}:</span>
                     <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.user?.fullName || "N/A"}
                     </p>
@@ -218,7 +221,7 @@ const AdminOrdersTab = () => {
                   </div>
                   <div>
                     <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <Phone size={14} /> Điện thoại:
+                      <Phone size={14} /> {t("admin.orders.phone")}:
                     </span>
                     <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.phone || "N/A"}
@@ -226,7 +229,7 @@ const AdminOrdersTab = () => {
                   </div>
                   <div>
                     <span className="text-slate-400 dark:text-slate-500 flex items-center gap-1">
-                      <MapPin size={14} /> Địa chỉ:
+                      <MapPin size={14} /> {t("admin.orders.address")}:
                     </span>
                     <p className="font-semibold text-slate-800 dark:text-white">
                       {selectedOrder.address || "N/A"}
@@ -238,19 +241,20 @@ const AdminOrdersTab = () => {
               {/* Order Status */}
               <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800 rounded-2xl p-4">
                 <div>
-                  <span className="text-sm text-slate-400 dark:text-slate-500">Trạng thái</span>
+                  <span className="text-sm text-slate-400 dark:text-slate-500">{t("admin.orders.status")}</span>
                   <p
                     className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-semibold mt-1 ${
-                      statusConfig[selectedOrder.status]?.color
-                    }`}>
-                    {statusConfig[selectedOrder.status]?.icon}
-                    {statusConfig[selectedOrder.status]?.label}
+                      statusIcons[selectedOrder.status]?.color
+                    }`}
+                  >
+                    {statusIcons[selectedOrder.status]?.icon}
+                    {t(`admin.orders.statusLabels.${selectedOrder.status}`)}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm text-slate-400 dark:text-slate-500">Ngày đặt</span>
+                  <span className="text-sm text-slate-400 dark:text-slate-500">{t("admin.orders.orderDate")}</span>
                   <p className="font-semibold text-slate-800 dark:text-white">
-                    {new Date(selectedOrder.createdAt).toLocaleString("vi-VN")}
+                    {formatDate(selectedOrder.createdAt, i18n.language)}
                   </p>
                 </div>
               </div>
@@ -259,7 +263,7 @@ const AdminOrdersTab = () => {
               <div>
                 <h3 className="font-bold text-slate-700 dark:text-slate-200 mb-3 flex items-center gap-2">
                   <Package size={18} className="text-indigo-600" />
-                  Sản phẩm ({selectedOrder.orderItems?.length || 0})
+                  {t("admin.orders.products", { count: selectedOrder.orderItems?.length || 0 })}
                 </h3>
                 <div className="space-y-3">
                   {selectedOrder.orderItems?.map(
@@ -271,7 +275,8 @@ const AdminOrdersTab = () => {
                     }) => (
                       <div
                         key={item.id}
-                        className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
+                        className="flex items-center gap-4 bg-slate-50 dark:bg-slate-800 rounded-xl p-3"
+                      >
                         <div className="w-16 h-16 bg-slate-200 dark:bg-slate-700 rounded-lg overflow-hidden flex-shrink-0">
                           {item.product.imageUrl ? (
                             <img
@@ -290,18 +295,15 @@ const AdminOrdersTab = () => {
                             {item.product.name}
                           </p>
                           <p className="text-sm text-slate-500 dark:text-slate-400">
-                            Số lượng: {item.quantity}
+                            {t("admin.orders.quantity")}: {item.quantity}
                           </p>
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-slate-900 dark:text-white">
-                            {(item.price * item.quantity).toLocaleString(
-                              "vi-VN",
-                            )}{" "}
-                            đ
+                            {formatCurrency(item.price * item.quantity, i18n.language)}
                           </p>
                           <p className="text-xs text-slate-400 dark:text-slate-500">
-                            {item.price.toLocaleString("vi-VN")} đ/sp
+                            {t("admin.orders.unitPrice", { price: formatCurrency(item.price, i18n.language) })}
                           </p>
                         </div>
                       </div>
@@ -313,10 +315,10 @@ const AdminOrdersTab = () => {
               {/* Total */}
               <div className="bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl p-4 flex items-center justify-between">
                 <span className="text-lg font-bold text-indigo-900 dark:text-indigo-200">
-                  Tổng cộng
+                  {t("admin.orders.grandTotal")}
                 </span>
                 <span className="text-2xl font-black text-indigo-600">
-                  {selectedOrder.totalAmount.toLocaleString("vi-VN")} đ
+                  {formatCurrency(selectedOrder.totalAmount, i18n.language)}
                 </span>
               </div>
             </div>

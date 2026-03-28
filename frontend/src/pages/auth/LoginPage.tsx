@@ -32,8 +32,7 @@ const LoginPage = () => {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
-        error.response?.data?.message ||
-          "Đăng nhập thất bại. Vui lòng thử lại.",
+        error.response?.data?.message || t("auth.loginFailed"),
       );
     } finally {
       setLoading(false);
@@ -46,7 +45,7 @@ const LoginPage = () => {
       await signInWithGoogle();
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setError(error.message || "Đăng nhập Google thất bại");
+      setError(error.message || t("auth.googleLoginFailed"));
       setGoogleLoading(false);
     }
   };
@@ -67,7 +66,7 @@ const LoginPage = () => {
           {/* Email Field */}
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Email
+              {t("auth.email")}
             </label>
             <div className="relative group">
               <Mail
@@ -92,12 +91,12 @@ const LoginPage = () => {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                Mật khẩu
+                {t("auth.password")}
               </label>
               <Link
                 to="/forgot-password"
                 className="text-sm text-indigo-600 dark:text-indigo-400 font-medium hover:underline">
-                Quên mật khẩu?
+                {t("auth.forgotPassword")}
               </Link>
             </div>
             <div className="relative group">
@@ -134,7 +133,7 @@ const LoginPage = () => {
               <Loader2 size={22} className="animate-spin" />
             ) : (
               <>
-                <span>Đăng nhập</span>
+                <span>{t("common.login")}</span>
                 <ArrowRight
                   size={20}
                   className="group-hover:translate-x-1 transition-transform"
@@ -151,7 +150,7 @@ const LoginPage = () => {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500">
-              hoặc tiếp tục với
+              {t("common.orContinueWith")}
             </span>
           </div>
         </div>
@@ -184,17 +183,19 @@ const LoginPage = () => {
             </svg>
           )}
           <span className="group-hover:translate-x-0.5 transition-transform">
-            {googleLoading ? "Đang xử lý..." : "Tiếp tục với Google"}
+            {googleLoading
+              ? t("common.processing")
+              : t("auth.continueWithGoogle")}
           </span>
         </button>
 
         {/* Register Link */}
         <div className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
-          Chưa có tài khoản?{" "}
+          {t("auth.noAccount")}{" "}
           <Link
             to="/register"
             className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
-            Đăng ký ngay
+            {t("auth.registerHere")}
           </Link>
         </div>
       </div>

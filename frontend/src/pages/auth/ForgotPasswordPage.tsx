@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import api from "../../api/axios";
 import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 
 const ForgotPasswordPage = () => {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -19,9 +21,7 @@ const ForgotPasswordPage = () => {
       setSubmitted(true);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(
-        error.response?.data?.message || "Có lỗi xảy ra. Vui lòng thử lại."
-      );
+      setError(error.response?.data?.message || t("auth.forgotPasswordError"));
     } finally {
       setLoading(false);
     }
@@ -35,17 +35,16 @@ const ForgotPasswordPage = () => {
             <CheckCircle size={32} className="text-green-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white">
-            Kiểm tra email của bạn
+            {t("auth.checkEmailTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400">
-            Nếu email <strong>{email}</strong> tồn tại trong hệ thống, bạn sẽ
-            nhận được link đặt lại mật khẩu trong vài phút.
+            {t("auth.checkEmailMessage", { email })}
           </p>
           <Link
             to="/login"
             className="inline-flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">
             <ArrowLeft size={18} />
-            Quay lại đăng nhập
+            {t("auth.backToLogin")}
           </Link>
         </div>
       </div>
@@ -60,10 +59,10 @@ const ForgotPasswordPage = () => {
             <Mail size={32} className="text-indigo-600" />
           </div>
           <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-            Quên mật khẩu?
+            {t("auth.forgotPasswordTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2">
-            Nhập email của bạn và chúng tôi sẽ gửi link đặt lại mật khẩu
+            {t("auth.forgotPasswordDescription")}
           </p>
         </div>
 
@@ -76,7 +75,7 @@ const ForgotPasswordPage = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider">
-              Email
+              {t("auth.email")}
             </label>
             <input
               type="email"
@@ -92,7 +91,7 @@ const ForgotPasswordPage = () => {
               type="submit"
               disabled={loading}
               className="w-full bg-slate-900 dark:bg-indigo-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-slate-800 dark:hover:bg-indigo-700 transition-all shadow-xl shadow-slate-200 dark:shadow-none disabled:bg-slate-400 dark:disabled:bg-slate-700 uppercase tracking-widest">
-              {loading ? "Đang gửi..." : "Gửi link đặt lại"}
+              {loading ? t("auth.sendingResetLink") : t("auth.sendResetLink")}
             </button>
         </form>
 
@@ -101,7 +100,7 @@ const ForgotPasswordPage = () => {
             to="/login"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">
             <ArrowLeft size={18} />
-            Quay lại đăng nhập
+            {t("auth.backToLogin")}
           </Link>
         </div>
       </div>

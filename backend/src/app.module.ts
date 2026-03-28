@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { validate } from './config/env.validation';
 import { AppController } from './app.controller';
@@ -28,6 +28,9 @@ import { FlashSaleModule } from './flash-sale/flash-sale.module';
 import { LoyaltyModule } from './loyalty/loyalty.module';
 import { ContactModule } from './contact/contact.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { MessageLocalizationService } from './common/i18n/message-localization.service';
+import { LocalizationExceptionFilter } from './common/filters/localization-exception.filter';
+import { LocalizationResponseInterceptor } from './common/interceptors/localization-response.interceptor';
 
 @Module({
   imports: [
@@ -69,9 +72,18 @@ import { NotificationsModule } from './notifications/notifications.module';
   controllers: [AppController],
   providers: [
     AppService,
+    MessageLocalizationService,
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LocalizationResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: LocalizationExceptionFilter,
     },
   ],
 })

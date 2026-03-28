@@ -68,7 +68,7 @@ const RegisterPage = () => {
 
   const handleSendOtp = useCallback(async () => {
     if (!isEmailValid) {
-      setError("Vui lòng nhập email hợp lệ");
+      setError(t("auth.invalidEmail"));
       return;
     }
 
@@ -82,30 +82,29 @@ const RegisterPage = () => {
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       setError(
-        error.response?.data?.message ||
-          "Gửi mã OTP thất bại. Vui lòng thử lại.",
+        error.response?.data?.message || t("auth.sendOtpFailed"),
       );
     } finally {
       setOtpSending(false);
     }
-  }, [formData.email, isEmailValid]);
+  }, [formData.email, isEmailValid, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!isPasswordValid) {
-      setError("Mật khẩu không đáp ứng đủ các yêu cầu bảo mật.");
+      setError(t("auth.passwordPolicyError"));
       return;
     }
 
     if (!passwordsMatch) {
-      setError("Mật khẩu nhập lại không khớp.");
+      setError(t("auth.confirmPasswordMismatchError"));
       return;
     }
 
     if (formData.otp.length !== 6) {
-      setError("Vui lòng nhập mã OTP 6 ký tự.");
+      setError(t("auth.otpLengthError"));
       return;
     }
 
@@ -116,9 +115,7 @@ const RegisterPage = () => {
       navigate("/login");
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(
-        error.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại.",
-      );
+      setError(error.response?.data?.message || t("auth.registerFailed"));
     } finally {
       setLoading(false);
     }
@@ -134,7 +131,7 @@ const RegisterPage = () => {
       await signInWithGoogle();
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setError(error.message || "Đăng ký Google thất bại");
+      setError(error.message || t("auth.googleRegisterFailed"));
       setGoogleLoading(false);
     }
   };
@@ -175,7 +172,7 @@ const RegisterPage = () => {
           {/* Full Name */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Họ và tên
+              {t("auth.fullName")}
             </label>
             <div className="relative group">
               <User
@@ -189,7 +186,7 @@ const RegisterPage = () => {
                 required
                 autoComplete="name"
                 className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700/50 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition-all placeholder:text-slate-400"
-                placeholder="Nguyễn Văn A"
+                placeholder={t("auth.fullNamePlaceholder")}
                 value={formData.fullName}
                 onChange={handleChange}
               />
@@ -199,7 +196,7 @@ const RegisterPage = () => {
           {/* Email */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Email
+              {t("auth.email")}
             </label>
             <div className="relative group">
               <Mail
@@ -223,7 +220,7 @@ const RegisterPage = () => {
           {/* Password */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Mật khẩu
+              {t("auth.password")}
             </label>
             <div className="relative group">
               <Lock
@@ -253,28 +250,28 @@ const RegisterPage = () => {
             {formData.password && (
               <div className="mt-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-slate-100 dark:border-slate-600 space-y-1.5">
                 <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">
-                  Yêu cầu mật khẩu:
+                  {t("auth.passwordRequirements")}
                 </p>
                 <div className="grid grid-cols-2 gap-1.5">
                   <ValidationItem
                     valid={passwordValidation.length}
-                    text="8-16 ký tự"
+                    text={t("auth.passwordRuleLength")}
                   />
                   <ValidationItem
                     valid={passwordValidation.uppercase}
-                    text="Chữ hoa (A-Z)"
+                    text={t("auth.passwordRuleUppercase")}
                   />
                   <ValidationItem
                     valid={passwordValidation.lowercase}
-                    text="Chữ thường (a-z)"
+                    text={t("auth.passwordRuleLowercase")}
                   />
                   <ValidationItem
                     valid={passwordValidation.number}
-                    text="Số (0-9)"
+                    text={t("auth.passwordRuleNumber")}
                   />
                   <ValidationItem
                     valid={passwordValidation.special}
-                    text="Ký tự đặc biệt"
+                    text={t("auth.passwordRuleSpecial")}
                   />
                 </div>
               </div>
@@ -284,7 +281,7 @@ const RegisterPage = () => {
           {/* Confirm Password */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Nhập lại mật khẩu
+              {t("auth.confirmPassword")}
             </label>
             <div className="relative group">
               <Lock
@@ -314,12 +311,12 @@ const RegisterPage = () => {
             </div>
             {confirmPassword && !passwordsMatch && (
               <p className="text-sm text-red-500 dark:text-red-400 font-medium flex items-center gap-1">
-                <X size={14} /> Mật khẩu không khớp
+                <X size={14} /> {t("auth.passwordsDoNotMatch")}
               </p>
             )}
             {confirmPassword && passwordsMatch && (
               <p className="text-sm text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
-                <Check size={14} /> Mật khẩu khớp
+                <Check size={14} /> {t("auth.passwordsMatch")}
               </p>
             )}
           </div>
@@ -327,7 +324,7 @@ const RegisterPage = () => {
           {/* OTP */}
           <div className="space-y-1.5">
             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-              Mã xác thực OTP
+              {t("auth.otpCode")}
             </label>
             <div className="flex gap-2">
               <input
@@ -350,15 +347,15 @@ const RegisterPage = () => {
                 className="px-4 py-3.5 rounded-xl bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-all disabled:bg-slate-300 dark:disabled:bg-slate-600 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap cursor-pointer">
                 <Send size={16} />
                 {otpSending
-                  ? "..."
+                  ? t("common.loading")
                   : countdown > 0
                     ? `${countdown}s`
-                    : "Gửi mã"}
+                    : t("auth.sendOtp")}
               </button>
             </div>
             {otpSent && countdown > 0 && (
               <p className="text-sm text-green-600 dark:text-green-400 font-medium">
-                Mã OTP đã được gửi đến email của bạn
+                {t("auth.otpSentNotice")}
               </p>
             )}
           </div>
@@ -377,7 +374,7 @@ const RegisterPage = () => {
               <Loader2 size={22} className="animate-spin" />
             ) : (
               <>
-                <span>Đăng ký</span>
+                <span>{t("common.register")}</span>
                 <ArrowRight
                   size={20}
                   className="group-hover:translate-x-1 transition-transform"
@@ -394,7 +391,7 @@ const RegisterPage = () => {
           </div>
           <div className="relative flex justify-center text-sm">
             <span className="px-4 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500">
-              hoặc tiếp tục với
+              {t("common.orContinueWith")}
             </span>
           </div>
         </div>
@@ -426,16 +423,20 @@ const RegisterPage = () => {
               />
             </svg>
           )}
-          <span>{googleLoading ? "Đang xử lý..." : "Tiếp tục với Google"}</span>
+          <span>
+            {googleLoading
+              ? t("common.processing")
+              : t("auth.continueWithGoogle")}
+          </span>
         </button>
 
         {/* Login Link */}
         <div className="text-center text-sm text-slate-600 dark:text-slate-400 pt-2">
-          Đã có tài khoản?{" "}
+          {t("auth.hasAccount")}{" "}
           <Link
             to="/login"
             className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
-            Đăng nhập
+            {t("common.login")}
           </Link>
         </div>
       </div>

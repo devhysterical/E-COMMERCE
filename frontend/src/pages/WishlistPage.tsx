@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Trash2, Package } from "lucide-react";
 import { WishlistService, type WishlistItem } from "../services/api.service";
@@ -10,8 +11,10 @@ import {
   WISHLIST_QUERY_KEY,
 } from "../utils/wishlist";
 import { useAuthStore } from "../store/useAuthStore";
+import { formatCurrency } from "../utils/language";
 
 const WishlistPage = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { isAuthenticated } = useAuthStore();
 
@@ -33,12 +36,12 @@ const WishlistPage = () => {
       return { previousWishlist };
     },
     onSuccess: () => {
-      toast.success("Đã xóa khỏi danh sách yêu thích");
+      toast.success(t("wishlist.removeSuccess"));
     },
     onError: (error, _productId, context) => {
       console.error("Error removing from wishlist:", error);
       queryClient.setQueryData(WISHLIST_QUERY_KEY, context?.previousWishlist);
-      toast.error("Không thể xóa khỏi danh sách yêu thích");
+      toast.error(t("wishlist.removeError"));
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
@@ -52,18 +55,15 @@ const WishlistPage = () => {
   const handleAddToCart = async (item: WishlistItem) => {
     try {
       await CartService.add(item.product.id, 1);
-      toast.success("Đã thêm vào giỏ hàng");
+      toast.success(t("cart.added"));
     } catch (error) {
       console.error("Error adding to cart:", error);
-      toast.error("Không thể thêm vào giỏ hàng");
+      toast.error(t("cart.addError"));
     }
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(price);
+    return formatCurrency(price, i18n.resolvedLanguage);
   };
 
   if (loading) {
@@ -82,16 +82,16 @@ const WishlistPage = () => {
             <Heart size={48} className="text-indigo-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            Danh sách yêu thích trống
+            {t("wishlist.emptyTitle")}
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mb-6">
-            Bạn chưa có sản phẩm nào trong danh sách yêu thích
+            {t("wishlist.emptyDescription")}
           </p>
           <Link
             to="/"
             className="inline-flex items-center gap-2 bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
             <Package size={20} />
-            Khám phá sản phẩm
+            {t("wishlist.exploreProducts")}
           </Link>
         </div>
       </div>
@@ -104,7 +104,7 @@ const WishlistPage = () => {
         <div className="flex items-center gap-3 mb-8">
           <Heart size={32} className="text-red-500" fill="currentColor" />
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Danh sách yêu thích ({wishlist.length})
+            {t("header.wishlist")} ({wishlist.length})
           </h1>
         </div>
 
@@ -144,12 +144,12 @@ const WishlistPage = () => {
                     onClick={() => handleAddToCart(item)}
                     className="flex-1 bg-indigo-600 text-white py-2 px-3 rounded-xl font-medium hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
                     <ShoppingCart size={18} />
-                    Thêm vào giỏ
+                    {t("product.addToCart")}
                   </button>
                   <button
                     onClick={() => handleRemove(item.productId)}
                     className="p-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-                    title="Xóa khỏi yêu thích">
+                    title={t("product.removeFromWishlist")}>
                     <Trash2 size={18} />
                   </button>
                 </div>

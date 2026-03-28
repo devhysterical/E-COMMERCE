@@ -1,5 +1,7 @@
 import axios from "axios";
 import { useAuthStore } from "../store/useAuthStore";
+import i18n from "../i18n";
+import { getLanguageTag } from "../utils/language";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:4000",
@@ -7,6 +9,12 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
   withCredentials: true, // Gửi httpOnly cookies tự động
+});
+
+api.interceptors.request.use((config) => {
+  const languageTag = getLanguageTag(i18n.resolvedLanguage ?? i18n.language);
+  config.headers.set("Accept-Language", languageTag);
+  return config;
 });
 
 // Response interceptor: auto refresh token khi 401
@@ -53,11 +61,18 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const languageTag = getLanguageTag(i18n.resolvedLanguage ?? i18n.language);
+
         // Server đọc refresh_token từ cookie, set cookie mới
         await axios.post(
           `${import.meta.env.VITE_API_BASE_URL || "http://localhost:4000"}/auth/refresh`,
           {},
-          { withCredentials: true },
+          {
+            withCredentials: true,
+            headers: {
+              "Accept-Language": languageTag,
+            },
+          },
         );
 
         // Retry tất cả requests đang chờ

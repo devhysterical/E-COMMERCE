@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from "react";
 import { AlertTriangle, RefreshCw } from "lucide-react";
+import i18n from "../i18n";
 
 interface Props {
   children: ReactNode;
@@ -30,6 +31,8 @@ class ErrorBoundary extends Component<Props, State> {
 
   render() {
     if (this.state.hasError) {
+      const t = i18n.t.bind(i18n);
+
       return (
         <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center px-4">
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 text-center max-w-md shadow-xl border border-slate-100 dark:border-slate-800">
@@ -37,10 +40,10 @@ class ErrorBoundary extends Component<Props, State> {
               <AlertTriangle size={32} className="text-red-600 dark:text-red-400" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
-              Đã xảy ra lỗi
+              {t("errorBoundary.title")}
             </h2>
             <p className="text-slate-600 dark:text-slate-400 mb-6">
-              Ứng dụng gặp sự cố không mong muốn. Vui lòng thử tải lại trang.
+              {t("errorBoundary.description")}
             </p>
             {import.meta.env.DEV && this.state.error && (
               <pre className="text-left bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-sm text-red-600 dark:text-red-400 mb-6 overflow-auto max-h-40 border border-slate-200 dark:border-slate-700">
@@ -52,12 +55,12 @@ class ErrorBoundary extends Component<Props, State> {
                 onClick={this.handleRetry}
                 className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
                 <RefreshCw size={18} />
-                Thử lại
+                {t("errorBoundary.retry")}
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
                 className="px-5 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-                Về trang chủ
+                {t("errorBoundary.backHome")}
               </button>
             </div>
           </div>

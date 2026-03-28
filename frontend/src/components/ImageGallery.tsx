@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight, Package } from "lucide-react";
 import type { ProductImage } from "../services/api.service";
 
@@ -13,6 +14,7 @@ const ImageGallery = ({
   mainImageUrl,
   productName,
 }: ImageGalleryProps) => {
+  const { t } = useTranslation();
   // Tạo danh sách ảnh: ưu tiên images từ ProductImage, fallback mainImageUrl
   const allImages =
     images.length > 0
@@ -28,7 +30,7 @@ const ImageGallery = ({
       <div className="w-full aspect-square rounded-3xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex items-center justify-center">
         <div className="text-slate-400 dark:text-slate-500 text-center">
           <Package size={64} />
-          <p className="mt-2">Không có ảnh</p>
+          <p className="mt-2">{t("product.noImage")}</p>
         </div>
       </div>
     );

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { LoyaltyService } from "../services/api.service";
 import { Crown } from "lucide-react";
 
@@ -10,6 +11,7 @@ const tierStyles: Record<string, string> = {
 };
 
 const LoyaltyBadge = () => {
+  const { t } = useTranslation();
   const { data: balance } = useQuery({
     queryKey: ["loyalty-balance"],
     queryFn: LoyaltyService.getBalance,
@@ -24,7 +26,7 @@ const LoyaltyBadge = () => {
         tierStyles[balance.tier.name] ?? "bg-slate-500 text-white"
       }`}>
       <Crown size={12} />
-      {balance.tier.name}
+      {t(`loyalty.tiers.${balance.tier.name}`, balance.tier.name)}
     </div>
   );
 };

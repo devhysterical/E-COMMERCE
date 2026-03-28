@@ -1,13 +1,16 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { AdminService } from "../services/api.service";
 import type { UserProfile } from "../services/api.service";
 import { Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
+import { formatDate } from "../utils/language";
 import ConfirmModal from "./ConfirmModal";
 import Pagination from "./Pagination";
 
 const AdminUsersTab = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const [deleteTarget, setDeleteTarget] = useState<UserProfile | null>(null);
   const [page, setPage] = useState(1);
@@ -30,12 +33,12 @@ const AdminUsersTab = () => {
     mutationFn: AdminService.deleteUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users"] });
-      toast.success("Đã xoá tài khoản thành công");
+      toast.success(t("admin.users.deleteSuccess"));
       setDeleteTarget(null);
     },
     onError: (error: { response?: { data?: { message?: string } } }) => {
       toast.error(
-        error.response?.data?.message || "Không thể xoá tài khoản này",
+        error.response?.data?.message || t("admin.users.deleteFailed"),
       );
       setDeleteTarget(null);
     },
@@ -43,9 +46,7 @@ const AdminUsersTab = () => {
 
   const handleDeleteUser = (user: UserProfile) => {
     if (user.role === "ADMIN") {
-      toast.error(
-        "Không thể xoá tài khoản Admin. Hãy hạ vai trò về User trước.",
-      );
+      toast.error(t("admin.users.cannotDeleteAdmin"));
       return;
     }
     setDeleteTarget(user);
@@ -57,19 +58,19 @@ const AdminUsersTab = () => {
         <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Người dùng
+              {t("admin.users.user")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Email
+              {t("admin.users.email")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Vai trò
+              {t("admin.users.role")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Ngày tạo
+              {t("admin.users.createdAt")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-              Hành động
+              {t("admin.common.actions")}
             </th>
           </tr>
         </thead>
@@ -77,7 +78,8 @@ const AdminUsersTab = () => {
           {users.slice((page - 1) * limit, page * limit).map((user: UserProfile) => (
             <tr
               key={user.id}
-              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+              className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors"
+            >
               <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-300 font-bold">
@@ -103,13 +105,14 @@ const AdminUsersTab = () => {
                     user.role === "ADMIN"
                       ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
                       : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-                  }`}>
+                  }`}
+                >
                   <option value="USER">User</option>
                   <option value="ADMIN">Admin</option>
                 </select>
               </td>
               <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                {new Date(user.createdAt).toLocaleDateString("vi-VN")}
+                {formatDate(user.createdAt, i18n.language)}
               </td>
               <td className="px-6 py-4 text-right">
                 <button
@@ -122,9 +125,10 @@ const AdminUsersTab = () => {
                   }`}
                   title={
                     user.role === "ADMIN"
-                      ? "Không thể xoá Admin"
-                      : "Xoá tài khoản"
-                  }>
+                      ? t("admin.users.cannotDelete")
+                      : t("admin.users.deleteAccount")
+                  }
+                >
                   <Trash2 size={18} />
                 </button>
               </td>
@@ -137,15 +141,15 @@ const AdminUsersTab = () => {
         page={page}
         totalPages={Math.ceil(users.length / limit)}
         totalItems={users.length}
-        label="người dùng"
+        label={t("admin.users.user")}
         onPageChange={setPage}
       />
 
       <ConfirmModal
         isOpen={!!deleteTarget}
-        title="Xoá tài khoản"
-        message={`Bạn có chắc muốn xoá tài khoản "${deleteTarget?.fullName || deleteTarget?.email}"? Hành động này không thể hoàn tác.`}
-        confirmLabel="Xoá tài khoản"
+        title={t("admin.users.deleteAccount")}
+        message={t("admin.users.confirmDelete", { name: deleteTarget?.fullName || deleteTarget?.email })}
+        confirmLabel={t("admin.users.deleteAccount")}
         variant="danger"
         isPending={deleteUserMutation.isPending}
         onConfirm={() => {

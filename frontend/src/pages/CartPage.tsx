@@ -24,6 +24,7 @@ import {
   Tag,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { formatCurrency } from "../utils/language";
 
 interface CartItem {
   id: string;
@@ -37,7 +38,7 @@ interface CartItem {
 }
 
 const CartPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -91,7 +92,7 @@ const CartPage = () => {
       if (context?.previousCart) {
         queryClient.setQueryData(["cart"], context.previousCart);
       }
-      toast.error("Cập nhật số lượng thất bại");
+      toast.error(t("cart.quantityUpdateError"));
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -158,7 +159,7 @@ const CartPage = () => {
       if (context?.previousCart) {
         queryClient.setQueryData(["cart"], context.previousCart);
       }
-      toast.error("Xoá sản phẩm thất bại");
+      toast.error(t("cart.removeError"));
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: ["cart"] });
@@ -187,7 +188,7 @@ const CartPage = () => {
   const handleValidateCoupon = async (code?: string) => {
     const codeToValidate = code || couponCode;
     if (!codeToValidate.trim()) {
-      setCouponError("Vui lòng nhập mã giảm giá");
+      setCouponError(t("cart.couponRequired"));
       return;
     }
     if (!totalAmount) return;
@@ -198,13 +199,16 @@ const CartPage = () => {
       const result = await CouponService.validate(codeToValidate, totalAmount);
       setCouponResult(result);
       setCouponCode(result.code);
-      toast.success(result.message);
+      toast.success(
+        t("cart.couponApplied", {
+          code: result.code,
+          amount: formatCurrency(result.discountAmount, i18n.resolvedLanguage),
+        }),
+      );
       setShowAvailableCoupons(false);
     } catch (err) {
       const error = err as { response?: { data?: { message?: string } } };
-      setCouponError(
-        error.response?.data?.message || "Mã giảm giá không hợp lệ",
-      );
+      setCouponError(error.response?.data?.message || t("cart.invalidCoupon"));
       setCouponResult(null);
     } finally {
       setValidatingCoupon(false);
@@ -236,7 +240,7 @@ const CartPage = () => {
     if (coupon.discountType === "PERCENTAGE") {
       return `${coupon.discountValue}%`;
     }
-    return `${coupon.discountValue.toLocaleString("vi-VN")}đ`;
+    return formatCurrency(coupon.discountValue, i18n.resolvedLanguage);
   };
 
   if (isLoading)
@@ -286,7 +290,7 @@ const CartPage = () => {
                     {item.product.name}
                   </h3>
                   <p className="text-indigo-600 dark:text-indigo-400 font-bold mt-1">
-                    {item.product.price.toLocaleString("vi-VN")} đ
+                    {formatCurrency(item.product.price, i18n.resolvedLanguage)}
                   </p>
                 </div>
                 <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-700 p-1.5 rounded-xl">
@@ -340,13 +344,14 @@ const CartPage = () => {
           <div className="w-full lg:w-96">
             <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm sticky top-24 space-y-6">
               <h2 className="text-xl font-bold text-slate-900 uppercase italic">
-                Tóm tắt đơn hàng
+                {t("cart.orderSummary")}
               </h2>
 
               {/* Coupon Section */}
               <div className="space-y-3">
                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700">
-                  <Ticket size={16} className="text-indigo-600" /> Mã giảm giá
+                  <Ticket size={16} className="text-indigo-600" />{" "}
+                  {t("cart.coupon")}
                 </label>
 
                 {couponResult ? (
@@ -358,8 +363,12 @@ const CartPage = () => {
                           {couponResult.code}
                         </p>
                         <p className="text-xs text-green-600">
-                          Giảm{" "}
-                          {couponResult.discountAmount.toLocaleString("vi-VN")}đ
+                          {t("cart.appliedDiscount", {
+                            amount: formatCurrency(
+                              couponResult.discountAmount,
+                              i18n.resolvedLanguage,
+                            ),
+                          })}
                         </p>
                       </div>
                     </div>
@@ -379,7 +388,7 @@ const CartPage = () => {
                           setCouponCode(e.target.value.toUpperCase())
                         }
                         className="flex-1 px-3 py-2 rounded-xl border border-slate-200 focus:ring-2 focus:ring-indigo-500 outline-none text-sm uppercase"
-                        placeholder="Nhập mã giảm giá"
+                        placeholder={t("cart.couponPlaceholder")}
                       />
                       <button
                         onClick={() => handleValidateCoupon()}
@@ -388,7 +397,7 @@ const CartPage = () => {
                         {validatingCoupon ? (
                           <Loader2 size={18} className="animate-spin" />
                         ) : (
-                          "Áp dụng"
+                          t("cart.applyCouponAction")
                         )}
                       </button>
                     </div>
@@ -401,7 +410,9 @@ const CartPage = () => {
                       className="w-full flex items-center justify-between px-3 py-2 text-sm text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors">
                       <span className="flex items-center gap-2">
                         <Tag size={14} />
-                        Xem mã giảm giá khả dụng ({availableCoupons.length})
+                        {t("cart.availableCoupons", {
+                          count: availableCoupons.length,
+                        })}
                       </span>
                       {showAvailableCoupons ? (
                         <ChevronUp size={16} />
@@ -415,7 +426,7 @@ const CartPage = () => {
                       <div className="max-h-48 overflow-y-auto space-y-2 border border-slate-100 rounded-xl p-2">
                         {availableCoupons.length === 0 ? (
                           <p className="text-sm text-slate-500 text-center py-4">
-                            Không có mã giảm giá nào
+                            {t("cart.noAvailableCoupons")}
                           </p>
                         ) : (
                           availableCoupons.map((coupon) => (
@@ -451,11 +462,12 @@ const CartPage = () => {
                                       ? "text-slate-400"
                                       : "text-red-500"
                                   }`}>
-                                  Đơn tối thiểu{" "}
-                                  {coupon.minOrderAmount.toLocaleString(
-                                    "vi-VN",
-                                  )}
-                                  đ
+                                  {t("cart.minimumOrder", {
+                                    amount: formatCurrency(
+                                      coupon.minOrderAmount,
+                                      i18n.resolvedLanguage,
+                                    ),
+                                  })}
                                 </p>
                               )}
                             </button>
@@ -474,32 +486,38 @@ const CartPage = () => {
               {/* Price Summary */}
               <div className="space-y-4 pt-4 border-t border-slate-100">
                 <div className="flex justify-between text-slate-500">
-                  <span>Tạm tính</span>
-                  <span>{totalAmount?.toLocaleString("vi-VN")} đ</span>
+                  <span>{t("cart.subtotal")}</span>
+                  <span>
+                    {formatCurrency(totalAmount || 0, i18n.resolvedLanguage)}
+                  </span>
                 </div>
 
                 {couponResult && (
                   <div className="flex justify-between text-green-600">
-                    <span>Giảm giá</span>
+                    <span>{t("cart.discount")}</span>
                     <span>
-                      -{couponResult.discountAmount.toLocaleString("vi-VN")} đ
+                      -
+                      {formatCurrency(
+                        couponResult.discountAmount,
+                        i18n.resolvedLanguage,
+                      )}
                     </span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-slate-500">
-                  <span>Phí vận chuyển</span>
+                  <span>{t("checkout.shippingFee")}</span>
                   <span className="text-green-600 font-bold uppercase">
-                    Miễn phí
+                    {t("checkout.freeShipping")}
                   </span>
                 </div>
 
                 <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
                   <span className="text-lg font-bold text-slate-900">
-                    Tổng cộng
+                    {t("cart.total")}
                   </span>
                   <span className="text-2xl font-black text-indigo-600">
-                    {finalAmount.toLocaleString("vi-VN")} đ
+                    {formatCurrency(finalAmount, i18n.resolvedLanguage)}
                   </span>
                 </div>
               </div>
@@ -507,7 +525,7 @@ const CartPage = () => {
               <button
                 onClick={handleProceedToCheckout}
                 className="w-full flex items-center justify-center gap-3 bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 uppercase">
-                Tiến hành thanh toán <ArrowRight size={22} />
+                {t("cart.proceedToCheckout")} <ArrowRight size={22} />
               </button>
             </div>
           </div>

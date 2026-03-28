@@ -25,11 +25,12 @@ import {
 } from "lucide-react";
 import AddressSelector from "../components/AddressSelector";
 import AddressForm from "../components/AddressForm";
+import { formatCurrency } from "../utils/language";
 
 type PaymentMethod = "COD" | "MOMO";
 
 const CheckoutPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -118,22 +119,22 @@ const CheckoutPage = () => {
           if (paymentResult.success && paymentResult.payUrl) {
             window.location.href = paymentResult.payUrl;
           } else {
-            setError(paymentResult.message || "Không thể tạo thanh toán MoMo");
+            setError(paymentResult.message || t("checkout.createMomoError"));
             setIsProcessing(false);
           }
         } catch {
-          setError("Có lỗi xảy ra khi tạo thanh toán MoMo");
+          setError(t("checkout.createMomoError"));
           setIsProcessing(false);
         }
       } else {
         // COD - thông báo thành công
-        toast.success("Đặt hàng thành công!");
+        toast.success(t("checkout.orderSuccess"));
         navigate("/orders");
       }
     },
     onError: (err: unknown) => {
       const error = err as { response?: { data?: { message?: string } } };
-      setError(error.response?.data?.message || "Có lỗi xảy ra khi đặt hàng.");
+      setError(error.response?.data?.message || t("checkout.orderError"));
     },
   });
 
@@ -161,7 +162,7 @@ const CheckoutPage = () => {
       finalAddress = manualAddress;
       finalPhone = manualPhone;
     } else {
-      setError("Vui lòng chọn hoặc nhập địa chỉ giao hàng");
+      setError(t("checkout.shippingAddressRequired"));
       return;
     }
 
@@ -232,7 +233,12 @@ const CheckoutPage = () => {
             <div className="flex-1">
               <p className="font-bold text-green-700">{appliedCoupon.code}</p>
               <p className="text-sm text-green-600">
-                Giảm {appliedCoupon.discountAmount.toLocaleString("vi-VN")}đ
+                {t("cart.appliedDiscount", {
+                  amount: formatCurrency(
+                    appliedCoupon.discountAmount,
+                    i18n.resolvedLanguage,
+                  ),
+                })}
               </p>
             </div>
           </div>
@@ -274,10 +280,7 @@ const CheckoutPage = () => {
                 <textarea
                   required
                   className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all h-24 mt-4"
-                  placeholder={
-                    t("checkout.addressPlaceholder") ||
-                    "VD: 123 Đường ABC, Quận X, TP. Y"
-                  }
+                  placeholder={t("checkout.addressPlaceholder")}
                   value={manualAddress}
                   onChange={(e) => setManualAddress(e.target.value)}
                 />
@@ -291,7 +294,7 @@ const CheckoutPage = () => {
                     type="tel"
                     required
                     className="w-full px-4 py-3 rounded-2xl border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
-                    placeholder="09xx xxx xxx"
+                    placeholder={t("profile.phonePlaceholder")}
                     value={manualPhone || profile?.phone || ""}
                     onChange={(e) => setManualPhone(e.target.value)}
                   />
@@ -392,7 +395,10 @@ const CheckoutPage = () => {
                   }`}>
                   {shippingInfo.isFreeShipping
                     ? t("checkout.freeShipping")
-                    : `${shippingInfo.fee.toLocaleString("vi-VN")}d`}
+                    : formatCurrency(
+                        shippingInfo.fee,
+                        i18n.resolvedLanguage,
+                      )}
                 </span>
               </div>
               {shippingInfo.zone?.estimatedDays && (

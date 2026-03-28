@@ -1,5 +1,6 @@
 import type { WishlistItem } from "../services/api.service";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Heart, ShoppingCart, Package } from "lucide-react";
 import { WishlistService, type Product } from "../services/api.service";
 import { CartService } from "../services/cart.service";
@@ -12,12 +13,14 @@ import {
   syncWishlistCache,
   WISHLIST_QUERY_KEY,
 } from "../utils/wishlist";
+import { formatCurrency } from "../utils/language";
 
 interface ProductCardProps {
   product: Product;
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
+  const { t, i18n } = useTranslation();
   const { isAuthenticated } = useAuthStore();
   const queryClient = useQueryClient();
 
@@ -32,7 +35,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     e.stopPropagation();
 
     if (!isAuthenticated) {
-      toast.info("Vui lòng đăng nhập để thêm vào yêu thích");
+      toast.info(t("product.wishlistLoginRequired"));
       return;
     }
 
@@ -55,7 +58,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     onError: (error, _variables, context) => {
       console.error("Error toggling wishlist:", error);
       queryClient.setQueryData(WISHLIST_QUERY_KEY, context?.previousWishlist);
-      toast.error("Không thể cập nhật danh sách yêu thích");
+      toast.error(t("wishlist.updateError"));
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: WISHLIST_QUERY_KEY });
@@ -66,10 +69,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
     mutationFn: () => CartService.add(product.id, 1),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["cart"] });
-      toast.success("Đã thêm vào giỏ hàng");
+      toast.success(t("cart.added"));
     },
     onError: () => {
-      toast.error("Không thể thêm vào giỏ hàng");
+      toast.error(t("cart.addError"));
     },
   });
 
@@ -108,7 +111,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
                 ? "bg-red-500 text-white"
                 : "bg-white/90 backdrop-blur-sm text-slate-600 hover:text-red-500"
             } ${toggleWishlistMutation.isPending ? "opacity-50" : ""}`}
-            title={inWishlist ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}>
+            title={
+              inWishlist
+                ? t("product.removeFromWishlist")
+                : t("product.addToWishlist")
+            }>
             <Heart size={18} fill={inWishlist ? "currentColor" : "none"} />
           </button>
         </div>
@@ -121,7 +128,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </Link>
         <div className="flex items-center justify-between gap-2 mt-auto pt-2">
           <span className="text-base font-black text-slate-900 dark:text-white whitespace-nowrap shrink-0">
-            {product.price.toLocaleString("vi-VN")} đ
+            {formatCurrency(product.price, i18n.resolvedLanguage)}
           </span>
           <button
             onClick={handleAddToCart}

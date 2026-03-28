@@ -1,11 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { Bell, Package, Star, Megaphone, Info, Check } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   NotificationService,
   type Notification,
 } from "../services/notification.service";
+import { getLanguageTag } from "../utils/language";
 
 const typeConfig: Record<
   string,
@@ -33,18 +35,6 @@ const typeConfig: Record<
   },
 };
 
-function timeAgo(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
-  const minutes = Math.floor(diff / 60000);
-  if (minutes < 1) return "Vừa xong";
-  if (minutes < 60) return `${minutes} phút trước`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} giờ trước`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} ngày trước`;
-  return new Date(dateStr).toLocaleDateString("vi-VN");
-}
-
 function getNotificationLink(notification: Notification): string | null {
   if (!notification.metadata) return null;
   if (notification.type === "ORDER_STATUS" && notification.metadata.orderId) {
@@ -54,9 +44,33 @@ function getNotificationLink(notification: Notification): string | null {
 }
 
 export default function NotificationBell() {
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
+  const languageTag = getLanguageTag(i18n.resolvedLanguage);
+  const relativeTime = new Intl.RelativeTimeFormat(languageTag, {
+    numeric: "auto",
+  });
+
+  const timeAgo = useCallback(
+    (dateStr: string) => {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const minutes = Math.floor(diff / 60000);
+
+      if (minutes < 1) return t("notifications.justNow");
+      if (minutes < 60) return relativeTime.format(-minutes, "minute");
+
+      const hours = Math.floor(minutes / 60);
+      if (hours < 24) return relativeTime.format(-hours, "hour");
+
+      const days = Math.floor(hours / 24);
+      if (days < 7) return relativeTime.format(-days, "day");
+
+      return new Date(dateStr).toLocaleDateString(languageTag);
+    },
+    [languageTag, relativeTime, t],
+  );
 
   // Đóng dropdown khi click ra ngoài
   const handleClickOutside = useCallback((event: MouseEvent) => {
@@ -132,7 +146,7 @@ export default function NotificationBell() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
-        title="Thông báo"
+        title={t("notifications.title")}
         id="notification-bell-btn">
         <Bell size={24} />
         {unreadCount > 0 && (
@@ -147,7 +161,7 @@ export default function NotificationBell() {
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-slate-700">
             <h3 className="font-bold text-slate-900 dark:text-white">
-              Thông báo
+              {t("notifications.title")}
             </h3>
             {unreadCount > 0 && (
               <button
@@ -155,7 +169,7 @@ export default function NotificationBell() {
                 className="text-xs text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
                 disabled={markAllReadMutation.isPending}>
                 <Check size={14} />
-                Đọc tất cả
+                {t("notifications.markAllRead")}
               </button>
             )}
           </div>
@@ -165,7 +179,7 @@ export default function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="px-4 py-8 text-center text-slate-400 dark:text-slate-500">
                 <Bell size={32} className="mx-auto mb-2 opacity-50" />
-                <p className="text-sm">Chưa có thông báo nào</p>
+                <p className="text-sm">{t("notifications.empty")}</p>
               </div>
             ) : (
               notifications.map((notif) => {
@@ -223,7 +237,7 @@ export default function NotificationBell() {
               to="/notifications"
               onClick={() => setIsOpen(false)}
               className="block text-center py-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
-              Xem tất cả thông báo
+              {t("notifications.viewAll")}
             </Link>
           </div>
         </div>

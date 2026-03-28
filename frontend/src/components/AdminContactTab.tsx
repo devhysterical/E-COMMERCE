@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Eye, X, Clock, Loader, CheckCircle, XCircle } from "lucide-react";
 import api from "../api/axios";
 import { toast } from "react-toastify";
+import { formatDate } from "../utils/language";
 import Pagination from "./Pagination";
 
 interface ContactTicket {
@@ -17,37 +19,31 @@ interface ContactTicket {
   updatedAt: string;
 }
 
-const statusConfig: Record<
-  string,
-  { label: string; color: string; icon: React.ReactNode }
-> = {
+const statusIcons: Record<string, { color: string; icon: React.ReactNode }> = {
   OPEN: {
-    label: "Mở",
     color: "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
     icon: <Clock size={14} />,
   },
   IN_PROGRESS: {
-    label: "Đang xử lý",
     color: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300",
     icon: <Loader size={14} />,
   },
   RESOLVED: {
-    label: "Đã giải quyết",
     color: "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300",
     icon: <CheckCircle size={14} />,
   },
   CLOSED: {
-    label: "Đã đóng",
     color: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
     icon: <XCircle size={14} />,
   },
 };
 
+const TICKET_STATUSES = ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] as const;
+
 const AdminContactTab = () => {
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
-  const [selectedTicket, setSelectedTicket] = useState<ContactTicket | null>(
-    null,
-  );
+  const [selectedTicket, setSelectedTicket] = useState<ContactTicket | null>(null);
   const [adminNote, setAdminNote] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
   const [page, setPage] = useState(1);
@@ -77,7 +73,7 @@ const AdminContactTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-tickets"] });
       setSelectedTicket(null);
-      toast.success("Cập nhật ticket thành công!");
+      toast.success(t("admin.contact.updateSuccess"));
     },
   });
 
@@ -93,8 +89,8 @@ const AdminContactTab = () => {
     <>
       {/* Filter */}
       <div className="p-4 border-b border-slate-100 dark:border-slate-700 flex items-center gap-3">
-        <span className="text-sm font-bold text-slate-500 dark:text-slate-400">Lọc:</span>
-        {["", "OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"].map((status) => (
+        <span className="text-sm font-bold text-slate-500 dark:text-slate-400">{t("admin.common.filter")}:</span>
+        {(["", ...TICKET_STATUSES] as const).map((status) => (
           <button
             key={status}
             onClick={() => setFilterStatus(status)}
@@ -102,8 +98,9 @@ const AdminContactTab = () => {
               filterStatus === status
                 ? "bg-slate-900 text-white"
                 : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
-            }`}>
-            {status === "" ? "Tất cả" : statusConfig[status]?.label || status}
+            }`}
+          >
+            {status === "" ? t("admin.common.all") : t(`admin.contact.statusLabels.${status}`)}
           </button>
         ))}
       </div>
@@ -113,19 +110,19 @@ const AdminContactTab = () => {
         <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-100 dark:border-slate-700">
           <tr>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Khách hàng
+              {t("admin.contact.customer")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Chủ đề
+              {t("admin.contact.subject")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Trạng thái
+              {t("admin.contact.status")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">
-              Ngày gửi
+              {t("admin.contact.sentDate")}
             </th>
             <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest text-right">
-              Hành động
+              {t("admin.common.actions")}
             </th>
           </tr>
         </thead>
@@ -133,14 +130,15 @@ const AdminContactTab = () => {
           {tickets.length === 0 ? (
             <tr>
               <td colSpan={5} className="px-6 py-12 text-center text-slate-400 dark:text-slate-500">
-                Chưa có yêu cầu hỗ trợ nào
+                {t("admin.contact.noTickets")}
               </td>
             </tr>
           ) : (
             tickets.slice((page - 1) * limit, page * limit).map((ticket) => (
               <tr
                 key={ticket.id}
-                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors">
+                className="hover:bg-slate-50/50 dark:hover:bg-slate-800/70 transition-colors"
+              >
                 <td className="px-6 py-4">
                   <div>
                     <p className="font-bold text-slate-900 dark:text-white">{ticket.name}</p>
@@ -153,14 +151,15 @@ const AdminContactTab = () => {
                 <td className="px-6 py-4">
                   <span
                     className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-semibold ${
-                      statusConfig[ticket.status]?.color || "bg-slate-100"
-                    }`}>
-                    {statusConfig[ticket.status]?.icon}
-                    {statusConfig[ticket.status]?.label || ticket.status}
+                      statusIcons[ticket.status]?.color || "bg-slate-100"
+                    }`}
+                  >
+                    {statusIcons[ticket.status]?.icon}
+                    {t(`admin.contact.statusLabels.${ticket.status}`)}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400">
-                  {new Date(ticket.createdAt).toLocaleDateString("vi-VN")}
+                  {formatDate(ticket.createdAt, i18n.language)}
                 </td>
                 <td className="px-6 py-4 text-right">
                   <button
@@ -168,7 +167,8 @@ const AdminContactTab = () => {
                       setSelectedTicket(ticket);
                       setAdminNote(ticket.adminNote || "");
                     }}
-                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all">
+                    className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-all"
+                  >
                     <Eye size={18} />
                   </button>
                 </td>
@@ -182,7 +182,7 @@ const AdminContactTab = () => {
         page={page}
         totalPages={Math.ceil(tickets.length / limit)}
         totalItems={tickets.length}
-        label="yêu cầu"
+        label={t("admin.contact.subject")}
         onPageChange={setPage}
       />
 
@@ -192,37 +192,38 @@ const AdminContactTab = () => {
           <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
             <div className="p-6 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
               <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                Chi tiết yêu cầu hỗ trợ
+                {t("admin.contact.detailTitle")}
               </h3>
               <button
                 onClick={() => setSelectedTicket(null)}
-                className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg">
+                className="p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              >
                 <X size={20} />
               </button>
             </div>
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Họ tên</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t("admin.contact.fullName")}</p>
                   <p className="font-semibold text-slate-900 dark:text-white">
                     {selectedTicket.name}
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Email</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{t("admin.contact.email")}</p>
                   <p className="font-semibold text-slate-900 dark:text-white">
                     {selectedTicket.email}
                   </p>
                 </div>
               </div>
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400">Chủ đề</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t("admin.contact.subject")}</p>
                 <p className="font-semibold text-slate-900 dark:text-white">
                   {selectedTicket.subject}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Nội dung</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">{t("admin.contact.content")}</p>
                 <div className="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 text-slate-700 dark:text-slate-200 whitespace-pre-wrap">
                   {selectedTicket.message}
                 </div>
@@ -233,39 +234,42 @@ const AdminContactTab = () => {
               {/* Admin actions */}
               <div>
                 <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">
-                  Cập nhật trạng thái
+                  {t("admin.contact.updateStatus")}
                 </p>
                 <select
                   value={selectedTicket.status}
                   onChange={(e) =>
                     handleUpdateStatus(selectedTicket.id, e.target.value)
                   }
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none">
-                  <option value="OPEN">Mở</option>
-                  <option value="IN_PROGRESS">Đang xử lý</option>
-                  <option value="RESOLVED">Đã giải quyết</option>
-                  <option value="CLOSED">Đã đóng</option>
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+                >
+                  {TICKET_STATUSES.map((s) => (
+                    <option key={s} value={s}>
+                      {t(`admin.contact.statusLabels.${s}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
               <div>
                 <p className="text-sm font-bold text-slate-500 dark:text-slate-400 mb-2">
-                  Ghi chú admin
+                  {t("admin.contact.adminNote")}
                 </p>
                 <textarea
                   value={adminNote}
                   onChange={(e) => setAdminNote(e.target.value)}
                   rows={3}
                   className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none resize-y"
-                  placeholder="Ghi chú nội bộ..."
+                  placeholder={t("admin.contact.adminNotePlaceholder")}
                 />
                 <button
                   onClick={() =>
                     handleUpdateStatus(selectedTicket.id, selectedTicket.status)
                   }
                   disabled={updateStatusMutation.isPending}
-                  className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors text-sm">
-                  Lưu ghi chú
+                  className="mt-2 px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors text-sm"
+                >
+                  {t("admin.contact.saveNote")}
                 </button>
               </div>
             </div>

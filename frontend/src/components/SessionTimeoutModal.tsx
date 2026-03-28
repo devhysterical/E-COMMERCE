@@ -1,4 +1,5 @@
 import { AlertTriangle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface SessionTimeoutModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ const SessionTimeoutModal = ({
   isOpen,
   onConfirm,
 }: SessionTimeoutModalProps) => {
+  const { t } = useTranslation();
   if (!isOpen) return null;
 
   return (
@@ -25,18 +27,17 @@ const SessionTimeoutModal = ({
 
         {/* Content */}
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white text-center mb-3">
-          Phiên đăng nhập đã hết hạn
+          {t("modal.sessionExpiredTitle")}
         </h2>
         <p className="text-slate-500 dark:text-slate-400 text-center mb-8">
-          Bạn đã không hoạt động trong một thời gian dài. Vui lòng đăng nhập lại
-          để tiếp tục sử dụng.
+          {t("modal.sessionExpiredDescription")}
         </p>
 
         {/* Button */}
         <button
           onClick={onConfirm}
           className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
-          Xác nhận
+          {t("modal.confirm")}
         </button>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ProductService } from "../services/api.service";
 import { AlertTriangle, Package, ArrowRight } from "lucide-react";
 
@@ -11,6 +12,7 @@ const LowStockAlert = ({
   threshold = 10,
   onViewProducts,
 }: LowStockAlertProps) => {
+  const { t } = useTranslation();
   const { data, isLoading } = useQuery({
     queryKey: ["low-stock", threshold],
     queryFn: () => ProductService.getLowStock(threshold),
@@ -42,10 +44,10 @@ const LowStockAlert = ({
           </div>
           <div>
             <h3 className="font-bold text-slate-900 dark:text-white">
-              Cảnh báo tồn kho
+              {t("inventory.title")}
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {data.total} sản phẩm cần bổ sung
+              {t("inventory.needsRestock", { count: data.total })}
             </p>
           </div>
         </div>
@@ -53,7 +55,7 @@ const LowStockAlert = ({
           <button
             onClick={onViewProducts}
             className="flex items-center gap-1 text-sm text-amber-700 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 font-medium">
-            Xem tất cả <ArrowRight size={16} />
+            {t("inventory.viewAll")} <ArrowRight size={16} />
           </button>
         )}
       </div>
@@ -63,7 +65,7 @@ const LowStockAlert = ({
         <div className="mb-3">
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-semibold text-red-600 dark:text-red-300 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full">
-              Sắp hết hàng ({criticalProducts.length})
+              {t("inventory.critical", { count: criticalProducts.length })}
             </span>
           </div>
           <div className="space-y-2">
@@ -97,7 +99,7 @@ const LowStockAlert = ({
                     {product.stock}
                   </span>
                   <p className="text-xs text-slate-500 dark:text-slate-400">
-                    còn lại
+                    {t("inventory.remaining")}
                   </p>
                 </div>
               </div>
@@ -111,7 +113,7 @@ const LowStockAlert = ({
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-xs font-semibold text-amber-600 dark:text-amber-300 bg-amber-100 dark:bg-amber-900/30 px-2 py-0.5 rounded-full">
-              Tồn kho thấp ({lowProducts.length})
+              {t("inventory.lowStock", { count: lowProducts.length })}
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -129,7 +131,9 @@ const LowStockAlert = ({
             ))}
             {lowProducts.length > 5 && (
               <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center">
-                +{lowProducts.length - 5} sản phẩm khác
+                {t("inventory.moreProducts", {
+                  count: lowProducts.length - 5,
+                })}
               </span>
             )}
           </div>

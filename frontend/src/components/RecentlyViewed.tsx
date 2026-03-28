@@ -1,15 +1,18 @@
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Clock, X, Trash2 } from "lucide-react";
 import {
   useRecentlyViewed,
   type RecentProduct,
 } from "../hooks/useRecentlyViewed";
+import { formatCurrency } from "../utils/language";
 
 interface RecentlyViewedProps {
   excludeProductId?: string;
 }
 
 const RecentlyViewed = ({ excludeProductId }: RecentlyViewedProps) => {
+  const { t, i18n } = useTranslation();
   const { products, removeProduct, clearAll } = useRecentlyViewed();
 
   // Lọc bỏ sản phẩm hiện tại nếu có
@@ -27,14 +30,14 @@ const RecentlyViewed = ({ excludeProductId }: RecentlyViewedProps) => {
         <div className="flex items-center gap-2">
           <Clock className="text-indigo-600" size={24} />
           <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-            Sản phẩm đã xem gần đây
+            {t("product.recentlyViewed")}
           </h3>
         </div>
         <button
           onClick={clearAll}
           className="flex items-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors">
           <Trash2 size={14} />
-          Xóa tất cả
+          {t("recentlyViewed.clearAll")}
         </button>
       </div>
 
@@ -66,7 +69,7 @@ const RecentlyViewed = ({ excludeProductId }: RecentlyViewedProps) => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500 text-xs">
-                    No Image
+                    {t("product.noImage")}
                   </div>
                 )}
               </div>
@@ -75,7 +78,7 @@ const RecentlyViewed = ({ excludeProductId }: RecentlyViewedProps) => {
                   {product.name}
                 </h4>
                 <p className="text-indigo-600 font-bold mt-1 text-xs">
-                  {product.price.toLocaleString("vi-VN")}đ
+                  {formatCurrency(product.price, i18n.resolvedLanguage)}
                 </p>
               </div>
             </Link>

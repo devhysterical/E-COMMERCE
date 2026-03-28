@@ -20,9 +20,15 @@ import {
   ChevronDown,
 } from "lucide-react";
 import { toast } from "react-toastify";
+import { formatDate } from "../utils/language";
+
+type FeedbackState = {
+  type: "success" | "error";
+  message: string;
+};
 
 const ProfilePage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const queryClient = useQueryClient();
   const { user: authUser, setAuth } = useAuthStore();
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +50,9 @@ const ProfilePage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
-  const [passwordMessage, setPasswordMessage] = useState("");
+  const [passwordFeedback, setPasswordFeedback] = useState<FeedbackState | null>(
+    null,
+  );
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile"],
@@ -62,27 +70,31 @@ const ProfilePage = () => {
         );
       }
       setIsEditing(false);
-      toast.success("Cập nhật hồ sơ thành công!");
+      toast.success(t("profile.updateSuccess"));
     },
     onError: () => {
-      toast.error("Cập nhật hồ sơ thất bại!");
+      toast.error(t("profile.updateError"));
     },
   });
 
   const changePasswordMutation = useMutation({
     mutationFn: UserService.changePassword,
     onSuccess: () => {
-      setPasswordMessage("Đổi mật khẩu thành công!");
+      setPasswordFeedback({
+        type: "success",
+        message: t("profile.passwordChangeSuccess"),
+      });
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
       setShowPasswordForm(false);
-      setTimeout(() => setPasswordMessage(""), 3000);
+      setTimeout(() => setPasswordFeedback(null), 3000);
     },
     onError: () => {
-      setPasswordMessage(
-        "Đổi mật khẩu thất bại. Vui lòng kiểm tra lại mật khẩu hiện tại.",
-      );
+      setPasswordFeedback({
+        type: "error",
+        message: t("profile.passwordChangeError"),
+      });
     },
   });
 
@@ -110,7 +122,10 @@ const ProfilePage = () => {
   const handleChangePassword = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      setPasswordMessage("Mật khẩu mới không khớp!");
+      setPasswordFeedback({
+        type: "error",
+        message: t("profile.passwordMismatch"),
+      });
       return;
     }
     changePasswordMutation.mutate({ currentPassword, newPassword });
@@ -122,13 +137,13 @@ const ProfilePage = () => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      toast.error("Vui lòng chọn file hình ảnh");
+      toast.error(t("profile.invalidImageType"));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Kích thước file tối đa là 5MB");
+      toast.error(t("profile.invalidImageSize"));
       return;
     }
 
@@ -136,9 +151,9 @@ const ProfilePage = () => {
     try {
       const result = await UploadService.uploadImage(file);
       await updateProfileMutation.mutateAsync({ avatarUrl: result.url });
-      toast.success("Cập nhật ảnh đại diện thành công!");
+      toast.success(t("profile.avatarUpdateSuccess"));
     } catch {
-      toast.error("Cập nhật ảnh đại diện thất bại!");
+      toast.error(t("profile.avatarUpdateError"));
     } finally {
       setIsUploadingAvatar(false);
     }
@@ -172,15 +187,14 @@ const ProfilePage = () => {
         {t("common.profile")}
       </h1>
 
-      {passwordMessage && (
+      {passwordFeedback && (
         <div
           className={`mb-6 p-4 rounded-xl ${
-            passwordMessage.includes("thành công") ||
-            passwordMessage.includes("success")
+            passwordFeedback.type === "success"
               ? "bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
               : "bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400"
           }`}>
-          {passwordMessage}
+          {passwordFeedback.message}
         </div>
       )}
 
@@ -220,11 +234,13 @@ const ProfilePage = () => {
             </label>
           </div>
           <h2 className="mt-4 text-2xl font-bold text-white">
-            {profile?.fullName || "Chưa cập nhật tên"}
+            {profile?.fullName || t("profile.notUpdatedName")}
           </h2>
           <p className="text-sm text-indigo-100/90">{profile?.email}</p>
           <span className="mt-3 inline-flex rounded-full border border-white/15 bg-slate-950/20 px-3 py-1 text-sm font-medium text-white backdrop-blur-sm">
-            {profile?.role === "ADMIN" ? "Quản trị viên" : "Khách hàng"}
+            {profile?.role === "ADMIN"
+              ? t("profile.roleAdmin")
+              : t("profile.roleCustomer")}
           </span>
         </div>
 
@@ -236,7 +252,7 @@ const ProfilePage = () => {
               {/* Full Name */}
               <div className="space-y-2">
                 <label className={fieldLabelClass}>
-                  <User size={16} /> Họ và tên
+                  <User size={16} /> {t("profile.fullName")}
                 </label>
                 <input
                   type="text"
@@ -245,14 +261,14 @@ const ProfilePage = () => {
                     setFormData({ ...formData, fullName: e.target.value })
                   }
                   className={inputClass}
-                  placeholder="Nhập họ và tên"
+                  placeholder={t("profile.fullNamePlaceholder")}
                 />
               </div>
 
               {/* Email (read-only) */}
               <div className="space-y-2">
                 <label className={fieldLabelClass}>
-                  <Mail size={16} /> Email
+                  <Mail size={16} /> {t("auth.email")}
                 </label>
                 <input
                   type="email"
@@ -265,7 +281,7 @@ const ProfilePage = () => {
               {/* Phone */}
               <div className="space-y-2">
                 <label className={fieldLabelClass}>
-                  <Phone size={16} /> Số điện thoại
+                  <Phone size={16} /> {t("profile.phone")}
                 </label>
                 <input
                   type="tel"
@@ -274,14 +290,14 @@ const ProfilePage = () => {
                     setFormData({ ...formData, phone: e.target.value })
                   }
                   className={inputClass}
-                  placeholder="Nhập số điện thoại"
+                  placeholder={t("profile.phonePlaceholder")}
                 />
               </div>
 
               {/* Date of Birth */}
               <div className="space-y-2">
                 <label className={fieldLabelClass}>
-                  <Calendar size={16} /> Ngày sinh
+                  <Calendar size={16} /> {t("profile.dateOfBirth")}
                 </label>
                 <input
                   type="date"
@@ -296,7 +312,7 @@ const ProfilePage = () => {
               {/* Address */}
               <div className="space-y-2">
                 <label className={fieldLabelClass}>
-                  <MapPin size={16} /> Địa chỉ
+                  <MapPin size={16} /> {t("profile.address")}
                 </label>
                 <textarea
                   value={formData.address}
@@ -304,7 +320,7 @@ const ProfilePage = () => {
                     setFormData({ ...formData, address: e.target.value })
                   }
                   className={`${inputClass} min-h-[88px] resize-y`}
-                  placeholder="Nhập địa chỉ nhận hàng mặc định"
+                  placeholder={t("profile.addressPlaceholder")}
                   rows={2}
                 />
               </div>
@@ -314,7 +330,7 @@ const ProfilePage = () => {
                 <button
                   onClick={() => setIsEditing(false)}
                   className="flex-1 rounded-xl border border-slate-200 px-6 py-3 font-semibold text-slate-600 transition-colors hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800">
-                  Hủy
+                  {t("common.cancel")}
                 </button>
                 <button
                   onClick={handleSaveProfile}
@@ -322,8 +338,8 @@ const ProfilePage = () => {
                   className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-indigo-700">
                   <Save size={18} />
                   {updateProfileMutation.isPending
-                    ? "Đang lưu..."
-                    : "Lưu thay đổi"}
+                    ? t("common.saving")
+                    : t("profile.saveChanges")}
                 </button>
               </div>
             </div>
@@ -336,10 +352,10 @@ const ProfilePage = () => {
                   <User size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Họ và tên
+                      {t("profile.fullName")}
                     </p>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
-                      {profile?.fullName || "Chưa cập nhật"}
+                      {profile?.fullName || t("profile.notUpdated")}
                     </p>
                   </div>
                 </div>
@@ -351,7 +367,7 @@ const ProfilePage = () => {
                   <Mail size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Email
+                      {t("auth.email")}
                     </p>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.email}
@@ -366,10 +382,10 @@ const ProfilePage = () => {
                   <Phone size={18} className="text-slate-400 dark:text-slate-500" />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Số điện thoại
+                      {t("profile.phone")}
                     </p>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
-                      {profile?.phone || "Chưa cập nhật"}
+                      {profile?.phone || t("profile.notUpdated")}
                     </p>
                   </div>
                 </div>
@@ -384,14 +400,15 @@ const ProfilePage = () => {
                   />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Ngày sinh
+                      {t("profile.dateOfBirth")}
                     </p>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
                       {profile?.dateOfBirth
-                        ? new Date(profile.dateOfBirth).toLocaleDateString(
-                            "vi-VN",
+                        ? formatDate(
+                            profile.dateOfBirth,
+                            i18n.resolvedLanguage,
                           )
-                        : "Chưa cập nhật"}
+                        : t("profile.notUpdated")}
                     </p>
                   </div>
                 </div>
@@ -406,10 +423,10 @@ const ProfilePage = () => {
                   />
                   <div>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      Địa chỉ
+                      {t("profile.address")}
                     </p>
                     <p className="font-medium text-slate-900 dark:text-slate-100">
-                      {profile?.address || "Chưa cập nhật"}
+                      {profile?.address || t("profile.notUpdated")}
                     </p>
                   </div>
                 </div>
@@ -419,7 +436,7 @@ const ProfilePage = () => {
               <button
                 onClick={handleEditProfile}
                 className="mt-4 w-full rounded-xl border border-indigo-200 bg-indigo-50/70 px-6 py-3 font-semibold text-indigo-700 transition-colors hover:bg-indigo-100 dark:border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-200 dark:hover:bg-indigo-500/15">
-                Chỉnh sửa thông tin
+                {t("profile.editInformation")}
               </button>
             </div>
           )}
@@ -435,10 +452,10 @@ const ProfilePage = () => {
               <MapPin size={20} className="text-indigo-600" />
               <div>
                 <p className="font-medium text-slate-900 dark:text-slate-100">
-                  Địa chỉ giao hàng
+                  {t("profile.shippingAddresses")}
                 </p>
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Quản lý địa chỉ nhận hàng
+                  {t("profile.manageShippingAddresses")}
                 </p>
               </div>
             </div>
@@ -455,7 +472,7 @@ const ProfilePage = () => {
               onClick={() => setShowPasswordForm(!showPasswordForm)}
               className="flex items-center gap-2 font-semibold text-slate-700 transition-colors hover:text-indigo-600 dark:text-slate-200 dark:hover:text-indigo-300">
               <Lock size={18} />
-              Đổi mật khẩu
+              {t("profile.changePassword")}
             </button>
 
             {showPasswordForm && (
@@ -467,7 +484,7 @@ const ProfilePage = () => {
                     type={showCurrentPassword ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Mật khẩu hiện tại"
+                    placeholder={t("profile.currentPassword")}
                     className={`${inputClass} pr-12`}
                     required
                   />
@@ -488,7 +505,7 @@ const ProfilePage = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mật khẩu mới"
+                    placeholder={t("profile.newPassword")}
                     className={`${inputClass} pr-12`}
                     required
                   />
@@ -505,7 +522,7 @@ const ProfilePage = () => {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Xác nhận mật khẩu mới"
+                    placeholder={t("profile.confirmNewPassword")}
                     className={`w-full rounded-xl border px-4 py-3 text-slate-900 outline-none focus:border-transparent focus:ring-2 focus:ring-indigo-500 dark:bg-slate-900 dark:text-slate-100 dark:placeholder:text-slate-500 ${
                       confirmPassword && confirmPassword !== newPassword
                         ? "border-red-300 dark:border-red-500/60"
@@ -531,8 +548,8 @@ const ProfilePage = () => {
                   }
                   className="w-full rounded-xl bg-slate-900 py-3 font-semibold text-white transition-colors hover:bg-slate-800 disabled:bg-slate-300 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white dark:disabled:bg-slate-700 dark:disabled:text-slate-400">
                   {changePasswordMutation.isPending
-                    ? "Đang xử lý..."
-                    : "Đổi mật khẩu"}
+                    ? t("common.processing")
+                    : t("profile.changePasswordAction")}
                 </button>
               </form>
             )}

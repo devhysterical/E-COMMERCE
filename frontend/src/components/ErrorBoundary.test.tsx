@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import ErrorBoundary from "./ErrorBoundary";
+import i18n from "../i18n";
 
 // Component luôn throw error để test ErrorBoundary
 const ThrowError = ({ message = "Test error" }: { message?: string }) => {
@@ -12,6 +13,10 @@ const ThrowError = ({ message = "Test error" }: { message?: string }) => {
 const HappyChild = () => <div>All is well</div>;
 
 describe("ErrorBoundary", () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage("vi");
+  });
+
   it("should render children when no error", () => {
     render(
       <ErrorBoundary>
@@ -32,9 +37,9 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Đã xảy ra lỗi")).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("errorBoundary.title"))).toBeInTheDocument();
     expect(
-      screen.getByText(/Ứng dụng gặp sự cố không mong muốn/),
+      screen.getByText(i18n.t("errorBoundary.description")),
     ).toBeInTheDocument();
 
     spy.mockRestore();
@@ -49,8 +54,8 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Thử lại")).toBeInTheDocument();
-    expect(screen.getByText("Về trang chủ")).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("errorBoundary.retry"))).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("errorBoundary.backHome"))).toBeInTheDocument();
 
     spy.mockRestore();
   });
@@ -71,11 +76,11 @@ describe("ErrorBoundary", () => {
       </ErrorBoundary>,
     );
 
-    expect(screen.getByText("Đã xảy ra lỗi")).toBeInTheDocument();
+    expect(screen.getByText(i18n.t("errorBoundary.title"))).toBeInTheDocument();
 
     // Fix: component sẽ re-render sau khi retry
     shouldThrow = false;
-    await user.click(screen.getByText("Thử lại"));
+    await user.click(screen.getByText(i18n.t("errorBoundary.retry")));
 
     // After retry, ErrorBoundary resets state — re-render children
     rerender(

@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { changeLanguage } from "../i18n";
 import { Globe } from "lucide-react";
+import { normalizeAppLanguage } from "../utils/language";
 
 const LanguageSwitcher = () => {
-  const { i18n } = useTranslation();
-  const currentLang = i18n.language;
+  const { i18n, t } = useTranslation();
+  const currentLang = normalizeAppLanguage(i18n.resolvedLanguage);
 
   return (
     <div className="flex items-center gap-1 p-1 rounded-xl bg-slate-100 dark:bg-slate-800">
@@ -15,7 +16,7 @@ const LanguageSwitcher = () => {
             ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400"
             : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         }`}
-        aria-label="Tiếng Việt">
+        aria-label={t("settings.vietnamese")}>
         <span className="text-base">🇻🇳</span>
         <span className="text-sm font-medium hidden sm:inline">VI</span>
       </button>
@@ -26,7 +27,7 @@ const LanguageSwitcher = () => {
             ? "bg-white dark:bg-slate-700 shadow-sm text-indigo-600 dark:text-indigo-400"
             : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
         }`}
-        aria-label="English">
+        aria-label={t("settings.english")}>
         <span className="text-base">🇬🇧</span>
         <span className="text-sm font-medium hidden sm:inline">EN</span>
       </button>
@@ -36,8 +37,8 @@ const LanguageSwitcher = () => {
 
 // Compact version for header
 export const LanguageSwitcherCompact = () => {
-  const { i18n } = useTranslation();
-  const currentLang = i18n.language;
+  const { i18n, t } = useTranslation();
+  const currentLang = normalizeAppLanguage(i18n.resolvedLanguage);
 
   const toggleLanguage = () => {
     changeLanguage(currentLang === "vi" ? "en" : "vi");
@@ -47,7 +48,7 @@ export const LanguageSwitcherCompact = () => {
     <button
       onClick={toggleLanguage}
       className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-      aria-label="Đổi ngôn ngữ">
+      aria-label={t("settings.switchLanguage")}>
       <Globe size={18} className="text-slate-600 dark:text-slate-400" />
       <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
         {currentLang === "vi" ? "VI 🇻🇳" : "EN 🇬🇧"}

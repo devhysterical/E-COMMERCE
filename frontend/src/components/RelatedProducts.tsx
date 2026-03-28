@@ -1,7 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { ProductService } from "../services/api.service";
 import { Link } from "react-router-dom";
 import { PackageSearch } from "lucide-react";
+import { formatCurrency } from "../utils/language";
 
 interface RelatedProductsProps {
   productId: string;
@@ -9,6 +11,7 @@ interface RelatedProductsProps {
 }
 
 const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
+  const { t, i18n } = useTranslation();
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["related-products", productId],
     queryFn: () => ProductService.getRelated(productId, limit),
@@ -19,7 +22,7 @@ const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
     return (
       <div className="space-y-4">
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-          Sản phẩm liên quan
+          {t("product.relatedProducts")}
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
@@ -42,7 +45,7 @@ const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
       <div className="flex items-center gap-2">
         <PackageSearch className="text-indigo-600" size={24} />
         <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-          Sản phẩm liên quan
+          {t("product.relatedProducts")}
         </h3>
       </div>
 
@@ -61,7 +64,7 @@ const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
-                  No Image
+                  {t("product.noImage")}
                 </div>
               )}
             </div>
@@ -70,7 +73,7 @@ const RelatedProducts = ({ productId, limit = 4 }: RelatedProductsProps) => {
                 {product.shortName || product.name}
               </h4>
               <p className="text-indigo-600 font-bold mt-1 text-sm">
-                {product.price.toLocaleString("vi-VN")}đ
+                {formatCurrency(product.price, i18n.resolvedLanguage)}
               </p>
             </div>
           </Link>

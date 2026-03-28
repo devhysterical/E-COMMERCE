@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { BannerService, UploadService } from "../services/api.service";
 import type { Banner } from "../services/api.service";
@@ -17,6 +18,7 @@ import {
 import Pagination from "./Pagination";
 
 const AdminBannersTab = () => {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showModal, setShowModal] = useState(false);
   const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
@@ -33,10 +35,10 @@ const AdminBannersTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
       queryClient.invalidateQueries({ queryKey: ["banners"] });
-      toast.success("Tạo banner thành công!");
+      toast.success(t("admin.banners.createSuccess"));
       setShowModal(false);
     },
-    onError: () => toast.error("Tạo banner thất bại!"),
+    onError: () => toast.error(t("admin.banners.createFailed")),
   });
 
   const updateMutation = useMutation({
@@ -62,11 +64,11 @@ const AdminBannersTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
       queryClient.invalidateQueries({ queryKey: ["banners"] });
-      toast.success("Cập nhật banner thành công!");
+      toast.success(t("admin.banners.updateSuccess"));
       setShowModal(false);
       setEditingBanner(null);
     },
-    onError: () => toast.error("Cập nhật banner thất bại!"),
+    onError: () => toast.error(t("admin.banners.updateFailed")),
   });
 
   const deleteMutation = useMutation({
@@ -74,9 +76,9 @@ const AdminBannersTab = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
       queryClient.invalidateQueries({ queryKey: ["banners"] });
-      toast.success("Xóa banner thành công!");
+      toast.success(t("admin.banners.deleteSuccess"));
     },
-    onError: () => toast.error("Xóa banner thất bại!"),
+    onError: () => toast.error(t("admin.banners.deleteFailed")),
   });
 
   const handleEdit = (banner: Banner) => {
@@ -92,7 +94,7 @@ const AdminBannersTab = () => {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm("Bạn có chắc chắn muốn xóa banner này?")) {
+    if (confirm(t("admin.banners.confirmDelete"))) {
       deleteMutation.mutate(id);
     }
   };
@@ -110,16 +112,17 @@ const AdminBannersTab = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          Quản lý Banner/Slider
+          {t("admin.banners.title")}
         </h2>
         <button
           onClick={() => {
             setEditingBanner(null);
             setShowModal(true);
           }}
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+        >
           <Plus size={20} />
-          Thêm Banner
+          {t("admin.banners.addBanner")}
         </button>
       </div>
 
@@ -127,11 +130,12 @@ const AdminBannersTab = () => {
       {banners.length === 0 ? (
         <div className="text-center py-12 bg-slate-50 dark:bg-slate-800 rounded-xl">
           <Image size={48} className="mx-auto text-slate-300 dark:text-slate-500 mb-4" />
-          <p className="text-slate-500 dark:text-slate-400">Chưa có banner nào</p>
+          <p className="text-slate-500 dark:text-slate-400">{t("admin.banners.noBanners")}</p>
           <button
             onClick={() => setShowModal(true)}
-            className="mt-4 text-indigo-600 hover:underline">
-            Thêm banner đầu tiên
+            className="mt-4 text-indigo-600 hover:underline"
+          >
+            {t("admin.banners.addFirst")}
           </button>
         </div>
       ) : (
@@ -144,7 +148,8 @@ const AdminBannersTab = () => {
                   banner.isActive
                     ? "border-slate-200 dark:border-slate-700"
                     : "border-slate-100 dark:border-slate-800 opacity-60"
-                }`}>
+                }`}
+              >
                 <div className="w-32 h-20 rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800 flex-shrink-0">
                   <img
                     src={banner.imageUrl}
@@ -159,7 +164,7 @@ const AdminBannersTab = () => {
                     </h3>
                     {!banner.isActive && (
                       <span className="text-xs px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded">
-                        Ẩn
+                        {t("admin.banners.hidden")}
                       </span>
                     )}
                   </div>
@@ -169,14 +174,15 @@ const AdminBannersTab = () => {
                     </p>
                   )}
                   <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
-                    Thứ tự: {banner.sortOrder}
+                    {t("admin.banners.sortOrder")}: {banner.sortOrder}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => handleToggleActive(banner)}
                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    title={banner.isActive ? "Ẩn banner" : "Hiện banner"}>
+                    title={banner.isActive ? t("admin.banners.hide") : t("admin.banners.show")}
+                  >
                     {banner.isActive ? (
                       <Eye size={18} className="text-green-600" />
                     ) : (
@@ -186,13 +192,15 @@ const AdminBannersTab = () => {
                   <button
                     onClick={() => handleEdit(banner)}
                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
-                    title="Chỉnh sửa">
+                    title={t("admin.common.edit")}
+                  >
                     <Edit size={18} className="text-indigo-600" />
                   </button>
                   <button
                     onClick={() => handleDelete(banner.id)}
                     className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                    title="Xóa">
+                    title={t("admin.common.delete")}
+                  >
                     <Trash2 size={18} className="text-red-500" />
                   </button>
                 </div>
@@ -255,6 +263,7 @@ const BannerModal = ({
   onSubmit,
   isPending,
 }: BannerModalProps) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     title: banner?.title || "",
     description: banner?.description || "",
@@ -270,9 +279,9 @@ const BannerModal = ({
     try {
       const result = await UploadService.uploadImage(file);
       setFormData({ ...formData, imageUrl: result.url });
-      toast.success("Upload ảnh thành công!");
+      toast.success(t("admin.banners.uploadSuccess"));
     } catch {
-      toast.error("Upload ảnh thất bại!");
+      toast.error(t("admin.banners.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -281,7 +290,7 @@ const BannerModal = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.title || !formData.imageUrl) {
-      toast.error("Vui lòng nhập tiêu đề và hình ảnh!");
+      toast.error(t("admin.banners.requiredFields"));
       return;
     }
     onSubmit({
@@ -300,20 +309,20 @@ const BannerModal = ({
       <div className="relative bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto border border-slate-100 dark:border-slate-700">
         <div className="sticky top-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 p-4 flex items-center justify-between rounded-t-2xl">
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            {banner ? "Chỉnh sửa Banner" : "Thêm Banner mới"}
+            {banner ? t("admin.banners.editBanner") : t("admin.banners.addNewBanner")}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+            className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          >
             <X size={20} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          {/* Title */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Tiêu đề *
+              {t("admin.banners.titleLabel")} *
             </label>
             <input
               type="text"
@@ -322,14 +331,13 @@ const BannerModal = ({
                 setFormData({ ...formData, title: e.target.value })
               }
               className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Nhập tiêu đề banner"
+              placeholder={t("admin.banners.titlePlaceholder")}
             />
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Mô tả
+              {t("admin.banners.description")}
             </label>
             <textarea
               value={formData.description}
@@ -337,15 +345,14 @@ const BannerModal = ({
                 setFormData({ ...formData, description: e.target.value })
               }
               className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="Nhập mô tả (không bắt buộc)"
+              placeholder={t("admin.banners.descriptionPlaceholder")}
               rows={2}
             />
           </div>
 
-          {/* Image */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Hình ảnh *
+              {t("admin.banners.image")} *
             </label>
             {formData.imageUrl ? (
               <div className="relative rounded-lg overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -357,7 +364,8 @@ const BannerModal = ({
                 <button
                   type="button"
                   onClick={() => setFormData({ ...formData, imageUrl: "" })}
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600">
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                >
                   <X size={16} />
                 </button>
               </div>
@@ -370,7 +378,7 @@ const BannerModal = ({
                   } text-slate-400`}
                 />
                 <span className="text-sm text-slate-500 dark:text-slate-400 mt-2">
-                  {isUploading ? "Đang upload..." : "Click để upload ảnh"}
+                  {isUploading ? t("admin.banners.uploading") : t("admin.banners.clickUpload")}
                 </span>
                 <input
                   type="file"
@@ -385,10 +393,9 @@ const BannerModal = ({
             )}
           </div>
 
-          {/* Link URL */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Link khi click
+              {t("admin.banners.linkUrl")}
             </label>
             <input
               type="url"
@@ -397,14 +404,13 @@ const BannerModal = ({
                 setFormData({ ...formData, linkUrl: e.target.value })
               }
               className="w-full px-4 py-2 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="https://example.com (không bắt buộc)"
+              placeholder={t("admin.banners.linkPlaceholder")}
             />
           </div>
 
-          {/* Sort Order */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-              Thứ tự hiển thị
+              {t("admin.banners.sortOrder")}
             </label>
             <input
               type="number"
@@ -420,7 +426,6 @@ const BannerModal = ({
             />
           </div>
 
-          {/* Is Active */}
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -432,24 +437,25 @@ const BannerModal = ({
               className="w-5 h-5 text-indigo-600 rounded border-slate-300"
             />
             <label htmlFor="isActive" className="text-sm text-slate-700 dark:text-slate-300">
-              Hiển thị banner này
+              {t("admin.banners.showBanner")}
             </label>
           </div>
 
-          {/* Submit */}
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
-              Hủy
+              className="flex-1 px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+            >
+              {t("admin.common.cancel")}
             </button>
             <button
               type="submit"
               disabled={isPending || isUploading}
-              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
+            >
               <Save size={18} />
-              {isPending ? "Đang lưu..." : "Lưu banner"}
+              {isPending ? t("admin.common.saving") : t("admin.banners.saveBanner")}
             </button>
           </div>
         </form>

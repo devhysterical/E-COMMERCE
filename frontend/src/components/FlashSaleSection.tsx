@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from "react-i18next";
 import { FlashSaleService } from "../services/api.service";
 import type { FlashSaleItem } from "../services/api.service";
 import { Zap } from "lucide-react";
 import { Link } from "react-router-dom";
-
-const formatVND = (value: number) => value.toLocaleString("vi-VN");
+import { formatCurrency } from "../utils/language";
 
 export default function FlashSaleSection() {
+  const { t, i18n } = useTranslation();
   const { data: flashSales = [] } = useQuery({
     queryKey: ["flash-sales-active"],
     queryFn: FlashSaleService.getActive,
@@ -22,10 +23,10 @@ export default function FlashSaleSection() {
         <div className="flex items-center gap-2">
           <Zap className="text-orange-500" size={22} />
           <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-            Flash Sale
+            {t("flashSale.title")}
           </h2>
           <span className="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold uppercase animate-pulse">
-            Hot
+            {t("flashSale.hot")}
           </span>
         </div>
       </div>
@@ -62,10 +63,10 @@ export default function FlashSaleSection() {
 
                 <div className="flex items-baseline gap-2 mt-1">
                   <span className="text-red-600 font-bold text-sm">
-                    {formatVND(item.salePrice)}đ
+                    {formatCurrency(item.salePrice, i18n.resolvedLanguage)}
                   </span>
                   <span className="text-slate-400 dark:text-slate-500 text-xs line-through">
-                    {formatVND(item.product.price)}đ
+                    {formatCurrency(item.product.price, i18n.resolvedLanguage)}
                   </span>
                 </div>
 
@@ -78,7 +79,10 @@ export default function FlashSaleSection() {
                     />
                   </div>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 text-center">
-                    Đã bán {item.soldQty}/{item.saleQty}
+                    {t("flashSale.sold", {
+                      sold: item.soldQty,
+                      total: item.saleQty,
+                    })}
                   </p>
                 </div>
               </div>
