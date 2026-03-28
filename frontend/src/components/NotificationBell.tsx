@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { Bell, Package, Star, Megaphone, Info, Check } from "lucide-react";
@@ -49,9 +49,13 @@ export default function NotificationBell() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
   const languageTag = getLanguageTag(i18n.resolvedLanguage);
-  const relativeTime = new Intl.RelativeTimeFormat(languageTag, {
-    numeric: "auto",
-  });
+  const relativeTime = useMemo(
+    () =>
+      new Intl.RelativeTimeFormat(languageTag, {
+        numeric: "auto",
+      }),
+    [languageTag],
+  );
 
   const timeAgo = useCallback(
     (dateStr: string) => {

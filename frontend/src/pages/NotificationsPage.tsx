@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bell, Package, Star, Megaphone, Info, Check } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -23,8 +23,10 @@ export default function NotificationsPage() {
   const { t, i18n } = useTranslation();
   const [filter, setFilter] = useState<FilterType>("all");
   const [page, setPage] = useState(1);
+  const [now, setNow] = useState(() => Date.now());
   const queryClient = useQueryClient();
-  const languageTag = getLanguageTag(i18n.resolvedLanguage);
+  const currentLanguage = i18n.resolvedLanguage ?? i18n.language;
+  const languageTag = getLanguageTag(currentLanguage);
 
   const typeConfig: Record<
     string,
@@ -56,12 +58,26 @@ export default function NotificationsPage() {
     },
   };
 
-  const relativeTime = new Intl.RelativeTimeFormat(languageTag, {
-    numeric: "auto",
-  });
+  const relativeTime = useMemo(
+    () =>
+      new Intl.RelativeTimeFormat(languageTag, {
+        numeric: "auto",
+      }),
+    [languageTag],
+  );
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setNow(Date.now());
+    }, 60000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, []);
 
   const timeAgo = (dateStr: string) => {
-    const diff = Date.now() - new Date(dateStr).getTime();
+    const diff = now - new Date(dateStr).getTime();
     const minutes = Math.floor(diff / 60000);
     if (minutes < 1) return t("notifications.justNow");
     if (minutes < 60) return relativeTime.format(-minutes, "minute");
@@ -69,7 +85,7 @@ export default function NotificationsPage() {
     if (hours < 24) return relativeTime.format(-hours, "hour");
     const days = Math.floor(hours / 24);
     if (days < 7) return relativeTime.format(-days, "day");
-    return formatDate(dateStr, i18n.resolvedLanguage);
+    return formatDate(dateStr, currentLanguage);
   };
 
   const { data, isLoading } = useQuery({

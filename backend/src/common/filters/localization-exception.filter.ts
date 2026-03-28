@@ -38,7 +38,10 @@ export class LocalizationExceptionFilter implements ExceptionFilter {
             }
           : Array.isArray(rawResponse)
             ? { statusCode: status, message: rawResponse }
-            : { statusCode: status, ...(rawResponse as Record<string, unknown>) };
+            : {
+                statusCode: status,
+                ...(rawResponse as Record<string, unknown>),
+              };
 
       response
         .status(status)

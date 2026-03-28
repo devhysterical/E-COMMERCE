@@ -16,57 +16,40 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Scan for hardcoded secrets
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: 1.24.0
+
+      - name: Install Gitleaks
+        env:
+          GOBIN: ${{ runner.temp }}/bin
         run: |
-          echo "🔍 Scanning tracked files for hardcoded secrets..."
-          FOUND=0
+          mkdir -p "$GOBIN"
+          go install github.com/zricethezav/gitleaks/v8@v8.30.1
 
-          # Patterns: JWT tokens, private keys, provider secrets,
-          # and direct assignments to secret-like variable names.
-          PATTERNS=(
-            'eyJhbGciOi'
-            'PRIVATE KEY'
-            'GOCSPX-'
-            'sk_live_'
-            'sk_test_'
-            'AKIA[0-9A-Z]{16}'
-            'smtp_pass'
-            '(^|[^[:alnum:]_])[A-Za-z_][A-Za-z0-9_]*(password|passwd|pwd|secret|api[_-]?key|token)[A-Za-z0-9_]*[[:space:]]*[:=][[:space:]]*["\x27][^"\x27]{8,}["\x27]'
-          )
+      - name: Scan tracked files with Gitleaks
+        env:
+          GITLEAKS_BIN: ${{ runner.temp }}/bin/gitleaks
+          SCAN_DIR: ${{ runner.temp }}/gitleaks-target
+        run: |
+          echo "🔍 Scanning tracked files with Gitleaks..."
+          rm -rf "$SCAN_DIR"
+          mkdir -p "$SCAN_DIR"
 
-          for pattern in "${PATTERNS[@]}"; do
-            MATCHES=$(
-              git ls-files -z -- \
-                ':!*.lock' \
-                ':!package-lock.json' \
-                ':!*.env.example' \
-                ':!.github/workflows/ci.yml' \
-                ':!.agent/**' \
-                ':!.shared/**' \
-                ':!**/dist/**' \
-                ':!*.map' \
-                ':!*.csv' \
-              | xargs -0 grep -nEI -- "$pattern" 2>/dev/null || true
-            )
-            if [ -n "$MATCHES" ]; then
-              echo "🔴BLOCKED — Pattern '$pattern' found in:"
-              echo "$MATCHES" | while read -r file; do
-                echo "   → $file"
-              done
-              FOUND=1
-            fi
-          done
+          # Scan only tracked files from the checked-out revision.
+          # This keeps CI deterministic and avoids local-only files such as .env or dist artifacts.
+          git archive --format=tar HEAD | tar -xf - -C "$SCAN_DIR"
 
-          if [ "$FOUND" -eq 1 ]; then
-            echo ""
-            echo "❌Secret scan FAILED. Remove hardcoded secrets before pushing."
-            echo "   Use environment variables or GitHub Secrets instead."
-            exit 1
-          fi
+          "$GITLEAKS_BIN" dir "$SCAN_DIR" \
+            --no-banner \
+            --no-color \
+            --redact \
+            --exit-code 1
 
-          echo "✅No hardcoded secrets detected."
+          echo "✅ No hardcoded secrets detected."
 
   # ============================================
   # Backend CI
@@ -81,10 +64,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm
@@ -123,10 +106,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 20
           cache: npm

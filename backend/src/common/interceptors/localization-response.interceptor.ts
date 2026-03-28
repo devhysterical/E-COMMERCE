@@ -19,15 +19,17 @@ export class LocalizationResponseInterceptor implements NestInterceptor {
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     const httpContext = context.switchToHttp();
-    const request = httpContext.getRequest<{ headers: Record<string, string> }>();
+    const request = httpContext.getRequest<{
+      headers: Record<string, string>;
+    }>();
     const response = httpContext.getResponse<Response>();
     const language = resolveAppLanguage(request.headers['accept-language']);
 
     response.setHeader('Content-Language', getLanguageTag(language));
     response.setHeader('Vary', 'Accept-Language');
 
-    return next.handle().pipe(
-      map((data) => {
+    return (next.handle() as Observable<unknown>).pipe(
+      map((data: unknown): unknown => {
         if (
           data == null ||
           data instanceof StreamableFile ||

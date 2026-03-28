@@ -59,4 +59,5 @@ export const resolveAppLanguage = (
   return 'vi';
 };
 
-export const getLanguageTag = (language: AppLanguage) => LANGUAGE_TAGS[language];
+export const getLanguageTag = (language: AppLanguage) =>
+  LANGUAGE_TAGS[language];

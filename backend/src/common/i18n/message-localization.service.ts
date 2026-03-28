@@ -41,11 +41,20 @@ export class MessageLocalizationService {
       'This email is already linked to Google sign-in. Please use "Sign in with Google" instead.',
     ],
     ['Email đã được đăng ký', 'Email is already registered'],
-    ['Mã OTP đã được gửi đến email của bạn', 'An OTP code has been sent to your email'],
-    ['Mã OTP không đúng hoặc đã hết hạn', 'The OTP code is invalid or has expired'],
+    [
+      'Mã OTP đã được gửi đến email của bạn',
+      'An OTP code has been sent to your email',
+    ],
+    [
+      'Mã OTP không đúng hoặc đã hết hạn',
+      'The OTP code is invalid or has expired',
+    ],
     ['Email đã tồn tại', 'Email already exists'],
     ['Thông tin đăng nhập không chính xác', 'Invalid login credentials'],
-    ['Refresh token không hợp lệ hoặc đã hết hạn', 'Refresh token is invalid or expired'],
+    [
+      'Refresh token không hợp lệ hoặc đã hết hạn',
+      'Refresh token is invalid or expired',
+    ],
     ['Người dùng không tồn tại', 'User not found'],
     ['Đăng xuất thành công', 'Logged out successfully'],
     [
@@ -84,9 +93,18 @@ export class MessageLocalizationService {
     ['Giỏ hàng trống', 'Cart is empty'],
     ['Đơn hàng không tồn tại', 'Order not found'],
     ['Đánh giá không tồn tại', 'Review not found'],
-    ['Bạn không có quyền sửa đánh giá này', 'You do not have permission to edit this review'],
-    ['Bạn không có quyền xóa đánh giá này', 'You do not have permission to delete this review'],
-    ['Sản phẩm không có trong danh sách yêu thích', 'Product is not in the wishlist'],
+    [
+      'Bạn không có quyền sửa đánh giá này',
+      'You do not have permission to edit this review',
+    ],
+    [
+      'Bạn không có quyền xóa đánh giá này',
+      'You do not have permission to delete this review',
+    ],
+    [
+      'Sản phẩm không có trong danh sách yêu thích',
+      'Product is not in the wishlist',
+    ],
     ['Đã xóa khỏi danh sách yêu thích', 'Removed from wishlist'],
     ['Đã thêm vào danh sách yêu thích', 'Added to wishlist'],
     ['Mã giảm giá không tồn tại', 'Coupon not found'],
@@ -129,7 +147,10 @@ export class MessageLocalizationService {
       'Mật khẩu phải chứa ít nhất 1 chữ thường',
       'Password must contain at least 1 lowercase letter',
     ],
-    ['Mật khẩu phải chứa ít nhất 1 số', 'Password must contain at least 1 number'],
+    [
+      'Mật khẩu phải chứa ít nhất 1 số',
+      'Password must contain at least 1 number',
+    ],
     [
       'Mật khẩu phải chứa ít nhất 1 ký tự đặc biệt',
       'Password must contain at least 1 special character',
@@ -200,7 +221,8 @@ export class MessageLocalizationService {
     {
       vi: /^Sản phẩm (.+) không đủ tồn kho$/,
       en: /^Product (.+) does not have enough stock$/,
-      toEn: ([, productName]) => `Product ${productName} does not have enough stock`,
+      toEn: ([, productName]) =>
+        `Product ${productName} does not have enough stock`,
       toVi: ([, productName]) => `Sản phẩm ${productName} không đủ tồn kho`,
     },
     {
@@ -314,9 +336,9 @@ export class MessageLocalizationService {
     return value;
   }
 
-  localizeValue<T>(value: T, language: AppLanguage): T {
+  localizeValue(value: unknown, language: AppLanguage): unknown {
     if (typeof value === 'string') {
-      return this.localizeText(value, language) as T;
+      return this.localizeText(value, language);
     }
 
     if (
@@ -330,19 +352,24 @@ export class MessageLocalizationService {
     }
 
     if (Array.isArray(value)) {
-      return value.map((item) => this.localizeValue(item, language)) as T;
+      return value.map((item) => this.localizeValue(item, language));
     }
 
-    if (typeof value === 'object') {
-      return Object.fromEntries(
-        Object.entries(value as Record<string, unknown>).map(([key, item]) => [
-          key,
-          this.localizeValue(item, language),
-        ]),
-      ) as T;
+    if (this.isPlainRecord(value)) {
+      const localizedRecord: Record<string, unknown> = {};
+
+      for (const [key, item] of Object.entries(value)) {
+        localizedRecord[key] = this.localizeValue(item, language);
+      }
+
+      return localizedRecord;
     }
 
     return value;
+  }
+
+  private isPlainRecord(value: unknown): value is Record<string, unknown> {
+    return Object.prototype.toString.call(value) === '[object Object]';
   }
 
   private formatCurrency(
@@ -361,7 +388,10 @@ export class MessageLocalizationService {
     return language === 'en' ? `${formatted} VND` : `${formatted}đ`;
   }
 
-  private formatNumber(rawValue: string | number, language: AppLanguage): string {
+  private formatNumber(
+    rawValue: string | number,
+    language: AppLanguage,
+  ): string {
     const parsedValue = this.parseNumericValue(rawValue);
     if (parsedValue === null) {
       return String(rawValue);
