@@ -18,17 +18,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: 1.24.0
-
       - name: Install Gitleaks
         env:
-          GOBIN: ${{ runner.temp }}/bin
+          GITLEAKS_VERSION: 8.30.1
+          GITLEAKS_BIN_DIR: ${{ runner.temp }}/bin
         run: |
-          mkdir -p "$GOBIN"
-          go install github.com/zricethezav/gitleaks/v8@v8.30.1
+          mkdir -p "$GITLEAKS_BIN_DIR"
+          curl -sSfL \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz" \
+            | tar -xz -C "$GITLEAKS_BIN_DIR" gitleaks
+          chmod +x "$GITLEAKS_BIN_DIR/gitleaks"
 
       - name: Scan tracked files with Gitleaks
         env:
