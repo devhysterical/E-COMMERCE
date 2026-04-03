@@ -1,6 +1,7 @@
 import {
   Injectable,
   BadRequestException,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,6 +15,7 @@ import { OrderStatus, PaymentMethod, PaymentStatus } from '@prisma/client';
 
 @Injectable()
 export class OrdersService {
+  private readonly logger = new Logger(OrdersService.name);
   constructor(
     private prisma: PrismaService,
     private cartsService: CartsService,
@@ -154,16 +156,16 @@ export class OrdersService {
         });
       }
 
-      // 3. Cập nhật soldQty cho flash sale items
+      // 3. Cập nhật soldQty cho flash sale items (trong transaction)
       for (const [productId, flashInfo] of flashSaleMap) {
         const cartItem = cart.cartItems.find(
           (ci) => ci.productId === productId,
         );
         if (cartItem) {
-          await this.flashSaleService.incrementSoldQty(
-            flashInfo.flashSaleItemId,
-            cartItem.quantity,
-          );
+          await tx.flashSaleItem.update({
+            where: { id: flashInfo.flashSaleItemId },
+            data: { soldQty: { increment: cartItem.quantity } },
+          });
         }
       }
 
@@ -191,18 +193,25 @@ export class OrdersService {
       // 6. Gửi email xác nhận đơn hàng
       const user = await tx.user.findUnique({ where: { id: userId } });
       if (user?.email) {
-        void this.emailService.sendOrderConfirmationEmail(user.email, {
-          orderId: order.id,
-          totalAmount: finalAmount,
-          discountAmount,
-          items: cart.cartItems.map((item) => ({
-            name: item.product.name,
-            quantity: item.quantity,
-            price: item.product.price * item.quantity,
-          })),
-          address,
-          paymentMethod,
-        });
+        this.emailService
+          .sendOrderConfirmationEmail(user.email, {
+            orderId: order.id,
+            totalAmount: finalAmount,
+            discountAmount,
+            items: cart.cartItems.map((item) => ({
+              name: item.product.name,
+              quantity: item.quantity,
+              price: item.product.price * item.quantity,
+            })),
+            address,
+            paymentMethod,
+          })
+          .catch((err: Error) => {
+            this.logger.error(
+              `Failed to send order confirmation email: ${err.message}`,
+              err.stack,
+            );
+          });
       }
 
       return order;
@@ -339,14 +348,18 @@ export class OrdersService {
         DELIVERED: 'Đã giao hàng',
         CANCELLED: 'Đã hủy',
       };
-      void this.emailService.sendOrderStatusUpdateEmail(
-        updatedOrder.user.email,
-        {
+      this.emailService
+        .sendOrderStatusUpdateEmail(updatedOrder.user.email, {
           orderId: id,
           status,
           statusLabel: statusLabels[status] || status,
-        },
-      );
+        })
+        .catch((err: Error) => {
+          this.logger.error(
+            `Failed to send order status email: ${err.message}`,
+            err.stack,
+          );
+        });
 
       // Gửi notification in-app
       void this.notificationsService.create({

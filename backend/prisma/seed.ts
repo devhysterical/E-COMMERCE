@@ -11,7 +11,10 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  const adminPassword = await bcrypt.hash('admin123', 10);
+  const adminPassword = await bcrypt.hash(
+    process.env.ADMIN_SEED_PASSWORD || 'Admin@123',
+    10,
+  );
 
   // Tạo Admin
   const admin = await prisma.user.upsert({

@@ -34,8 +34,8 @@ const mockCartsService = {
 };
 
 const mockEmailService = {
-  sendOrderConfirmationEmail: jest.fn(),
-  sendOrderStatusUpdateEmail: jest.fn(),
+  sendOrderConfirmationEmail: jest.fn().mockResolvedValue(undefined),
+  sendOrderStatusUpdateEmail: jest.fn().mockResolvedValue(undefined),
 };
 
 const mockShippingService = {
@@ -144,6 +144,7 @@ describe('OrdersService', () => {
               .mockResolvedValue({ stock: 50, name: 'Áo thun' }),
             update: jest.fn(),
           },
+          flashSaleItem: { update: jest.fn() },
           cartItem: { deleteMany: jest.fn() },
           user: {
             findUnique: jest.fn().mockResolvedValue({
@@ -187,6 +188,7 @@ describe('OrdersService', () => {
               .mockResolvedValue({ stock: 50, name: 'Áo thun' }),
             update: jest.fn(),
           },
+          flashSaleItem: { update: jest.fn() },
           cartItem: { deleteMany: jest.fn() },
           user: { findUnique: jest.fn().mockResolvedValue(null) },
           couponUsage: { create: jest.fn() },

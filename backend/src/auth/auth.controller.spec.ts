@@ -78,7 +78,7 @@ describe('AuthController', () => {
       expect(res.cookie).toHaveBeenCalledWith(
         'access_token',
         'jwt-token',
-        expect.objectContaining({ httpOnly: true, sameSite: 'strict' }),
+        expect.objectContaining({ httpOnly: true, sameSite: 'lax' }),
       );
       expect(res.cookie).toHaveBeenCalledWith(
         'refresh_token',
