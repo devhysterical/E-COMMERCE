@@ -28,6 +28,7 @@ export interface Product {
   id: string;
   name: string;
   shortName: string | null;
+  description: string | null;
   price: number;
   stock: number;
   imageUrl: string | null;
@@ -110,6 +111,7 @@ export const ProductService = {
   create: async (data: {
     name: string;
     shortName?: string;
+    description?: string;
     price: number;
     stock: number;
     imageUrl?: string;
@@ -124,6 +126,7 @@ export const ProductService = {
     data: Partial<{
       name: string;
       shortName: string;
+      description: string;
       price: number;
       stock: number;
       imageUrl: string;

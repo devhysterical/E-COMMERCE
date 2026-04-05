@@ -83,6 +83,7 @@ model Product {
   id              String    @id @default(uuid())
   name            String
   shortName       String?   // Tên ngắn hiển thị trang chủ
+  description     String?   // Mô tả chi tiết sản phẩm
   price           Int       // Định dạng tiền tệ: Số nguyên (Integer)
   stock           Int       @default(0)
   imageUrl        String?   // Ảnh chính (backward compatible)

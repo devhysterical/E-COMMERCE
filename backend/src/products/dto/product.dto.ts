@@ -16,6 +16,10 @@ export class CreateProductDto {
   @IsOptional()
   shortName?: string;
 
+  @IsString()
+  @IsOptional()
+  description?: string;
+
   @IsInt({ message: 'Giá phải là số nguyên' })
   @Min(0, { message: 'Giá không được nhỏ hơn 0' })
   price: number;
@@ -45,6 +49,10 @@ export class UpdateProductDto {
   @IsString()
   @IsOptional()
   shortName?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @IsInt()
   @IsOptional()
